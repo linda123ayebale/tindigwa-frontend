@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';import AuthService from '../../services/authService';
 import './Login.css';
 
 const Login = ({ setIsAuthenticated }) => {
@@ -22,8 +22,7 @@ const Login = ({ setIsAuthenticated }) => {
     setError('');
     
     // Clear any existing authentication tokens to ensure fresh login
-    localStorage.removeItem('tindigwa_token');
-    localStorage.removeItem('tindigwa_user');
+    AuthService.logout();
     
     // Generate new field key to force re-render
     setFieldKey(Date.now());
@@ -79,34 +78,22 @@ const Login = ({ setIsAuthenticated }) => {
     setError('');
 
     try {
-      // Simulate API call - replace with actual authentication
       if (formData.email && formData.password) {
-        // Mock successful login
-        setTimeout(() => {
-          const mockUser = {
-            id: 1,
-            name: 'Admin User',
-            email: formData.email,
-            role: 'admin',
-            branch: 'Masaka'
-          };
-          
-          localStorage.setItem('tindigwa_token', 'mock-jwt-token');
-          localStorage.setItem('tindigwa_user', JSON.stringify(mockUser));
-          
-          // Clear form data after successful login
-          clearForm();
-          
-          setIsAuthenticated(true);
-          navigate('/dashboard');
-          setLoading(false);
-        }, 1500);
+        // Use real authentication service
+        const response = await AuthService.login(formData.email, formData.password);
+        
+        // Clear form data after successful login
+        clearForm();
+        
+        setIsAuthenticated(true);
+        navigate('/dashboard');
       } else {
         setError('Please enter both email and password');
-        setLoading(false);
       }
     } catch (err) {
-      setError('Login failed. Please try again.');
+      console.error('Login error:', err);
+      setError(err.message || 'Login failed. Please check your credentials.');
+    } finally {
       setLoading(false);
     }
   };
