@@ -1,0 +1,268 @@
+/* Add Expense Page Styles */
+.add-expense-content {
+  padding: 0 32px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding: 0 32px;
+}
+
+.header-content h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 8px 0;
+}
+
+.page-description {
+  font-size: 16px;
+  color: #718096;
+  margin: 0;
+}
+
+.cancel-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f7fafc;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #edf2f7;
+  border-color: #cbd5e0;
+}
+
+/* Form Container */
+.expense-form-container {
+  max-width: 600px;
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f1f5f9;
+}
+
+.expense-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 4px;
+}
+
+/* Input Styles */
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="date"],
+.form-group textarea {
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+/* Select Wrapper */
+.select-wrapper {
+  position: relative;
+}
+
+.select-wrapper select {
+  width: 100%;
+  padding: 12px 16px;
+  padding-right: 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  appearance: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.select-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0aec0;
+  pointer-events: none;
+}
+
+/* Date Input Wrapper */
+.date-input-wrapper {
+  position: relative;
+}
+
+.date-input-wrapper input[type="date"] {
+  width: 100%;
+}
+
+.date-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0aec0;
+  pointer-events: none;
+}
+
+/* Textarea */
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.form-group textarea::placeholder {
+  color: #a0aec0;
+}
+
+/* Input Placeholders */
+.form-group input::placeholder {
+  color: #a0aec0;
+}
+
+/* Form Actions */
+.form-actions {
+  margin-top: 8px;
+}
+
+.save-expense-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(49, 130, 206, 0.2);
+}
+
+.save-expense-btn:hover {
+  background: #2c5aa0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(49, 130, 206, 0.3);
+}
+
+.save-expense-btn:active {
+  transform: translateY(0);
+}
+
+/* Validation States */
+.form-group input:invalid:not(:placeholder-shown),
+.form-group select:invalid:not(:placeholder-shown),
+.form-group textarea:invalid:not(:placeholder-shown) {
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+}
+
+.form-group input:valid,
+.form-group select:valid,
+.form-group textarea:valid {
+  border-color: #38a169;
+}
+
+/* Required Field Indicator */
+.form-group label::after {
+  content: " *";
+  color: #e53e3e;
+  font-weight: 400;
+}
+
+.form-group:has(textarea) label::after,
+.form-group:has(#description) label::after {
+  content: "";
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+    padding: 0 20px;
+  }
+  
+  .add-expense-content {
+    padding: 0 20px;
+  }
+  
+  .expense-form-container {
+    padding: 24px;
+  }
+  
+  .header-content h1 {
+    font-size: 28px;
+  }
+  
+  .cancel-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .form-group {
+    gap: 6px;
+  }
+  
+  .expense-form {
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .expense-form-container {
+    padding: 20px;
+    border-radius: 12px;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 14px;
+  }
+  
+  .save-expense-btn {
+    padding: 12px 20px;
+  }
+}

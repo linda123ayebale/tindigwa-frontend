@@ -1,0 +1,266 @@
+.loan-registration-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f5f5f5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 280px;
+  background: #ffffff;
+  border-right: 1px solid #e5e5e5;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+
+.sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.sidebar-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #000;
+  margin: 0;
+}
+
+.sidebar-nav {
+  padding: 20px 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  color: #666;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.nav-item.active {
+  background: #e8f4fd;
+  color: #4285f4;
+  font-weight: 500;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  margin-left: 280px;
+  padding: 0;
+  background: #f5f5f5;
+}
+
+.page-header {
+  background: white;
+  padding: 32px 40px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.page-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.content-container {
+  padding: 40px;
+  max-width: 800px;
+}
+
+/* Information Sections */
+.info-section, .status-section {
+  background: white;
+  border-radius: 8px;
+  padding: 32px;
+  margin-bottom: 24px;
+  border: 1px solid #e5e5e5;
+}
+
+.info-section h2, .status-section h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 24px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-grid, .status-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.info-row, .status-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 0;
+}
+
+.info-label, .status-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.info-input {
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.info-input:focus {
+  outline: none;
+  border-color: #4285f4;
+}
+
+.info-input::placeholder {
+  color: #999;
+}
+
+.info-input select {
+  cursor: pointer;
+}
+
+.status-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Checkbox styling to match screenshot */
+.checkbox-container {
+  margin-top: 16px;
+}
+
+.agreement-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.agreement-checkbox input[type="checkbox"] {
+  opacity: 0;
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.custom-checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #ddd;
+  border-radius: 3px;
+  position: relative;
+  background: white;
+  transition: all 0.2s ease;
+}
+
+.agreement-checkbox input[type="checkbox"]:checked + .custom-checkbox {
+  background: #4285f4;
+  border-color: #4285f4;
+}
+
+.agreement-checkbox input[type="checkbox"]:checked + .custom-checkbox::after {
+  content: '';
+  position: absolute;
+  top: 1px;
+  left: 5px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.agreement-checkbox span:not(.custom-checkbox) {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Submit Button */
+.form-submit {
+  margin-top: 32px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.submit-button {
+  padding: 12px 32px;
+  background: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submit-button:hover {
+  background: #3367d6;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .main-content {
+    margin-left: 0;
+  }
+  
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  
+  .content-container {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 24px 20px;
+  }
+  
+  .content-container {
+    padding: 20px;
+  }
+  
+  .info-section, .status-section {
+    padding: 24px;
+  }
+  
+  .info-row, .status-row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .info-label, .status-label {
+    font-weight: 600;
+  }
+}

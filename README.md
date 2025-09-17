@@ -1,100 +1,103 @@
-# Tindigwa Project
+# Tindigwa Loan Management System - Frontend
 
-This repository contains both the frontend and backend components of the Tindigwa loan management system.
+This is the React frontend for the Tindigwa loan management system.
+
+## Setup Instructions
+
+### Prerequisites
+- Node.js (version 16 or higher)
+- npm (comes with Node.js)
+
+### Installation
+
+1. **Enable PowerShell script execution (if needed):**
+   ```powershell
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Start the development server:**
+   ```bash
+   npm start
+   ```
 
 ## Project Structure
 
 ```
 tindigwa-frontend/
-├── backend/                 # Spring Boot Backend Application
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   │   └── org/example/
-│   │   │   │       ├── Controllers/      # REST API Controllers
-│   │   │   │       ├── Entities/         # JPA Entity Classes
-│   │   │   │       ├── Repositories/     # Data Access Layer
-│   │   │   │       ├── Services/         # Business Logic Layer
-│   │   │   │       ├── config/           # Security & JWT Configuration
-│   │   │   │       ├── auth/             # Authentication DTOs
-│   │   │   │       └── utils/            # Utility Classes
-│   │   │   └── resources/
-│   │   │       ├── application.properties
-│   │   │       └── db/changelog/         # Liquibase Database Migrations
-│   │   └── pom.xml                       # Maven Dependencies
-│   └── README.md                         # Backend Documentation
-└── frontend/                            # Frontend Application (To be added)
+├── public/
+│   └── index.html
+├── src/
+│   ├── components/
+│   │   └── Layout/
+│   │       └── Layout.jsx
+│   ├── pages/
+│   │   └── Auth/
+│   │       ├── Setup.jsx      # Initial setup/registration screen
+│   │       ├── Setup.css
+│   │       ├── Login.jsx      # Login screen
+│   │       └── Login.css
+│   ├── App.js                 # Main app with routing
+│   ├── App.css
+│   ├── index.js
+│   └── index.css
+└── package.json
 ```
 
-## Backend Features
+## Features Implemented
 
-- **Authentication & Authorization**: JWT-based authentication system
-- **Loan Management**: Complete loan lifecycle management
-- **Client Management**: Customer profile and information handling
-- **Branch Management**: Multi-branch support
-- **Payment Tracking**: Loan payment processing and history
-- **Reporting**: Daily and monthly reports generation
-- **Operational Expenses**: Expense tracking and management
+### 1. Setup Screen (Registration)
+- Initial system setup with admin account creation
+- Fields: Admin Name, Email, Password, Confirm Password
+- Clean, modern UI matching the provided screenshots
+- Form validation and loading states
 
-## Technologies Used
+### 2. Login Screen
+- Simple login form with Email and Password
+- "Forgot password?" link
+- "Don't have an account? Sign up" option
+- Clean, minimal design matching the screenshots
 
-### Backend
-- **Java** - Programming language
-- **Spring Boot** - Application framework
-- **Spring Security** - Authentication and authorization
-- **Spring Data JPA** - Data persistence
-- **MySQL** - Database
-- **Liquibase** - Database migrations
-- **JWT** - Token-based authentication
-- **Maven** - Build and dependency management
+### 3. Routing System
+- Protected routes based on authentication
+- Setup flow: `/setup` → `/login` → `/dashboard`
+- Automatic redirects based on completion status
 
-## Getting Started
+## Authentication Flow
 
-### Prerequisites
-- Java 11 or higher
-- MySQL 8.0+
-- Maven 3.6+
+1. **First Visit**: User is redirected to `/setup` to create admin account
+2. **Setup Complete**: User is redirected to `/login` for subsequent logins  
+3. **Authenticated**: User can access the dashboard and protected routes
 
-### Backend Setup
+## Next Steps
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/linda123ayebale/tindigwa-frontend.git
-   cd tindigwa-frontend/backend
-   ```
+The following screens need to be implemented based on your screenshots:
+- Dashboard with summary cards
+- Client management (list, add, edit, profile)
+- Loan management (applications, disbursement, details)
+- Payment management and tracking
+- Reports (daily, monthly, loan reports)
+- Operational expenses management
+- Settings and staff management
 
-2. Configure the database in `src/main/resources/application.properties`:
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/tindigwa_db
-   spring.datasource.username=your_username
-   spring.datasource.password=your_password
-   ```
+## Technology Stack
 
-3. Run the application:
-   ```bash
-   mvn spring-boot:run
-   ```
+- React 18
+- React Router DOM 6
+- CSS3 with modern flexbox/grid
+- Lucide React (for icons)
+- Axios (for API calls)
+- Date-fns (for date handling)
 
-The backend API will be available at `http://localhost:8080`
+## Design System
 
-## API Endpoints
-
-- **Authentication**: `/api/auth/login`
-- **Branches**: `/api/branches`
-- **Clients**: `/api/clients`
-- **Loans**: `/api/loans`
-- **Payments**: `/api/payments`
-- **Reports**: `/api/reports`
-- **Expenses**: `/api/expenses`
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
+The application uses a consistent design system with:
+- Primary color: #4285f4 (Google Blue)
+- Background gradients: #f5f7fa to #c3cfe2
+- Border radius: 12px for inputs and buttons, 20px for cards
+- Typography: System fonts (-apple-system, BlinkMacSystemFont, etc.)
+- Consistent spacing and hover effects
