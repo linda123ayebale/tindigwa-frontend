@@ -27,6 +27,9 @@ import LoanDetails from './pages/Loans/LoanDetails';
 // Finances
 import FinancialDashboard from './pages/Finances/FinancialDashboard';
 
+// Components
+import ConnectionStatus from './components/ConnectionStatus';
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isSetupComplete, setIsSetupComplete] = useState(false);
@@ -43,6 +46,7 @@ function App() {
   return (
     <Router>
       <div className="App">
+        <ConnectionStatus />
         <Routes>
           {/* Setup Route - only accessible if setup is not complete */}
           <Route 

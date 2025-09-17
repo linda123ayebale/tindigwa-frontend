@@ -1,5 +1,5 @@
 // API Configuration and Base Service
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080/api';const API_TIMEOUT = process.env.REACT_APP_API_TIMEOUT || 10000;// Debug logging in developmentconst DEBUG_MODE = process.env.REACT_APP_DEBUG === 'true';
 
 // Helper function to get auth token from localStorage
 const getAuthToken = () => {
@@ -28,23 +28,50 @@ class ApiService {
       ...options
     };
 
+    if (DEBUG_MODE) {
+      console.log(`🔗 API Request: ${options.method || 'GET'} ${url}`);
+      console.log('📤 Config:', config);
+    }
+
     try {
       const response = await fetch(url, config);
       
+      if (DEBUG_MODE) {
+        console.log(`📥 Response Status: ${response.status} ${response.statusText}`);
+      }
+      
       // Handle non-JSON responses (like 204 No Content)
       if (response.status === 204) {
+        if (DEBUG_MODE) console.log('✅ No Content Response');
         return null;
       }
 
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+      
+      if (DEBUG_MODE) {
+        console.log('📊 Response Data:', data);
       }
 
+      if (!response.ok) {
+        const errorMessage = data.message || `HTTP error! status: ${response.status}`;
+        if (DEBUG_MODE) console.error('❌ API Error:', errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      if (DEBUG_MODE) console.log('✅ API Request Successful');
       return data;
     } catch (error) {
-      console.error('API request failed:', error);
+      if (DEBUG_MODE) {
+        console.error('🚨 API Request Failed:', error);
+        console.error('🔍 URL:', url);
+        console.error('🔧 Config:', config);
+      }
+      
+      // Enhanced error messages for common issues
+      if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+        throw new Error('Cannot connect to backend server. Please ensure the backend is running on http://localhost:8080');
+      }
+      
       throw error;
     }
   }
