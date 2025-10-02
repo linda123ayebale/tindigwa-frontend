@@ -5,6 +5,16 @@ class LoanService {
     this.basePath = '/loans';
   }
 
+  // Get all loans
+  async getAllLoans() {
+    try {
+      return await ApiService.get(this.basePath);
+    } catch (error) {
+      console.error('Error fetching loans:', error);
+      throw error;
+    }
+  }
+
   // Get loan by ID
   async getLoanById(id) {
     try {

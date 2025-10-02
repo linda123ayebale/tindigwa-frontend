@@ -50,26 +50,68 @@ const Setup = () => {
     }
 
     try {
-      // Simulate API call for setup
-      setTimeout(() => {
-        // Mock successful setup
-        const mockUser = {
-          id: 1,
-          name: formData.adminName,
+      console.log('🚀 Submitting setup data:', {
+        adminName: formData.adminName,
+        email: formData.email,
+        password: '[HIDDEN]'
+      });
+
+      // Call the actual backend setup API
+      const response = await fetch('http://localhost:8080/api/auth/setup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          adminName: formData.adminName,
           email: formData.email,
-          role: 'admin',
-          branch: 'Main'
-        };
+          password: formData.password,
+          confirmPassword: formData.confirmPassword
+        })
+      });
+
+      console.log('📥 Response status:', response.status);
+      
+      const result = await response.json();
+      console.log('📊 Response data:', result);
+
+      if (response.ok) {
+        // Success! Store the token and user info
+        if (result.token) {
+          localStorage.setItem('authToken', result.token);
+        }
         
-        localStorage.setItem('tindigwa_token', 'mock-jwt-token');
-        localStorage.setItem('tindigwa_user', JSON.stringify(mockUser));
+        if (result.user) {
+          localStorage.setItem('currentUser', JSON.stringify(result.user));
+        }
+        
+        // Mark setup as complete
         localStorage.setItem('tindigwa_setup_complete', 'true');
         
+        console.log('✅ Setup successful!', result.message);
+        
+        // Show success message if it's first admin
+        if (result.user && result.user.role === 'ADMIN') {
+          console.log('🎉 First admin user created!');
+        }
+        
+        // Navigate to dashboard
         navigate('/dashboard');
-        setLoading(false);
-      }, 2000);
+      } else {
+        // Handle error response
+        const errorMessage = result.error || result.message || 'Setup failed';
+        console.error('❌ Setup failed:', errorMessage);
+        setError(errorMessage);
+      }
     } catch (err) {
-      setError('Setup failed. Please try again.');
+      console.error('🚨 Network error:', err);
+      
+      if (err.message.includes('fetch')) {
+        setError('Cannot connect to backend server. Please ensure the backend is running on http://localhost:8080');
+      } else {
+        setError('Setup failed. Please try again.');
+      }
+    } finally {
       setLoading(false);
     }
   };

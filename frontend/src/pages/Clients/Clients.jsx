@@ -18,178 +18,59 @@ import {
   BarChart3,
   Eye
 } from 'lucide-react';
-import AddClientForm from '../../components/AddClientForm';
 import EditClientModal from '../../components/EditClientModal';
+import ClientService from '../../services/clientService';
 import './Clients.css';
 
 const Clients = () => {
   const navigate = useNavigate();
   const [clients, setClients] = useState([]);
-  const [isAddClientFormOpen, setIsAddClientFormOpen] = useState(false);
   const [isEditClientFormOpen, setIsEditClientFormOpen] = useState(false);
   const [clientToEdit, setClientToEdit] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
-  // const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample data - replace with actual API call
+  // Fetch clients from API
+  const fetchClients = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      console.log('🔄 Fetching clients from API...');
+      
+      const clientsData = await ClientService.getAllClients();
+      console.log('✅ Clients fetched successfully:', clientsData);
+      
+      // Transform backend data to match frontend expectations
+      const transformedClients = (clientsData || []).map(client => ({
+        ...client,
+        // Ensure required fields for table display
+        fullName: `${client.givenName || client.firstName || ''} ${client.surname || client.lastName || ''}`.trim() || 'N/A',
+        firstName: client.givenName || client.firstName || '',
+        lastName: client.surname || client.lastName || '',
+        email: client.email || client.phoneNumber || 'No email',
+        phone: client.phoneNumber || client.phone || 'No phone',
+        company: client.company || '',
+        clientType: client.clientType || 'individual',
+        status: client.status || 'active',
+        createdAt: client.createdAt || new Date().toISOString(),
+      }));
+      
+      setClients(transformedClients);
+      
+    } catch (error) {
+      console.error('❌ Error fetching clients:', error);
+      setError(error.message);
+      // If API fails, we can show empty state instead of crashing
+      setClients([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const sampleClients = [
-      {
-        id: 1,
-        // Basic info for table display
-        fullName: 'John Smith',
-        firstName: 'John',
-        lastName: 'Smith',
-        email: 'john.smith@email.com',
-        phone: '+1-234-567-8900',
-        company: 'Smith Enterprises',
-        clientType: 'business',
-        status: 'active',
-        createdAt: '2024-01-15T10:00:00Z',
-        
-        // Detailed info for EditClientForm
-        surname: 'Smith',
-        givenName: 'John',
-        age: '35',
-        nationalIdNumber: 'CM123456789',
-        village: 'Buea Village',
-        parish: 'Buea Parish',
-        district: 'Fako',
-        lengthOfStay: '10 years',
-        sourceOfIncome: 'Small Business',
-        passportPhotoUrl: 'https://via.placeholder.com/150',
-        phoneNumber: '+1-234-567-8900',
-        
-        // Spouse Information
-        spouseName: 'Mary Smith',
-        spouseId: 'CM987654321',
-        
-        // Guarantor Information
-        guarantorName: 'Paul Ndongmo',
-        guarantorAge: '45',
-        guarantorContact: '+237698765432',
-        guarantorNationalId: 'CM456789123',
-        guarantorVillage: 'Limbe Village',
-        guarantorParish: 'Limbe Parish',
-        guarantorDistrict: 'Fako',
-        guarantorSourceOfIncome: 'Civil Servant',
-        
-        // Employment Information
-        employerName: 'Local Market Association',
-        position: 'Shop Owner',
-        monthlyIncome: '150000',
-        employmentLength: '5 years',
-        
-        // Documents
-        documents: [],
-        agreementSigned: true,
-        agreementNotes: 'All documents verified and signed properly.'
-      },
-      {
-        id: 2,
-        // Basic info for table display
-        fullName: 'Jane Doe',
-        firstName: 'Jane',
-        lastName: 'Doe',
-        email: 'jane.doe@email.com',
-        phone: '+1-234-567-8901',
-        company: '',
-        clientType: 'individual',
-        status: 'active',
-        createdAt: '2024-01-20T14:30:00Z',
-        
-        // Detailed info for EditClientForm
-        surname: 'Doe',
-        givenName: 'Jane',
-        age: '28',
-        nationalIdNumber: 'CM234567890',
-        village: 'Douala Village',
-        parish: 'Douala Parish',
-        district: 'Wouri',
-        lengthOfStay: '5 years',
-        sourceOfIncome: 'Farming',
-        passportPhotoUrl: 'https://via.placeholder.com/150',
-        phoneNumber: '+1-234-567-8901',
-        
-        // Spouse Information
-        spouseName: '',
-        spouseId: '',
-        
-        // Guarantor Information
-        guarantorName: 'Alice Fotso',
-        guarantorAge: '40',
-        guarantorContact: '+237698765431',
-        guarantorNationalId: 'CM567890234',
-        guarantorVillage: 'Douala Village',
-        guarantorParish: 'Douala Parish',
-        guarantorDistrict: 'Wouri',
-        guarantorSourceOfIncome: 'Teacher',
-        
-        // Employment Information
-        employerName: '',
-        position: 'Self-employed Farmer',
-        monthlyIncome: '80000',
-        employmentLength: '3 years',
-        
-        // Documents
-        documents: [],
-        agreementSigned: true,
-        agreementNotes: ''
-      },
-      {
-        id: 3,
-        // Basic info for table display
-        fullName: 'Michael Johnson',
-        firstName: 'Michael',
-        lastName: 'Johnson',
-        email: 'michael.j@email.com',
-        phone: '+1-234-567-8902',
-        company: 'Tech Solutions Inc',
-        clientType: 'business',
-        status: 'prospect',
-        createdAt: '2024-02-01T09:15:00Z',
-        
-        // Detailed info for EditClientForm
-        surname: 'Johnson',
-        givenName: 'Michael',
-        age: '42',
-        nationalIdNumber: 'CM345678901',
-        village: 'Bamenda Village',
-        parish: 'Bamenda Parish',
-        district: 'Mezam',
-        lengthOfStay: '15 years',
-        sourceOfIncome: 'Technology Services',
-        passportPhotoUrl: 'https://via.placeholder.com/150',
-        phoneNumber: '+1-234-567-8902',
-        
-        // Spouse Information
-        spouseName: 'Sarah Johnson',
-        spouseId: 'CM876543210',
-        
-        // Guarantor Information
-        guarantorName: 'Emmanuel Tabi',
-        guarantorAge: '50',
-        guarantorContact: '+237698765430',
-        guarantorNationalId: 'CM678901345',
-        guarantorVillage: 'Bamenda Village',
-        guarantorParish: 'Bamenda Parish',
-        guarantorDistrict: 'Mezam',
-        guarantorSourceOfIncome: 'Business Owner',
-        
-        // Employment Information
-        employerName: 'Tech Solutions Inc',
-        position: 'IT Consultant',
-        monthlyIncome: '300000',
-        employmentLength: '8 years',
-        
-        // Documents
-        documents: [],
-        agreementSigned: false,
-        agreementNotes: 'Pending final document review.'
-      }
-    ];
-    setClients(sampleClients);
+    fetchClients();
   }, []);
 
   const sidebarItems = [
@@ -202,27 +83,6 @@ const Clients = () => {
     { title: 'Settings', icon: Settings, path: '/settings' }
   ];
 
-  const handleAddClient = async (clientData) => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const newClient = {
-        id: clients.length + 1,
-        ...clientData
-      };
-      
-      setClients(prevClients => [newClient, ...prevClients]);
-      setIsAddClientFormOpen(false);
-      
-      // Show success message (you could use a toast library here)
-      alert('Client added successfully!');
-      
-    } catch (error) {
-      console.error('Error adding client:', error);
-      alert('Failed to add client. Please try again.');
-    }
-  };
 
   const handleDeleteClient = (clientId) => {
     if (window.confirm('Are you sure you want to delete this client?')) {
@@ -317,7 +177,7 @@ const Clients = () => {
           </div>
           <button 
             className="add-client-btn"
-            onClick={() => setIsAddClientFormOpen(true)}
+            onClick={() => navigate('/clients/add')}
           >
             <Plus size={16} />
             Add New Client
@@ -355,20 +215,40 @@ const Clients = () => {
 
           {/* Clients Table */}
           <div className="clients-table-container">
-            {filteredClients.length === 0 ? (
+            {isLoading ? (
+              <div className="empty-state">
+                <div style={{ fontSize: '48px' }}>⏳</div>
+                <h3>Loading clients...</h3>
+                <p>Fetching data from backend...</p>
+              </div>
+            ) : error ? (
+              <div className="empty-state">
+                <div style={{ fontSize: '48px', color: '#dc3545' }}>❌</div>
+                <h3>Error loading clients</h3>
+                <p>{error}</p>
+                <button 
+                  className="add-client-btn primary"
+                  onClick={fetchClients}
+                >
+                  🔄 Retry
+                </button>
+              </div>
+            ) : filteredClients.length === 0 ? (
               <div className="empty-state">
                 <Users size={48} />
                 <h3>No clients found</h3>
                 <p>
                   {searchTerm || filterStatus !== 'all' 
                     ? 'Try adjusting your search or filter criteria.'
-                    : 'Get started by adding your first client.'
+                    : clients.length === 0 
+                      ? 'No clients in the database. Add your first client to get started.'
+                      : 'Get started by adding your first client.'
                   }
                 </p>
                 {!searchTerm && filterStatus === 'all' && (
                   <button 
                     className="add-client-btn primary"
-                    onClick={() => setIsAddClientFormOpen(true)}
+                    onClick={() => navigate('/clients/add')}
                   >
                     <Plus size={16} />
                     Add Your First Client
@@ -453,13 +333,6 @@ const Clients = () => {
           </div>
         </div>
       </main>
-
-      {/* Add Client Form Modal */}
-      <AddClientForm
-        isOpen={isAddClientFormOpen}
-        onSubmit={handleAddClient}
-        onCancel={() => setIsAddClientFormOpen(false)}
-      />
 
       {/* Edit Client Modal */}
       <EditClientModal

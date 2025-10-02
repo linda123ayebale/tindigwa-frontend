@@ -17,15 +17,79 @@ import {
 } from 'lucide-react';
 import './Dashboard.css';
 
+// Import services
+import ClientService from '../../services/clientService';
+import LoanService from '../../services/loanService';
+import PaymentService from '../../services/paymentService';
+
 const Dashboard = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [dashboardData, setDashboardData] = useState({
+    totalClients: 0,
+    activeLoans: 0,
+    outstandingBalance: 0,
+    loading: true,
+    error: null
+  });
+
+  // Fetch dashboard data
+  const fetchDashboardData = async () => {
+    try {
+      setDashboardData(prev => ({ ...prev, loading: true, error: null }));
+      
+      // Fetch all required data in parallel
+      const [clientsResponse, loansResponse, paymentsResponse] = await Promise.all([
+        ClientService.getAllClients(),
+        LoanService.getAllLoans(),
+        PaymentService.getAllPayments()
+      ]);
+
+      const clients = clientsResponse || [];
+      const loans = loansResponse || [];
+      const payments = paymentsResponse || [];
+
+      // Calculate active loans (loans that are not fully paid)
+      const activeLoans = loans.filter(loan => {
+        const totalPaid = payments
+          .filter(payment => payment.loanId === loan.id)
+          .reduce((sum, payment) => sum + payment.amount, 0);
+        return totalPaid < loan.totalPayable;
+      });
+
+      // Calculate outstanding balance
+      const outstandingBalance = loans.reduce((total, loan) => {
+        const totalPaid = payments
+          .filter(payment => payment.loanId === loan.id)
+          .reduce((sum, payment) => sum + payment.amount, 0);
+        return total + (loan.totalPayable - totalPaid);
+      }, 0);
+
+      setDashboardData({
+        totalClients: clients.length,
+        activeLoans: activeLoans.length,
+        outstandingBalance: Math.max(0, outstandingBalance),
+        loading: false,
+        error: null
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      setDashboardData(prev => ({
+        ...prev,
+        loading: false,
+        error: error.message || 'Failed to fetch dashboard data'
+      }));
+    }
+  };
 
   useEffect(() => {
     const userData = localStorage.getItem('tindigwa_user');
     if (userData) {
       setUser(JSON.parse(userData));
     }
+    
+    // Fetch dashboard data on component mount
+    fetchDashboardData();
   }, []);
 
   const handleLogout = () => {
@@ -43,22 +107,31 @@ const Dashboard = ({ setIsAuthenticated }) => {
     navigate('/login');
   };
 
+  // Format currency helper
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0
+    }).format(amount);
+  };
+
   const summaryCards = [
     {
       title: 'Total Clients',
-      value: '120',
+      value: dashboardData.loading ? 'Loading...' : dashboardData.totalClients.toString(),
       icon: Users,
       color: '#e8f4fd'
     },
     {
       title: 'Active Loans', 
-      value: '85',
+      value: dashboardData.loading ? 'Loading...' : dashboardData.activeLoans.toString(),
       icon: CreditCard,
       color: '#e8f4fd'
     },
     {
       title: 'Outstanding Balance',
-      value: '$500,000',
+      value: dashboardData.loading ? 'Loading...' : formatCurrency(dashboardData.outstandingBalance),
       icon: DollarSign,
       color: '#e8f4fd'
     }
