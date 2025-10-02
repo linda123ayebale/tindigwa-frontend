@@ -12,7 +12,7 @@ import {
   Calendar,
   Edit
 } from 'lucide-react';
-import EditClientModal from '../../components/EditClientModal';
+// Removed EditClientModal import - using page-based approach instead
 import './ClientDetails.css';
 
 const ClientDetails = () => {
@@ -20,7 +20,6 @@ const ClientDetails = () => {
   const navigate = useNavigate();
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isEditClientFormOpen, setIsEditClientFormOpen] = useState(false);
 
   useEffect(() => {
     // Simulate fetching client data - replace with actual API call
@@ -186,27 +185,9 @@ const ClientDetails = () => {
   };
 
   const handleEditClient = () => {
-    setIsEditClientFormOpen(true);
+    // Navigate to edit client page instead of opening modal
+    navigate(`/clients/edit/${client.id}`);
   };
-
-  const handleUpdateClient = async (updatedClientData) => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update the current client data
-      setClient(updatedClientData);
-      setIsEditClientFormOpen(false);
-      
-      // Show success message
-      alert('Client updated successfully!');
-      
-    } catch (error) {
-      console.error('Error updating client:', error);
-      alert('Failed to update client. Please try again.');
-    }
-  };
-
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -502,13 +483,7 @@ const ClientDetails = () => {
         </div>
       </div>
 
-      {/* Edit Client Modal */}
-      <EditClientModal
-        client={client}
-        isOpen={isEditClientFormOpen}
-        onClose={() => setIsEditClientFormOpen(false)}
-        onSave={handleUpdateClient}
-      />
+      {/* Modal removed - using page-based editing instead */}
     </div>
   );
 };

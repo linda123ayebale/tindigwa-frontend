@@ -13,20 +13,16 @@ import {
   Edit,
   Trash2,
   Phone,
-  Mail,
-  Building,
   BarChart3,
   Eye
 } from 'lucide-react';
-import EditClientModal from '../../components/EditClientModal';
+// Removed EditClientModal import - using page-based approach instead
 import ClientService from '../../services/clientService';
 import './Clients.css';
 
 const Clients = () => {
   const navigate = useNavigate();
   const [clients, setClients] = useState([]);
-  const [isEditClientFormOpen, setIsEditClientFormOpen] = useState(false);
-  const [clientToEdit, setClientToEdit] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
@@ -96,34 +92,8 @@ const Clients = () => {
   };
 
   const handleEditClient = (client) => {
-    setClientToEdit(client);
-    setIsEditClientFormOpen(true);
-  };
-
-  const handleUpdateClient = async (updatedClientData) => {
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Update the client in the state
-      setClients(prevClients => 
-        prevClients.map(client => 
-          client.id === updatedClientData.id 
-            ? updatedClientData 
-            : client
-        )
-      );
-      
-      setIsEditClientFormOpen(false);
-      setClientToEdit(null);
-      
-      // Show success message
-      alert('Client updated successfully!');
-      
-    } catch (error) {
-      console.error('Error updating client:', error);
-      alert('Failed to update client. Please try again.');
-    }
+    // Navigate to edit client page instead of opening modal
+    navigate(`/clients/edit/${client.id}`);
   };
 
   const filteredClients = clients.filter(client => {
@@ -334,16 +304,7 @@ const Clients = () => {
         </div>
       </main>
 
-      {/* Edit Client Modal */}
-      <EditClientModal
-        client={clientToEdit}
-        isOpen={isEditClientFormOpen}
-        onClose={() => {
-          setIsEditClientFormOpen(false);
-          setClientToEdit(null);
-        }}
-        onSave={handleUpdateClient}
-      />
+      {/* Modal removed - using page-based editing instead */}
     </div>
   );
 };
