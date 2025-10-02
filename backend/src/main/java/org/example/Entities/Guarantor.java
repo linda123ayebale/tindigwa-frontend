@@ -8,12 +8,12 @@ import lombok.Setter;
 import org.example.Entities.Person;
 
 @Entity
-@Table(name = "next_of_kin")
+@Table(name = "guarantors")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class NextOfKin {
+public class Guarantor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

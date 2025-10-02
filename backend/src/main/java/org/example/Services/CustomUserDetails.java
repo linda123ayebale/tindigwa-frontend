@@ -1,30 +1,70 @@
 package org.example.Services;
 
-
-import org.example.Entities.LoanOfficer;
+import org.example.Entities.User;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
-    private final LoanOfficer user;
+    private final User user;
 
-    public CustomUserDetails(LoanOfficer user) {
+    public CustomUserDetails(User user) {
         this.user = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(() -> "ROLE_" + user.getRoleId());
+        // Convert UserRole enum to Spring Security authority
+        return Collections.singleton(() -> "ROLE_" + user.getRole().name());
     }
 
-    @Override public String getPassword() { return user.getPassword(); }
-    @Override public String getUsername() { return user.getUsername(); }
-    @Override public boolean isAccountNonExpired() { return true; }
-    @Override public boolean isAccountNonLocked() { return true; }
-    @Override public boolean isCredentialsNonExpired() { return true; }
-    @Override public boolean isEnabled() { return true; }
+    @Override 
+    public String getPassword() { 
+        return user.getPassword(); 
+    }
+    
+    @Override 
+    public String getUsername() { 
+        // Use email as username
+        return user.getEmail() != null ? user.getEmail() : user.getUsername(); 
+    }
+    
+    @Override 
+    public boolean isAccountNonExpired() { 
+        return true; 
+    }
+    
+    @Override 
+    public boolean isAccountNonLocked() { 
+        return true; 
+    }
+    
+    @Override 
+    public boolean isCredentialsNonExpired() { 
+        return true; 
+    }
+    
+    @Override 
+    public boolean isEnabled() { 
+        return true; 
+    }
+    
+    // Helper methods to get user information
+    public User getUser() {
+        return user;
+    }
+    
+    public String getEmail() {
+        return user.getEmail();
+    }
+    
+    public String getFullName() {
+        return user.getName();
+    }
+    
+    public User.UserRole getUserRole() {
+        return user.getRole();
+    }
 }
