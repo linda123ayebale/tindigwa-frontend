@@ -1,24 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Home, 
-  Users, 
-  CreditCard, 
-  DollarSign, 
-  FileText, 
-  Settings,
-  BarChart3,
   Plus,
   Search,
   Filter,
   Edit,
   Trash2,
-  Eye,
-  Calendar,
-  Receipt,
-  User,
-  Building
+  Eye
 } from 'lucide-react';
+import Sidebar from '../../components/Layout/Sidebar';
 import './Expenses.css';
 
 const Expenses = () => {
@@ -27,16 +17,6 @@ const Expenses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
 
-  const sidebarItems = [
-    { title: 'Dashboard', icon: Home, path: '/dashboard' },
-    { title: 'Clients', icon: Users, path: '/clients' },
-    { title: 'Loans', icon: CreditCard, path: '/loans' },
-    { title: 'Payments', icon: DollarSign, path: '/payments' },
-    { title: 'Finances', icon: BarChart3, path: '/finances' },
-    { title: 'Expenses', icon: Receipt, path: '/expenses', active: true },
-    { title: 'Reports', icon: FileText, path: '/reports' },
-    { title: 'Settings', icon: Settings, path: '/settings' }
-  ];
 
   // Sample expenses data
   useEffect(() => {
@@ -142,27 +122,7 @@ const Expenses = () => {
   return (
     <div className="dashboard-layout">
       {/* Sidebar */}
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-header">
-          <h2>TINDIGWA</h2>
-        </div>
-        
-        <nav className="sidebar-nav">
-          {sidebarItems.map((item, index) => {
-            const IconComponent = item.icon;
-            return (
-              <button
-                key={index}
-                className={`nav-item ${item.active ? 'active' : ''}`}
-                onClick={() => navigate(item.path)}
-              >
-                <IconComponent size={20} />
-                <span>{item.title}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
+      <Sidebar />
 
       {/* Main Content */}
       <main className="dashboard-main">
