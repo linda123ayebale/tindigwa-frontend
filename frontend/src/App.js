@@ -62,6 +62,7 @@ import ExpenseDetails from './pages/Expenses/subpages/ExpenseDetails';
 import EditExpense from './pages/Expenses/subpages/EditExpense';
 
 // Finances
+import FinancialDashboard from './pages/Finances/FinancialDashboard.jsx';
 
 // Components
 import ConnectionStatus from './components/ConnectionStatus';
