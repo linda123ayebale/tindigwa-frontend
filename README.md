@@ -1,6 +1,6 @@
-# Tindigwa Loan Management System - Frontend
+# Tindigwa Loan Management System - Full Stack Application
 
-This is the React frontend for the Tindigwa loan management system.
+This is a full-stack loan management system with React frontend and Java Spring Boot backend.
 
 ## Setup Instructions
 
