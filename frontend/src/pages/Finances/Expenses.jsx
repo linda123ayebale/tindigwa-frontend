@@ -113,8 +113,7 @@ const Expenses = () => {
   };
 
   const handleDeleteExpense = (expenseId) => {
-      setExpenses(prevExpenses => prevExpenses.filter(expense => expense.id !== expenseId));
-    }
+    setExpenses(prevExpenses => prevExpenses.filter(expense => expense.id !== expenseId));
   };
 
   // Filter expenses based on search term and type
