@@ -447,7 +447,7 @@ import {
 import Sidebar from '../../../components/Layout/Sidebar';
 import '../../../pages/Finances/Expenses.css';
 
-const RecordExpensePage = () => {
+const RecordExpense = () => {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [formData, setFormData] = useState({
@@ -671,4 +671,4 @@ const RecordExpensePage = () => {
   );
 };
 
-export default RecordExpensePage;
+export default RecordExpense;
