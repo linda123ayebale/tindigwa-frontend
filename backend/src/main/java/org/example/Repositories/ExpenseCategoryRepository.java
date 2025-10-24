@@ -11,6 +11,6 @@ import java.util.Optional;
 public interface ExpenseCategoryRepository extends JpaRepository<ExpenseCategory, Long> {
     List<ExpenseCategory> findByIsActiveTrue();
     Optional<ExpenseCategory> findByCategoryNameIgnoreCase(String categoryName);
-    List<ExpenseCategory> findByIsActiveTrueOrderBySortOrderAsc();
+    List<ExpenseCategory> findByIsActiveTrueOrderByCreatedAtDesc();
     boolean existsByCategoryNameIgnoreCase(String categoryName);
 }

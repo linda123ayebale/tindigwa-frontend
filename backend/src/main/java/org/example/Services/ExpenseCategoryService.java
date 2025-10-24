@@ -24,7 +24,7 @@ public class ExpenseCategoryService {
     }
 
     public List<ExpenseCategory> getAllActiveCategories() {
-        return repository.findByIsActiveTrue();
+        return repository.findByIsActiveTrueOrderByCreatedAtDesc();
     }
 
     public Optional<ExpenseCategory> getCategoryById(Long id) {
