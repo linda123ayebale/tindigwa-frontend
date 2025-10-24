@@ -63,6 +63,7 @@ import EditExpense from './pages/Expenses/subpages/EditExpense';
 
 // Finances
 import FinancialDashboard from './pages/Finances/FinancialDashboard';
+import AddExpensePage from './pages/Finances/AddExpensePage';
 
 // Components
 import ConnectionStatus from './components/ConnectionStatus';
@@ -304,6 +305,10 @@ function App() {
           <Route
             path="/finances"
             element={<FinancialDashboard />}
+          />
+          <Route
+            path="/finances/add-expense"
+            element={<AddExpensePage />}
           />
           
           {/* Default redirect - modified for testing */}

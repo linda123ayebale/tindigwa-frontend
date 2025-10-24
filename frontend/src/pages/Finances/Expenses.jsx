@@ -171,7 +171,7 @@ const Expenses = () => {
           </div>
           <button 
             className="add-expense-btn"
-            onClick={() => navigate('/expenses/add')}
+            onClick={() => navigate('/finances/add-expense')}
           >
             <Plus size={16} />
             Add New Expense
