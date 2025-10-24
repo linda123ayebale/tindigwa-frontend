@@ -103,13 +103,15 @@ const Expenses = () => {
 
   const handleCreateCategory = async () => {
     try {
-      const response = await ApiService.post('/expense-categories', newCategory);
-      setCategories([...categories, response.data]);
-      setNewCategory({ name: '', description: '', colorCode: '#000000' });
-      setShowCategoryModal(false);
+      const response = await ApiService.post('/expense-categories', {
+        categoryName: newCategory,
+        colorCode: '#3498db'
+      });
+      setCategories(prev => [...prev, response.data.categoryName]);
+      setNewCategory('');
     } catch (error) {
       console.error('Error creating category:', error);
-      alert('Failed to create category');
+      alert('Failed to create category: ' + (error.response?.data?.message || error.message));
     }
   };
 

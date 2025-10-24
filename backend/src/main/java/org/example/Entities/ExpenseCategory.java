@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "expense_categories")
@@ -29,26 +28,14 @@ public class ExpenseCategory {
     @Column(name = "is_active")
     private Boolean isActive = true;
     
-    @Column(name = "sort_order")
-    private Integer sortOrder = 0;
-    
-    @Column(name = "budget_limit")
-    private Double budgetLimit;
-    
     @Column(name = "color_code")
-    private String colorCode;
-    
-    @Column(name = "icon")
-    private String icon;
+    private String colorCode = "#000000";
     
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-    
-    @Column(name = "created_by")
-    private String createdBy;
     
     @PrePersist
     protected void onCreate() {
@@ -62,34 +49,5 @@ public class ExpenseCategory {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
-    }
-    
-    // Helper method to check if this is a parent category
-}package org.example.Entities;
-
-import lombok.*;
-import javax.persistence.*;
-
-@Entity
-@Table(name = "expense_categories")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ExpenseCategory {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false, unique = true)
-    private String name;
-    
-    private String description;
-    
-    private String colorCode; // Frontend color coding
-
-    public ExpenseCategory(String name, String description) {
-        this.name = name;
-        this.description = description;
     }
 }
