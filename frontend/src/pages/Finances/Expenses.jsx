@@ -6,7 +6,10 @@ import {
   Filter,
   Edit,
   Trash2,
-  Eye
+  Eye,
+  Receipt,
+  Calendar,
+  User
 } from 'lucide-react';
 import Sidebar from '../../components/Layout/Sidebar';
 import './Expenses.css';
