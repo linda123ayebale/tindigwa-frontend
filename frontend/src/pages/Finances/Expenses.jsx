@@ -33,10 +33,11 @@ const Expenses = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await ApiService.get('/expense-categories');
+        const response = await ApiService.get('/expense-categories/names');
         setCategories(response.data);
       } catch (error) {
         console.error('Error fetching categories:', error);
+        alert('Failed to load categories');
       }
     };
     
@@ -178,20 +179,24 @@ const Expenses = () => {
         {/* Category Management Section */}
         <div className="category-management">
           <h3>Expense Categories</h3>
-          <div className="categories-list">
-            {categories.map(cat => (
-              <div key={cat.id} className="category-badge" style={{ backgroundColor: cat.colorCode }}>
-                {cat.name}
-              </div>
+          <select className="category-dropdown">
+            {categories.map(category => (
+              <option key={category} value={category}>{category}</option>
             ))}
-            <button 
-              className="add-category-btn"
-              onClick={() => setShowCategoryModal(true)}
-            >
-              <Plus size={14} /> 
-              Add Category
-            </button>
-          </div>
+          </select>
+          <input 
+            type="text" 
+            placeholder="New category..." 
+            className="category-input"
+            onChange={(e) => setNewCategory(e.target.value)}
+          />
+          <button 
+            className="add-category-btn"
+            onClick={handleCreateCategory}
+          >
+            <Plus size={14} /> 
+            Add
+          </button>
         </div>
 
         <div className="expenses-content">

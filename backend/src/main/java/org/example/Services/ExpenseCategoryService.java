@@ -23,19 +23,6 @@ public class ExpenseCategoryService {
             throw new RuntimeException("Category name already exists: " + category.getCategoryName());
         }
         
-        // Validate parent category if specified
-        if (category.getParentCategoryId() != null) {
-            Optional<ExpenseCategory> parent = repository.findById(category.getParentCategoryId());
-            if (parent.isEmpty() || !parent.get().getIsActive()) {
-                throw new RuntimeException("Invalid parent category ID: " + category.getParentCategoryId());
-            }
-            
-            // Prevent deep nesting (only allow 1 level of subcategories)
-            if (parent.get().getParentCategoryId() != null) {
-                throw new RuntimeException("Cannot create subcategory of a subcategory");
-            }
-        }
-        
         return repository.save(category);
     }
     

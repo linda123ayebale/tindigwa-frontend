@@ -29,9 +29,6 @@ public class ExpenseCategory {
     @Column(name = "is_active")
     private Boolean isActive = true;
     
-    @Column(name = "parent_category_id")
-    private Long parentCategoryId; // For subcategories
-    
     @Column(name = "sort_order")
     private Integer sortOrder = 0;
     
@@ -68,14 +65,6 @@ public class ExpenseCategory {
     }
     
     // Helper method to check if this is a parent category
-    public boolean isParentCategory() {
-        return parentCategoryId == null;
-    }
-    
-    // Helper method to check if this is a subcategory
-    public boolean isSubcategory() {
-        return parentCategoryId != null;
-    }
 }package org.example.Entities;
 
 import lombok.*;

@@ -19,11 +19,6 @@ public interface ExpenseCategoryRepository extends JpaRepository<ExpenseCategory
     Optional<ExpenseCategory> findByCategoryNameIgnoreCase(String categoryName);
     
     // Find parent categories (no parent)
-    List<ExpenseCategory> findByParentCategoryIdIsNullAndIsActiveTrue();
-    
-    // Find subcategories by parent ID
-    List<ExpenseCategory> findByParentCategoryIdAndIsActiveTrue(Long parentCategoryId);
-    
     // Find categories ordered by sort order
     List<ExpenseCategory> findByIsActiveTrueOrderBySortOrderAsc();
     
