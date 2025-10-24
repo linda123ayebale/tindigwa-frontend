@@ -27,10 +27,9 @@ CREATE TRIGGER before_expense_category_update
 BEFORE UPDATE ON expense_categories
 FOR EACH ROW
 BEGIN
+    DECLARE current_parent BIGINT DEFAULT NEW.parent_category_id;
+
     IF NEW.parent_category_id IS NOT NULL THEN
-        DECLARE current_parent BIGINT;
-        SET current_parent = NEW.parent_category_id;
-        
         WHILE current_parent IS NOT NULL DO
             IF current_parent = NEW.id THEN
                 SIGNAL SQLSTATE '45000'
@@ -40,7 +39,7 @@ BEGIN
             SELECT parent_category_id INTO current_parent 
             FROM expense_categories 
             WHERE id = current_parent;
-        END WHILE;
+        END WHILE WHILE_LOOP;
     END IF;
 END$$
 DELIMITER ;
