@@ -171,4 +171,51 @@ public class ExpenseCategoryController {
             return ResponseEntity.internalServerError().build();
         }
     }
+}package org.springframework.security.access.prepost;
+
+package org.example.Controllers;
+
+import org.example.Entities.ExpenseCategory;
+import org.example.Services.ExpenseCategoryService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/expense-categories")
+public class ExpenseCategoryController {
+    private final ExpenseCategoryService categoryService;
+
+    public ExpenseCategoryController(ExpenseCategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ExpenseCategory>> getAllCategories() {
+        return ResponseEntity.ok(categoryService.getAllCategories());
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ExpenseCategory> createCategory(@RequestBody ExpenseCategory category) {
+        return new ResponseEntity<>(categoryService.createCategory(category), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ExpenseCategory> updateCategory(
+            @PathVariable Long id,
+            @RequestBody ExpenseCategory categoryDetails) {
+        return ResponseEntity.ok(categoryService.updateCategory(id, categoryDetails));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
+        categoryService.deleteCategory(id);
+        return ResponseEntity.noContent().build();
+    }
 }

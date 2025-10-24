@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ApiService from '../../services/api';
 import { 
   Plus,
   Search,
@@ -19,9 +20,30 @@ const Expenses = () => {
   const [expenses, setExpenses] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [categories, setCategories] = useState([]);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [newCategory, setNewCategory] = useState({
+    name: '',
+    description: '', 
+    colorCode: '#000000'
+  });
 
 
-  // Sample expenses data
+  // Get categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await ApiService.get('/expense-categories');
+        setCategories(response.data);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
+
+  // Sample expenses data (to be replaced with real API)
   useEffect(() => {
     const sampleExpenses = [
       {
@@ -78,8 +100,19 @@ const Expenses = () => {
     setExpenses(sampleExpenses);
   }, []);
 
+  const handleCreateCategory = async () => {
+    try {
+      const response = await ApiService.post('/expense-categories', newCategory);
+      setCategories([...categories, response.data]);
+      setNewCategory({ name: '', description: '', colorCode: '#000000' });
+      setShowCategoryModal(false);
+    } catch (error) {
+      console.error('Error creating category:', error);
+      alert('Failed to create category');
+    }
+  };
+
   const handleDeleteExpense = (expenseId) => {
-    if (window.confirm('Are you sure you want to delete this expense? This action cannot be undone.')) {
       setExpenses(prevExpenses => prevExpenses.filter(expense => expense.id !== expenseId));
     }
   };
@@ -141,6 +174,25 @@ const Expenses = () => {
             <Plus size={16} />
             Add New Expense
           </button>
+        </div>
+        
+        {/* Category Management Section */}
+        <div className="category-management">
+          <h3>Expense Categories</h3>
+          <div className="categories-list">
+            {categories.map(cat => (
+              <div key={cat.id} className="category-badge" style={{ backgroundColor: cat.colorCode }}>
+                {cat.name}
+              </div>
+            ))}
+            <button 
+              className="add-category-btn"
+              onClick={() => setShowCategoryModal(true)}
+            >
+              <Plus size={14} /> 
+              Add Category
+            </button>
+          </div>
         </div>
 
         <div className="expenses-content">
@@ -336,6 +388,54 @@ const Expenses = () => {
             </div>
           </div>
         </div>
+        
+        {/* Add Category Modal */}
+        {showCategoryModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h2>Add New Expense Category</h2>
+              <div className="modal-form">
+                <div className="form-group">
+                  <label>Category Name</label>
+                  <input 
+                    type="text" 
+                    value={newCategory.name}
+                    onChange={(e) => setNewCategory({...newCategory, name: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea 
+                    value={newCategory.description}
+                    onChange={(e) => setNewCategory({...newCategory, description: e.target.value})}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Color Code</label>
+                  <input 
+                    type="color" 
+                    value={newCategory.colorCode}
+                    onChange={(e) => setNewCategory({...newCategory, colorCode: e.target.value})}
+                  />
+                </div>
+                <div className="modal-actions">
+                  <button 
+                    className="cancel-btn"
+                    onClick={() => setShowCategoryModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    className="confirm-btn"
+                    onClick={handleCreateCategory}
+                  >
+                    Create Category
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

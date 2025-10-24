@@ -45,4 +45,17 @@ public interface ExpenseCategoryRepository extends JpaRepository<ExpenseCategory
     
     // Find categories by created user
     List<ExpenseCategory> findByCreatedByAndIsActiveTrue(String createdBy);
+}package org.example.Repositories;
+
+import org.example.Entities.ExpenseCategory;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface ExpenseCategoryRepository extends JpaRepository<ExpenseCategory, Long> {
+    List<ExpenseCategory> findAllByOrderByNameAsc();
+    boolean existsByName(String name);
+    Optional<ExpenseCategory> findByName(String name);
 }

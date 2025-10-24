@@ -187,4 +187,56 @@ public class ExpenseCategoryService {
                         .contains(searchTerm.toLowerCase()))
                 .collect(Collectors.toList());
     }
+}package org.example.Services;
+
+import org.example.Entities.ExpenseCategory;
+import org.example.Repositories.ExpenseCategoryRepository;
+import org.springframework.stereotype.Service;
+
+import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class ExpenseCategoryService {
+    private final ExpenseCategoryRepository repository;
+
+    public ExpenseCategoryService(ExpenseCategoryRepository repository) {
+        this.repository = repository;
+    }
+    
+    public List<ExpenseCategory> getAllCategories() {
+        return repository.findAllByOrderByNameAsc();
+    }
+    
+    public Optional<ExpenseCategory> getCategoryByName(String name) {
+        return repository.findByName(name);
+    }
+    
+    public ExpenseCategory createCategory(ExpenseCategory category) {
+        return repository.save(category);
+    }
+    
+    public Optional<ExpenseCategory> getCategoryById(Long id) {
+        return repository.findById(id);
+    }
+    
+    public ExpenseCategory updateCategory(Long id, ExpenseCategory categoryDetails) {
+        ExpenseCategory category = repository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+            
+        category.setName(categoryDetails.getName());
+        category.setDescription(categoryDetails.getDescription());
+        category.setColorCode(categoryDetails.getColorCode());
+        
+        return repository.save(category);
+    }
+    
+    public void deleteCategory(Long id) {
+        repository.deleteById(id);
+    }
+    
+    public boolean checkIfCategoryExists(String name) {
+        return repository.existsByName(name);
+    }
 }
