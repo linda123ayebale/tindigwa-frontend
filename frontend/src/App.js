@@ -56,14 +56,12 @@ import PaymentHistory from './pages/Payments/subpages/PaymentHistory';
 import PaymentAnalytics from './pages/Payments/subpages/PaymentAnalytics';
 
 // Expenses
-import RecordExpense from './pages/Expenses/subpages/RecordExpense';
+import RecordExpensePage from './pages/Expenses/subpages/RecordExpense';
 import AllExpenses from './pages/Expenses/subpages/AllExpenses';
 import ExpenseDetails from './pages/Expenses/subpages/ExpenseDetails';
 import EditExpense from './pages/Expenses/subpages/EditExpense';
 
 // Finances
-import FinancialDashboard from './pages/Finances/FinancialDashboard.jsx';
-import AddExpensePage from './pages/Finances/AddExpensePage.jsx';
 
 // Components
 import ConnectionStatus from './components/ConnectionStatus';
@@ -296,7 +294,7 @@ function App() {
           <Route path="/payments/old" element={<Payments />} />
           
           {/* Expenses Routes */}
-          <Route path="/expenses/record" element={<RecordExpense />} />
+          <Route path="/expenses/record" element={<RecordExpensePage />} />
           <Route path="/expenses/all" element={<AllExpenses />} />
           <Route path="/expenses/:id" element={<ExpenseDetails />} />
           <Route path="/expenses/edit/:id" element={<EditExpense />} />
@@ -305,10 +303,6 @@ function App() {
           <Route
             path="/finances"
             element={<FinancialDashboard />}
-          />
-          <Route
-            path="/finances/add-expense"
-            element={<AddExpensePage />}
           />
           
           {/* Default redirect - modified for testing */}
