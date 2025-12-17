@@ -1,0 +1,228 @@
+/* Notification Modal Container - NO OVERLAY/SHADOW */
+.notification-modal-container {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none; /* Allow clicking through container */
+}
+
+.notification-modal-container.center {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.notification-modal-container.top-right {
+  top: 20px;
+  right: 20px;
+}
+
+.notification-modal-container.bottom {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Modal Box */
+.notification-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  min-width: 320px;
+  max-width: 450px;
+  pointer-events: auto; /* Re-enable pointer events for modal */
+  animation: slideIn 0.3s ease-out;
+  border-left: 4px solid;
+  position: relative;
+}
+
+/* Border colors based on type */
+.notification-modal.success {
+  border-left-color: #10b981; /* Green */
+}
+
+.notification-modal.error {
+  border-left-color: #ef4444; /* Red */
+}
+
+.notification-modal.warning {
+  border-left-color: #f59e0b; /* Yellow */
+}
+
+.notification-modal.info {
+  border-left-color: #3b82f6; /* Blue */
+}
+
+/* Header */
+.notification-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 0 20px;
+}
+
+.notification-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: white;
+}
+
+/* Icon background colors */
+.notification-modal.success .notification-icon {
+  background-color: #10b981;
+}
+
+.notification-modal.error .notification-icon {
+  background-color: #ef4444;
+}
+
+.notification-modal.warning .notification-icon {
+  background-color: #f59e0b;
+}
+
+.notification-modal.info .notification-icon {
+  background-color: #3b82f6;
+}
+
+.notification-close-button {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.notification-close-button:hover {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+/* Content */
+.notification-modal-content {
+  padding: 16px 20px;
+}
+
+.notification-modal-content h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.notification-modal-content p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Footer */
+.notification-modal-footer {
+  padding: 0 20px 16px 20px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.notification-ok-button {
+  background-color: #f3f4f6;
+  border: none;
+  color: #374151;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s;
+  min-width: 60px;
+}
+
+/* Button colors based on type */
+.notification-ok-button.success {
+  background-color: #10b981;
+  color: white;
+}
+
+.notification-ok-button.success:hover {
+  background-color: #059669;
+}
+
+.notification-ok-button.error {
+  background-color: #ef4444;
+  color: white;
+}
+
+.notification-ok-button.error:hover {
+  background-color: #dc2626;
+}
+
+.notification-ok-button.warning {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.notification-ok-button.warning:hover {
+  background-color: #d97706;
+}
+
+.notification-ok-button.info {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.notification-ok-button.info:hover {
+  background-color: #2563eb;
+}
+
+.notification-ok-button:hover {
+  background-color: #e5e7eb;
+}
+
+/* Animation */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -60%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.notification-modal-container.top-right .notification-modal {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.notification-modal-container.bottom .notification-modal {
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+}

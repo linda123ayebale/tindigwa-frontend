@@ -1,0 +1,126 @@
+/* Fix dropdown styling issues */
+
+/* Remove default browser dropdown arrow and add custom one */
+.form-select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* Active dropdown state */
+.form-select.dropdown-active {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+/* Disabled state when other dropdown is open */
+.form-select:disabled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Guarantor form grid */
+.guarantor-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.guarantor-form-grid .form-group {
+  margin-bottom: 0;
+}
+
+.guarantor-form-grid .form-input[readonly] {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+  color: #495057;
+}
+
+/* No guarantor message styling */
+.no-guarantor-message {
+  background-color: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.no-guarantor-message p {
+  margin: 0;
+  color: #856404;
+  font-style: italic;
+}
+
+/* Loading message */
+.loading-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Info sections */
+.info-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.info-section h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #495057;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Form grid improvements */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.form-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+/* Action link styling */
+.action-link {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  font-size: 0.875rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0;
+  margin-top: 0.5rem;
+}
+
+.action-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+/* Input with action styling */
+.input-with-action {
+  display: flex;
+  flex-direction: column;
+}

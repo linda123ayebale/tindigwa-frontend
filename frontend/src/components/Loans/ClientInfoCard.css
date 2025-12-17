@@ -1,0 +1,74 @@
+/* ClientInfoCard Component Styles - FinTech Design */
+
+.client-info-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+  margin-bottom: 2rem;
+}
+
+.client-info-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.client-info-card h3 {
+  font-size: 1rem;
+  color: #1e1e2f;
+  margin-bottom: 1.2rem;
+  font-weight: 600;
+}
+
+.client-info-card .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid #f8f8f8;
+}
+
+.client-info-card .row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.client-info-card .label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #666;
+}
+
+.client-info-card .value {
+  font-size: 1rem;
+  color: #1e1e2f;
+  font-weight: 600;
+  text-align: right;
+}
+
+.client-info-card .contact-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.client-info-card .contact-info svg {
+  color: #6c63ff;
+  flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .client-info-card .row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .client-info-card .value {
+    text-align: left;
+  }
+}

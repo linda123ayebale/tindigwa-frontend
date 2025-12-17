@@ -17,6 +17,7 @@ const EditLoanModal = ({ loan, isOpen, onClose, onSave }) => {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   // Pre-populate form data when modal opens
   useEffect(() => {
@@ -120,6 +121,8 @@ const EditLoanModal = ({ loan, isOpen, onClose, onSave }) => {
 
     setIsSubmitting(true);
     
+    setApiError('');
+    
     try {
       // Prepare updated loan data
       const updatedLoan = {
@@ -140,7 +143,7 @@ const EditLoanModal = ({ loan, isOpen, onClose, onSave }) => {
       onClose();
     } catch (error) {
       console.error('Error updating loan:', error);
-      // You can add error handling here, like showing a toast notification
+      setApiError(error.message || 'Failed to update loan. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -182,6 +185,12 @@ const EditLoanModal = ({ loan, isOpen, onClose, onSave }) => {
 
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
+            {apiError && (
+              <div className="api-error-message">
+                <span>{apiError}</span>
+              </div>
+            )}
+            
             <div className="form-section">
               <h3>Loan Information</h3>
               

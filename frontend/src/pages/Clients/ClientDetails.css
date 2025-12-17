@@ -73,12 +73,17 @@
 }
 
 .client-details-layout .page-header .header-content {
-  flex: 1 1 auto !important;
+  flex: 0 0 auto !important;
+  margin-right: auto !important;
+}
+
+.client-details-layout .page-header .header-actions {
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
 }
 
 .client-details-layout .page-header .back-button {
   flex: 0 0 auto !important;
-  margin-left: auto !important;
 }
 
 .header-content {
@@ -201,8 +206,54 @@
 }
 
 .header-actions {
+  display: flex !important;
+  gap: 12px !important;
+  align-items: center !important;
+  flex: 0 0 auto !important;
+  margin-left: auto !important;
+}
+
+/* Edit Button */
+.edit-button {
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  outline: none;
+  letter-spacing: 0.025em;
+}
+
+.edit-button:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.edit-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.edit-button:focus {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+.edit-button span {
+  font-weight: 500;
+}
+
+.edit-button svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
 }
 
 /* Edit Client Button (for other components that might use it) */

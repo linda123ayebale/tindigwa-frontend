@@ -1,0 +1,317 @@
+/* View Loan Product Details Page */
+
+.view-product-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.page-header-centered {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding: 0 2rem;
+  gap: 1rem;
+}
+
+.back-to-list-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.back-to-list-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #374151;
+}
+
+.header-title-centered {
+  flex: 1;
+  text-align: center;
+}
+
+.header-title-centered h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.header-title-centered .subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin: 0.25rem 0 0;
+}
+
+/* Edit button removed from details page - only in table */
+.edit-btn-header {
+  display: none !important;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.details-section {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.details-section.span-2 {
+  grid-column: span 2;
+}
+
+.details-section h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 1.25rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #f3f4f6;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.25rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.info-item label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.info-item span {
+  font-size: 1rem;
+  color: #111827;
+  font-weight: 500;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.product-code-badge {
+  display: inline-block;
+  padding: 0.375rem 0.875rem;
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 6px;
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.375rem 0.875rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.status-active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.highlight-value {
+  color: #3b82f6 !important;
+  font-weight: 700 !important;
+  font-size: 1.125rem !important;
+}
+
+.fee-value {
+  color: #dc2626 !important;
+  font-weight: 600 !important;
+}
+
+.amount-value {
+  color: #059669 !important;
+  font-weight: 600 !important;
+}
+
+.text-success {
+  color: #059669 !important;
+  font-weight: 600 !important;
+}
+
+.text-muted {
+  color: #9ca3af !important;
+  font-weight: 500 !important;
+}
+
+/* Registration Fee Tiers Table */
+.tiers-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.tiers-header {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.tiers-table .tier-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.tiers-table .tier-row:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+/* Loading and Error States */
+.loading-state,
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: 2rem;
+}
+
+.loading {
+  font-size: 1.1rem;
+  color: #6b7280;
+}
+
+.error-state {
+  gap: 1rem;
+}
+
+.error-state svg {
+  color: #9ca3af;
+}
+
+.error-state h3 {
+  font-size: 1.5rem;
+  color: #111827;
+  margin: 0;
+}
+
+.error-state p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.error-state .back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: #3b82f6;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: all 0.2s;
+}
+
+.error-state .back-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details-section.span-2 {
+    grid-column: span 1;
+  }
+
+  .page-header-centered {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-title-centered {
+    text-align: left;
+    order: -1;
+  }
+
+  .back-to-list-btn,
+  .edit-btn-header {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px) {
+  .view-product-container {
+    padding: 1rem;
+  }
+
+  .page-header-centered {
+    padding: 0 1rem;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details-section {
+    padding: 1rem;
+  }
+
+  .header-title-centered h1 {
+    font-size: 1.5rem;
+  }
+}

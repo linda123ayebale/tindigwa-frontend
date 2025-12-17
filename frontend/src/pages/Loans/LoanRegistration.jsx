@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Plus } from 'lucide-react';
+import { Save } from 'lucide-react';
 import './LoanRegistration.css';
+import AppLayout from '../../components/Layout/AppLayout';
 
 const LoanRegistration = () => {
   const navigate = useNavigate();
@@ -52,34 +53,9 @@ const LoanRegistration = () => {
   ];
 
   return (
-    <div className="loan-registration-layout">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <h2>TINDIGWA</h2>
-        </div>
-        
-        <nav className="sidebar-nav">
-          <button className="nav-item" onClick={() => navigate('/dashboard')}>
-            <span>Dashboard</span>
-          </button>
-          <button className="nav-item" onClick={() => navigate('/clients')}>
-            <span>Clients</span>
-          </button>
-          <button className="nav-item active">
-            <span>Loans</span>
-          </button>
-          <button className="nav-item" onClick={() => navigate('/payments')}>
-            <span>Payments</span>
-          </button>
-          <button className="nav-item" onClick={() => navigate('/settings')}>
-            <span>Settings</span>
-          </button>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="main-content">
+    <AppLayout>
+      <div className="loan-registration-layout">
+        <main className="main-content">
         <div className="page-header">
           <h1>Loan Registration</h1>
         </div>
@@ -245,7 +221,8 @@ const LoanRegistration = () => {
           </form>
         </div>
       </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 

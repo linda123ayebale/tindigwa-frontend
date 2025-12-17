@@ -1,0 +1,126 @@
+/* Sidebar Styles - Matching Payments Page Design */
+.dashboard-sidebar {
+  width: 250px;
+  background: white;
+  border-right: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+
+.sidebar-header {
+  padding: 24px 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.sidebar-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-item-wrapper {
+  margin-bottom: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+  position: relative;
+}
+
+.nav-item:hover {
+  background: #f8f9fa;
+  color: #1a1a1a;
+}
+
+.nav-item.active {
+  background: #f8f9fa;
+  color: #1a1a1a;
+  font-weight: 600;
+  border-right: 3px solid #4285f4;
+}
+
+.nav-item span {
+  flex: 1;
+}
+
+.nav-item .chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Submenu Styles */
+.nav-submenu {
+  background: #f8f9fa;
+  padding: 4px 0;
+  margin: 0;
+  border-left: 3px solid #4285f4;
+  margin-left: 20px;
+}
+
+.nav-subitem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  color: #6c757d;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.nav-subitem:hover {
+  background: #e9ecef;
+  color: #1a1a1a;
+}
+
+.nav-subitem.active {
+  background: #e9ecef;
+  color: #4285f4;
+  font-weight: 600;
+}
+
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .dashboard-sidebar {
+    transform: translateX(-100%);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-sidebar {
+    position: fixed;
+    z-index: 1000;
+  }
+}

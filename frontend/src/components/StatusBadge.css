@@ -1,0 +1,214 @@
+/* StatusBadge Component - Color-Coded Status System */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+  border: 1px solid;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+/* Size Variants */
+.status-badge.size-sm {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.status-badge.size-md {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.status-badge.size-lg {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+/* Hover Effect - Subtle Elevation */
+.status-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+/* Status Colors - Approved */
+.status-badge.approved {
+  background: #E7F9EE;
+  color: #107C41;
+  border-color: #B8EAC2;
+}
+
+/* Status Colors - Pending Approval */
+.status-badge.pending-approval,
+.status-badge.pending_approval {
+  background: #FFF6E5;
+  color: #D9931E;
+  border-color: #FFD48B;
+}
+
+/* Status Colors - Rejected */
+.status-badge.rejected {
+  background: #FFE8E8;
+  color: #B71C1C;
+  border-color: #F5B5B5;
+}
+
+/* Status Colors - Disbursed */
+.status-badge.disbursed {
+  background: #E6F3FF;
+  color: #005EB8;
+  border-color: #A9D2FF;
+}
+
+/* Status Colors - Completed */
+.status-badge.completed {
+  background: #E9F8F2;
+  color: #056C4E;
+  border-color: #B4E7CF;
+}
+
+/* Status Colors - Due */
+.status-badge.due {
+  background: #FFF4E5;
+  color: #C76C04;
+  border-color: #FFD19A;
+}
+
+/* Status Colors - Defaulted */
+.status-badge.defaulted {
+  background: #FDE8E8;
+  color: #8B0000;
+  border-color: #E9B3B3;
+}
+
+/* ============================================================================ */
+/* LOAN STATUS COLORS - Updated to match business rules */
+/* ============================================================================ */
+
+/* OPEN - No installment made yet (Gray) */
+.status-badge.open {
+  background: #CBD5E1;
+  color: #334155;
+  border-color: #94A3B8;
+}
+
+/* IN_PROGRESS - At least one installment made (Blue) */
+.status-badge.in-progress,
+.status-badge.in_progress,
+.status-badge.inprogress {
+  background: #E0F2FE;
+  color: #0369A1;
+  border-color: #7DD3FC;
+}
+
+/* CLOSED - Fully paid before maturity (Green) */
+.status-badge.closed {
+  background: #DCFCE7;
+  color: #15803D;
+  border-color: #86EFAC;
+}
+
+/* OVERDUE - Payment made after maturity (Orange) */
+.status-badge.overdue {
+  background: #FEF3C7;
+  color: #B45309;
+  border-color: #FDE68A;
+}
+
+/* DEFAULTED - No payment for 180+ days (Red) */
+.status-badge.defaulted {
+  background: #FEE2E2;
+  color: #B91C1C;
+  border-color: #FCA5A5;
+}
+
+/* ============================================================================ */
+/* Additional Status Colors (legacy/other uses) */
+/* ============================================================================ */
+
+/* Active - For workflow status */
+.status-badge.active {
+  background: #E8F4FD;
+  color: #0066CC;
+  border-color: #B3D9F2;
+}
+
+/* Pending (generic) - Neutral gray */
+.status-badge.pending {
+  background: #F5F5F5;
+  color: #666;
+  border-color: #DDD;
+}
+
+/* Recorded (for payments) */
+.status-badge.recorded {
+  background: #E7F9EE;
+  color: #107C41;
+  border-color: #B8EAC2;
+}
+
+/* Reversed (for payments) */
+.status-badge.reversed {
+  background: #FFE8E8;
+  color: #B71C1C;
+  border-color: #F5B5B5;
+}
+
+/* Created */
+.status-badge.created {
+  background: #E8F4FD;
+  color: #0066CC;
+  border-color: #B3D9F2;
+}
+
+/* On Track (for tracking status) */
+.status-badge.on-track,
+.status-badge.on_track {
+  background: #E7F9EE;
+  color: #107C41;
+  border-color: #B8EAC2;
+}
+
+/* At Risk */
+.status-badge.at-risk,
+.status-badge.at_risk {
+  background: #FFF4E5;
+  color: #C76C04;
+  border-color: #FFD19A;
+}
+
+/* Badge Container for Multiple Badges */
+.status-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .status-badge {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+  
+  .status-badge.size-sm {
+    padding: 4px 8px;
+    font-size: 10px;
+  }
+  
+  .status-badge.size-lg {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  
+  .status-badges {
+    gap: 6px;
+  }
+}

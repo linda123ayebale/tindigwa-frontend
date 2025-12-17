@@ -1,0 +1,60 @@
+/* Import ClientDetails styles for consistency */
+@import '../Clients/ClientDetails.css';
+
+/* Custom styles for expense details */
+.amount-highlight {
+  font-size: 18px;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.category-badge-details {
+  display: inline-block;
+  padding: 6px 12px;
+  padding-left: 8px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.notes-content {
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.delete-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.3);
+}
+
+.span-2 {
+  grid-column: span 2;
+}

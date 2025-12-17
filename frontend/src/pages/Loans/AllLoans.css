@@ -1,0 +1,844 @@
+/* Dashboard Layout Override for Loans */
+.dashboard-main {
+  padding-top: 32px;
+}
+
+/* Loans Page Styles */
+.loans-content {
+  padding: 0;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e4e7;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 30px;
+  background: #f8f9fa;
+  padding: 4px;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.tab-button:hover {
+  background: #e9ecef;
+  color: #495057;
+}
+
+.tab-button.active {
+  background: white;
+  color: #0056b3;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 600;
+}
+
+.tab-count {
+  background: #6c757d;
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.tab-button.active .tab-count {
+  background: #0056b3;
+}
+
+/* Content sections */
+.loans-content,
+.approvals-content {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Workflow Status Badges */
+.workflow-badge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.workflow-badge.pending-approval {
+  background: rgba(255, 193, 7, 0.15);
+  color: #b8860b;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.workflow-badge.approved {
+  background: rgba(40, 167, 69, 0.15);
+  color: #1e7e34;
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.workflow-badge.rejected {
+  background: rgba(220, 53, 69, 0.15);
+  color: #b21f2d;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.workflow-badge.legacy {
+  background: rgba(108, 117, 125, 0.15);
+  color: #6c757d;
+  border: 1px solid rgba(108, 117, 125, 0.3);
+}
+.header-content h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 4px 0;
+}
+
+.page-description {
+  font-size: 14px;
+  color: #718096;
+  margin: 0;
+}
+
+.add-loan-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.add-loan-btn:hover {
+  background: #2c5aa0;
+}
+
+.add-loan-btn.primary {
+  background: #3182ce;
+  padding: 12px 20px;
+  font-size: 15px;
+  margin-top: 16px;
+}
+
+/* Controls */
+.loans-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 0 24px;
+  gap: 16px;
+}
+
+.search-box {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #3182ce;
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #a0aec0;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+}
+
+.filter-group select {
+  border: none;
+  background: none;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+  color: #4a5568;
+}
+
+/* Table */
+.loans-table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin: 0 24px 24px 24px;
+  overflow: hidden;
+}
+
+.loans-table {
+  width: 100%;
+}
+
+.table-header {
+  background: #f7fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr 0.8fr 0.7fr 1fr 0.6fr 0.6fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr;
+  align-items: center;
+  min-height: 60px;
+  gap: 8px;
+}
+
+/* Enhanced table for better column layout */
+.loans-table.enhanced .table-row {
+  grid-template-columns: 1.5fr 0.8fr 0.8fr 0.7fr 1fr 0.6fr 0.6fr 0.8fr 0.8fr 0.8fr 0.8fr 1fr;
+}
+
+
+.table-body .table-row {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s;
+}
+
+.table-body .table-row:hover {
+  background: #f8fafc;
+}
+
+.table-cell {
+  padding: 12px 16px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.header-row .table-cell {
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Loan Info */
+.loan-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.loan-avatar {
+  width: 36px;
+  height: 36px;
+  background: #e6f3ff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3182ce;
+}
+
+.loan-details {
+  flex: 1;
+}
+
+.loan-id {
+  font-weight: 600;
+  color: #1a202c;
+  margin-bottom: 2px;
+}
+
+.loan-branch {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #718096;
+}
+
+/* Client Info */
+.client-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+}
+
+.client-name {
+  font-weight: 500;
+  color: #1a202c;
+  text-align: left;
+}
+
+.loan-number {
+  font-size: 12px;
+  color: #718096;
+  font-family: monospace;
+}
+
+.client-id {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #718096;
+}
+
+/* Interest rate styling */
+.interest-rate {
+  font-size: 12px;
+  color: #718096;
+  font-style: italic;
+}
+
+/* Repayment info styling */
+.repayment-info {
+  text-align: center;
+}
+
+/* Action buttons compact styling */
+.action-buttons.compact .action-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 4px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #495057;
+  text-decoration: none;
+}
+
+.action-buttons.compact .action-btn:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+/* Amount Info */
+.amount-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.amount {
+  font-weight: 600;
+  color: #1a202c;
+  font-size: 14px;
+}
+
+.progress-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.progress-bar {
+  width: 60px;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #48bb78;
+  transition: width 0.3s;
+}
+
+.progress-text {
+  font-size: 11px;
+  color: #718096;
+  font-weight: 500;
+}
+
+/* Duration */
+.duration {
+  font-weight: 500;
+  color: #1a202c;
+  font-size: 14px;
+}
+
+/* Officer Name */
+.officer-name {
+  font-weight: 500;
+  color: #1a202c;
+  font-size: 14px;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.3px;
+}
+
+/* Loan Status Badge Colors based on Business Rules */
+.status-badge.open {
+  background: #e3f2fd;
+  color: #1976d2;
+  border: 1px solid #bbdefb;
+}
+
+.status-badge.in-progress {
+  background: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.status-badge.closed {
+  background: #e8f5e8;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.status-badge.overdue {
+  background: #fff3e0;
+  color: #f57c00;
+  border: 1px solid #ffcc02;
+}
+
+.status-badge.defaulted {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ef9a9a;
+}
+
+/* Balance styling based on status */
+.balance.paid {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.balance.overdue {
+  color: #f57c00;
+  font-weight: 600;
+}
+
+.balance.pending {
+  color: #1976d2;
+  font-weight: 500;
+}
+
+/* Date Info */
+.date-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #4a5568;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+  justify-content: flex-start;
+  min-width: 140px;
+  overflow: visible;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: white;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  flex-shrink: 0;
+  visibility: visible !important;
+  opacity: 1 !important;
+  margin: 2px;
+}
+
+.action-btn svg {
+  /* Force SVG dimensions and display */
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  min-height: 20px !important;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative !important;
+  
+  /* SVG-specific properties */
+  fill: none !important;
+  stroke: currentColor !important;
+  stroke-width: 2 !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+  
+  /* Override any box model resets */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  
+  /* Ensure proper rendering */
+  vertical-align: middle;
+  overflow: visible !important;
+  pointer-events: none !important;
+}
+
+.action-btn svg * {
+  /* Reset all SVG children elements */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  
+  /* Inherit SVG properties */
+  stroke: inherit !important;
+  fill: inherit !important;
+  stroke-width: inherit !important;
+  stroke-linecap: inherit !important;
+  stroke-linejoin: inherit !important;
+}
+
+
+.action-btn:hover {
+  border-color: #cbd5e0;
+  background: #f7fafc;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn.view {
+  color: #3182ce;
+}
+
+.action-btn.view:hover {
+  border-color: #3182ce;
+  background: #ebf8ff;
+  color: #2c5aa0;
+}
+
+.action-btn.payment {
+  color: #38a169;
+}
+
+.action-btn.payment:hover {
+  border-color: #38a169;
+  background: #f0fff4;
+  color: #2f855a;
+}
+
+.action-btn.edit {
+  color: #ed8936;
+}
+
+.action-btn.edit:hover {
+  border-color: #ed8936;
+  background: #fffaf0;
+  color: #c05621;
+}
+
+.action-btn.more {
+  color: #718096;
+}
+
+.action-btn.more:hover {
+  border-color: #718096;
+  background: #f7fafc;
+  color: #4a5568;
+}
+
+.action-btn.delete {
+  color: #e53e3e;
+}
+
+.action-btn.delete:hover {
+  border-color: #e53e3e;
+  background: #fed7d7;
+  color: #c53030;
+}
+
+/* Action Dropdown */
+.action-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 180px;
+  padding: 8px 0;
+  margin-top: 4px;
+}
+
+.dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  right: 12px;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-bottom: none;
+  border-right: none;
+  transform: rotate(45deg);
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 14px;
+  color: #4a5568;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.15s;
+}
+
+.dropdown-item:hover {
+  background: #f7fafc;
+  color: #1a202c;
+}
+
+.dropdown-item.success {
+  color: #38a169;
+}
+
+.dropdown-item.success:hover {
+  background: #f0fff4;
+  color: #2f855a;
+}
+
+.dropdown-item.danger {
+  color: #e53e3e;
+}
+
+.dropdown-item.danger:hover {
+  background: #fed7d7;
+  color: #c53030;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 8px 0;
+}
+
+/* Action Button States */
+.action-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.action-btn:disabled:hover {
+  border-color: #e2e8f0;
+  background: white;
+  color: inherit;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #718096;
+}
+
+.empty-state svg {
+  margin-bottom: 16px;
+  color: #a0aec0;
+}
+
+.empty-state h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #4a5568;
+  margin: 0 0 8px 0;
+}
+
+.empty-state p {
+  font-size: 14px;
+  margin: 0;
+}
+
+/* Summary Statistics */
+.loans-summary {
+  padding: 0 24px 24px 24px;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f1f5f9;
+}
+
+.stat-card h3 {
+  font-size: 13px;
+  color: #718096;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 4px;
+}
+
+.stat-change {
+  font-size: 12px;
+  color: #a0aec0;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .table-row {
+    grid-template-columns: 1.3fr 1fr 1fr 1.1fr 0.8fr 1fr 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .loans-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  
+  .search-box {
+    max-width: none;
+  }
+  
+  .table-row {
+    grid-template-columns: 1.2fr 1fr 1fr 1fr 0.8fr 1fr 0.8fr;
+    font-size: 13px;
+  }
+  
+  .summary-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+  }
+  
+  .add-loan-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .summary-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Hide some columns on mobile */
+  .table-row {
+    grid-template-columns: 1.5fr 1fr 0.8fr 1fr;
+  }
+  
+  .table-row .table-cell:nth-child(3),
+  .table-row .table-cell:nth-child(4),
+  .table-row .table-cell:nth-child(6) {
+    display: none;
+  }
+}

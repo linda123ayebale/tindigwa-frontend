@@ -1,0 +1,164 @@
+/* App Layout Styles */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+  position: relative;
+}
+
+/* Mobile Sidebar Toggle */
+.mobile-sidebar-toggle {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1002;
+  background: #1f2937;
+  color: white;
+  border: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
+}
+
+.mobile-sidebar-toggle:hover {
+  background: #374151;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.mobile-sidebar-toggle:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Main Content Area */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+  background: #f8fafc;
+}
+
+/* Desktop: Main content with expanded sidebar */
+.app-main.with-expanded-sidebar {
+  margin-left: 280px;
+}
+
+/* Desktop: Main content with collapsed sidebar */
+.app-main.with-collapsed-sidebar {
+  margin-left: 70px;
+}
+
+/* Mobile: No margin for main content */
+@media (max-width: 768px) {
+  .app-main.with-expanded-sidebar,
+  .app-main.with-collapsed-sidebar {
+    margin-left: 0;
+  }
+  
+  .mobile-sidebar-toggle {
+    display: flex;
+  }
+}
+
+/* Desktop: Hide mobile toggle */
+@media (min-width: 769px) {
+  .mobile-sidebar-toggle {
+    display: none;
+  }
+}
+
+/* Content wrapper for pages */
+.app-main > * {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure proper spacing for content */
+.app-main .main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Page header adjustments */
+.app-main .page-header {
+  flex-shrink: 0;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .app-layout {
+    position: relative;
+  }
+  
+  .app-main {
+    width: 100%;
+  }
+  
+  /* Add padding for mobile toggle button */
+  .app-main .page-header {
+    padding-left: 80px;
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .app-main.with-expanded-sidebar {
+    margin-left: 280px;
+  }
+  
+  .app-main.with-collapsed-sidebar {
+    margin-left: 70px;
+  }
+}
+
+/* High DPI display adjustments */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .mobile-sidebar-toggle {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .mobile-sidebar-toggle:hover {
+    box-shadow: 0 3px 9px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Focus styles for accessibility */
+.mobile-sidebar-toggle:focus {
+  outline: 2px solid #10b981;
+  outline-offset: 2px;
+}
+
+/* Animation for smooth transitions */
+@media (prefers-reduced-motion: no-preference) {
+  .app-main {
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .mobile-sidebar-toggle {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .app-main {
+    transition: none;
+  }
+  
+  .mobile-sidebar-toggle {
+    transition: none;
+  }
+}

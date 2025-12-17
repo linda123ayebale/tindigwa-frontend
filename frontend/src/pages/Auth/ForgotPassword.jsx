@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { validateEmail } from '../../utils/validation';
 import './ForgotPassword.css';
 
 const ForgotPassword = () => {
@@ -20,16 +21,10 @@ const ForgotPassword = () => {
     setLoading(true);
     setError('');
 
-    // Basic email validation
-    if (!email) {
-      setError('Please enter your email address');
-      setLoading(false);
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Please enter a valid email address');
+    // Email validation
+    const emailValidation = validateEmail(email, true);
+    if (!emailValidation.isValid) {
+      setError(emailValidation.error);
       setLoading(false);
       return;
     }

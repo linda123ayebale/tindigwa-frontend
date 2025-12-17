@@ -1,24 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Home, 
-  Users, 
-  CreditCard, 
-  DollarSign, 
-  FileText, 
-  Settings,
   Search,
   TrendingUp,
   TrendingDown,
-  BarChart3,
-  PieChart,
-  Calendar,
   Download,
+  PieChart,
   Eye,
   Plus,
-  ChevronUp,
   ChevronDown
 } from 'lucide-react';
+import Sidebar from '../../components/Layout/Sidebar';
 import './FinancialDashboard.css';
 
 const FinancialDashboard = () => {
@@ -48,15 +40,6 @@ const FinancialDashboard = () => {
     }
   });
 
-  const sidebarItems = [
-    { title: 'Dashboard', icon: Home, path: '/dashboard' },
-    { title: 'Clients', icon: Users, path: '/clients' },
-    { title: 'Loans', icon: CreditCard, path: '/loans' },
-    { title: 'Payments', icon: DollarSign, path: '/payments' },
-    { title: 'Finances', icon: BarChart3, path: '/finances', active: true },
-    { title: 'Reports', icon: FileText, path: '/reports' },
-    { title: 'Settings', icon: Settings, path: '/settings' }
-  ];
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-UG', {
@@ -97,27 +80,7 @@ const FinancialDashboard = () => {
   return (
     <div className="dashboard-layout">
       {/* Sidebar */}
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-header">
-          <h2>TINDIGWA</h2>
-        </div>
-        
-        <nav className="sidebar-nav">
-          {sidebarItems.map((item, index) => {
-            const IconComponent = item.icon;
-            return (
-              <button
-                key={index}
-                className={`nav-item ${item.active ? 'active' : ''}`}
-                onClick={() => navigate(item.path)}
-              >
-                <IconComponent size={20} />
-                <span>{item.title}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
+      <Sidebar />
 
       {/* Main Content */}
       <main className="dashboard-main">
@@ -303,11 +266,11 @@ const FinancialDashboard = () => {
                   </div>
                   
                   <div className="expense-actions">
-                    <button className="view-table-btn" onClick={() => navigate('/expenses')}>
+                    <button className="view-table-btn" onClick={() => navigate('/expenses/all')}>
                       <Eye size={16} />
                       View Expenses Table
                     </button>
-                    <button className="add-expense-btn" onClick={() => navigate('/expenses/add')}>
+                    <button className="add-expense-btn" onClick={() => navigate('/expenses/record')}>
                       <Plus size={16} />
                       Add New Expense
                     </button>

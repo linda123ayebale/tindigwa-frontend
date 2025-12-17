@@ -1,0 +1,308 @@
+/* WorkflowTimeline Component Styles - Enhanced FinTech Design */
+
+.workflow-timeline {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  margin-bottom: 2rem;
+  border: 1px solid #f0f0f5;
+}
+
+.workflow-timeline:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+  border-color: #e5e5ef;
+}
+
+.workflow-timeline h3 {
+  font-size: 1.15rem;
+  color: #1e1e2f;
+  margin-bottom: 1.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f2f5;
+}
+
+.workflow-timeline h3 svg {
+  width: 20px;
+  height: 20px;
+  color: #4a47a3;
+}
+
+.workflow-timeline ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.workflow-timeline li {
+  position: relative;
+  border-left: 3px solid #e0e5ee;
+  padding-left: 2rem;
+  padding-bottom: 1.75rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.workflow-timeline li:hover {
+  border-left-color: #4a47a3;
+}
+
+.workflow-timeline li:last-child {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+.workflow-timeline li::before {
+  content: '';
+  position: absolute;
+  left: -8.5px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #cbd5e1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.workflow-timeline li:hover::before {
+  transform: scale(1.2);
+  box-shadow: 0 3px 10px rgba(74, 71, 163, 0.3);
+}
+
+.stage {
+  font-weight: 700;
+  color: #1e1e2f;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage svg {
+  width: 16px;
+  height: 16px;
+  color: #4a47a3;
+}
+
+.date {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.date svg {
+  width: 13px;
+  height: 13px;
+  color: #cbd5e1;
+}
+
+.user {
+  font-size: 0.85rem;
+  color: #4a47a3;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(74, 71, 163, 0.08);
+  padding: 0.25rem 0.75rem;
+  border-radius: 6px;
+  display: inline-flex;
+  margin-top: 0.4rem;
+}
+
+.user svg {
+  width: 13px;
+  height: 13px;
+}
+
+.description {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-top: 0.6rem;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 3px solid #e2e8f0;
+  line-height: 1.5;
+}
+
+/* Event Count Badge */
+.event-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(74, 71, 163, 0.1);
+  color: #4a47a3;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 12px;
+  margin-left: auto;
+}
+
+/* Status-specific colors - Enhanced */
+.workflow-timeline li.created::before {
+  background: #fff;
+  border-color: #10b981;
+  box-shadow: 0 0 0 1px #10b981, 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.workflow-timeline li.created {
+  border-left-color: #10b981;
+}
+
+.workflow-timeline li.created .stage {
+  color: #047857;
+}
+
+.workflow-timeline li.created .description {
+  border-left-color: #10b981;
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.workflow-timeline li.approved::before {
+  background: #fff;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 1px #3b82f6, 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.workflow-timeline li.approved {
+  border-left-color: #3b82f6;
+}
+
+.workflow-timeline li.approved .stage {
+  color: #1e40af;
+}
+
+.workflow-timeline li.approved .user {
+  background: rgba(59, 130, 246, 0.1);
+  color: #1e40af;
+}
+
+.workflow-timeline li.approved .description {
+  border-left-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.04);
+}
+
+.workflow-timeline li.rejected::before {
+  background: #fff;
+  border-color: #ef4444;
+  box-shadow: 0 0 0 1px #ef4444, 0 2px 8px rgba(239, 68, 68, 0.3);
+}
+
+.workflow-timeline li.rejected {
+  border-left-color: #ef4444;
+}
+
+.workflow-timeline li.rejected .stage {
+  color: #b91c1c;
+}
+
+.workflow-timeline li.rejected .user {
+  background: rgba(239, 68, 68, 0.1);
+  color: #b91c1c;
+}
+
+.workflow-timeline li.rejected .description {
+  border-left-color: #ef4444;
+  background: rgba(239, 68, 68, 0.04);
+}
+
+.workflow-timeline li.disbursed::before {
+  background: #fff;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 1px #f59e0b, 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.workflow-timeline li.disbursed {
+  border-left-color: #f59e0b;
+}
+
+.workflow-timeline li.disbursed .stage {
+  color: #b45309;
+}
+
+.workflow-timeline li.disbursed .user {
+  background: rgba(245, 158, 11, 0.1);
+  color: #b45309;
+}
+
+.workflow-timeline li.disbursed .description {
+  border-left-color: #f59e0b;
+  background: rgba(245, 158, 11, 0.04);
+}
+
+/* Empty State */
+.workflow-timeline .empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #94a3b8;
+}
+
+.workflow-timeline .empty-state svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.workflow-timeline .empty-state p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .workflow-timeline {
+    padding: 1.5rem 1.75rem;
+  }
+  
+  .workflow-timeline li {
+    padding-left: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+  
+  .workflow-timeline li::before {
+    left: -7.5px;
+    width: 12px;
+    height: 12px;
+  }
+  
+  .stage {
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .workflow-timeline {
+    padding: 1.25rem 1.5rem;
+  }
+  
+  .workflow-timeline h3 {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .workflow-timeline li {
+    padding-left: 1.25rem;
+  }
+  
+  .description {
+    font-size: 0.8rem;
+    padding: 0.6rem 0.85rem;
+  }
+}

@@ -1,0 +1,132 @@
+/* Dark blurred overlay */
+.branch-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(17, 24, 39, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+/* Main modal card */
+.branch-modal-card {
+  width: 650px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0px 8px 20px rgba(0,0,0,0.15);
+  animation: fadeIn 0.25s ease-out;
+}
+
+/* Header */
+.branch-modal-header {
+  padding: 20px 28px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.branch-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.close-icon {
+  cursor: pointer;
+  color: #6b7280;
+  transition: 0.2s ease;
+}
+
+.close-icon:hover {
+  color: #111827;
+}
+
+/* Body */
+.branch-modal-body {
+  padding: 24px 28px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 14px;
+}
+
+.detail-section {
+  margin-bottom: 20px;
+}
+
+/* Information grid */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Each detail box */
+.detail-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.detail-box label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.detail-box p {
+  font-size: 15px;
+  color: #111827;
+  margin: 0;
+  font-weight: 500;
+}
+
+/* Footer */
+.branch-modal-footer {
+  padding: 16px 28px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

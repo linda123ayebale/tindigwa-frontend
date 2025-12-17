@@ -1,0 +1,16 @@
+/* Import AddExpense styles for consistency */
+@import '../Expenses/AddExpense.css';
+
+/* Additional specific styles for Loan Products if needed */
+.add-loan-product-container {
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 0 32px;
+}
+
+.add-loan-product-container form {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

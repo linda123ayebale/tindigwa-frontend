@@ -1,42 +1,82 @@
-/* Loan Details Page Styles */
-/* Use exact Loans page header styling */
+/* Loan Details Page Styles - FinTech Dashboard Design */
+
 .dashboard-main {
-  padding-top: 32px;
+  flex: 1;
+  padding: 2.5rem;
+  background: #f5f7fa;
+  min-height: 100vh;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding: 0 24px;
+  margin-bottom: 2rem;
+  padding: 0;
+}
+
+.page-header h1 {
+  font-size: 1.6rem;
+  color: #1e1e2f;
+  font-weight: 600;
+  margin: 0;
 }
 
 .loan-details-content {
-  padding: 0 24px;
-  max-width: 1200px;
+  max-width: 1350px;
   margin: 0 auto;
+  padding: 0;
+}
+
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1e1e2f;
+  margin-bottom: 1rem;
+}
+
+/* Component Spacing */
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
 }
 
 .back-btn {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: #3182ce;
-  border: 1px solid #3182ce;
-  border-radius: 8px;
-  padding: 8px 12px;
-  font-size: 14px;
-  color: white;
+  justify-content: center;
+  gap: 6px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #64748b;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: all 0.2s ease;
   text-decoration: none;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .back-btn:hover {
-  background: #2c5aa0;
-  border-color: #2c5aa0;
-  color: white;
+  background: #f8fafc;
+  border-color: #cbd5e0;
+  color: #475569;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.back-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .header-info h1 {
@@ -303,6 +343,47 @@
   color: #718096;
 }
 
+/* Loan Completed Card */
+.loan-completed-card {
+  border: 1px solid #d1fae5;
+  background: #f0fdf4;
+}
+
+.completion-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  background: #dcfce7;
+  border-radius: 50%;
+  color: #16a34a;
+  margin-bottom: 12px;
+}
+
+.check-icon {
+  color: #16a34a;
+}
+
+.completion-info {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.completion-label {
+  font-size: 12px;
+  color: #065f46;
+  font-weight: 600;
+}
+
+.completion-value {
+  font-size: 14px;
+  color: #065f46;
+  font-weight: 700;
+}
+
 /* Status Badge */
 .status-badge {
   display: inline-block;
@@ -334,53 +415,337 @@
   color: #dc3545;
 }
 
-/* Action Buttons */
+/* Enhanced Header Actions */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.loan-id-header {
+  font-size: 14px;
+  color: #718096;
+  font-weight: 400;
+}
+
+.primary-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.secondary-actions {
+  position: relative;
+}
+
+/* Action Buttons - Enhanced */
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  text-decoration: none;
+  white-space: nowrap;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+}
+
+.action-btn.primary {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn.primary:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3), 0 2px 4px -1px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+}
+
+.action-btn.primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn.primary.edit-btn {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.action-btn.primary.edit-btn:hover {
+  background: #059669;
+  border-color: #059669;
+  box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -1px rgba(16, 185, 129, 0.2);
+}
+
+.action-btn.primary.edit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn.primary.payment-btn {
+  background: #8b5cf6;
+  border-color: #8b5cf6;
+}
+
+.action-btn.primary.payment-btn:hover {
+  background: #7c3aed;
+  border-color: #7c3aed;
+  box-shadow: 0 4px 6px -1px rgba(139, 92, 246, 0.3), 0 2px 4px -1px rgba(139, 92, 246, 0.2);
+}
+
+.action-btn.primary.payment-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn.primary.tracking-btn {
+  background: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.action-btn.primary.tracking-btn:hover {
+  background: #d97706;
+  border-color: #d97706;
+  box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3), 0 2px 4px -1px rgba(245, 158, 11, 0.2);
+}
+
+.action-btn.primary.tracking-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn.secondary {
+  background: white;
+  color: #64748b;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn.secondary:hover {
+  background: #f8fafc;
+  border-color: #cbd5e0;
+  color: #475569;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.action-btn.secondary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn.approve {
+  background: #28a745;
+  color: white;
+  border-color: #28a745;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn.approve:hover {
+  background: #218838;
+  border-color: #1e7e34;
+  box-shadow: 0 4px 6px -1px rgba(40, 167, 69, 0.3), 0 2px 4px -1px rgba(40, 167, 69, 0.2);
+  transform: translateY(-1px);
+}
+
+.action-btn.approve:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn.reject {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn.reject:hover {
+  background: #c82333;
+  border-color: #bd2130;
+  box-shadow: 0 4px 6px -1px rgba(220, 53, 69, 0.3), 0 2px 4px -1px rgba(220, 53, 69, 0.2);
+  transform: translateY(-1px);
+}
+
+.action-btn.reject:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.action-btn.disburse {
+  background: #17a2b8;
+  color: white;
+  border-color: #17a2b8;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.action-btn.disburse:hover {
+  background: #138496;
+  border-color: #117a8b;
+  box-shadow: 0 4px 6px -1px rgba(23, 162, 184, 0.3), 0 2px 4px -1px rgba(23, 162, 184, 0.2);
+  transform: translateY(-1px);
+}
+
+.action-btn.disburse:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Dropdown Menu */
+.action-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 1000;
+  min-width: 180px;
+  padding: 8px 0;
+  margin-top: 4px;
+  animation: slideDown 0.15s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 400;
+  color: #4a5568;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  text-align: left;
+}
+
+.dropdown-item:hover {
+  background: #f7fafc;
+  color: #2d3748;
+}
+
+.dropdown-item.warning {
+  color: #d69e2e;
+}
+
+.dropdown-item.warning:hover {
+  background: #fef5e7;
+  color: #b7791f;
+}
+
+.dropdown-item.danger {
+  color: #e53e3e;
+}
+
+.dropdown-item.danger:hover {
+  background: #fed7d7;
+  color: #c53030;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 8px 0;
+}
+
+/* Table Action Buttons - For loans table */
+.action-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.action-buttons .action-btn {
+  padding: 6px 8px;
+  min-width: auto;
+  border-radius: 6px;
+}
+
+.action-buttons .action-btn.view {
+  background: #4299e1;
+  color: white;
+  border: 1px solid #4299e1;
+}
+
+.action-buttons .action-btn.view:hover {
+  background: #3182ce;
+  border-color: #3182ce;
+}
+
+.action-buttons .action-btn.edit {
+  background: #48bb78;
+  color: white;
+  border: 1px solid #48bb78;
+}
+
+.action-buttons .action-btn.edit:hover {
+  background: #38a169;
+  border-color: #38a169;
+}
+
+.action-buttons .action-btn.payment {
+  background: #9f7aea;
+  color: white;
+  border: 1px solid #9f7aea;
+}
+
+.action-buttons .action-btn.payment:hover {
+  background: #805ad5;
+  border-color: #805ad5;
+}
+
+.action-buttons .action-btn.delete {
+  background: #f56565;
+  color: white;
+  border: 1px solid #f56565;
+}
+
+.action-buttons .action-btn.delete:hover {
+  background: #e53e3e;
+  border-color: #e53e3e;
+}
+
+/* Legacy Action Card */
 .actions-card {
   background: white;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 24px;
   border: 1px solid #f1f5f9;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  border: none;
-  text-decoration: none;
-}
-
-.action-btn.primary {
-  background: #3182ce;
-  color: white;
-}
-
-.action-btn.primary:hover {
-  background: #2c5aa0;
-}
-
-.action-btn.secondary {
-  background: white;
-  color: #4a5568;
-  border: 1px solid #e2e8f0;
-}
-
-.action-btn.secondary:hover {
-  background: #f7fafc;
-  border-color: #cbd5e0;
 }
 
 .action-btn.danger {
@@ -477,6 +842,20 @@
   
   .page-header {
     padding: 32px 16px 0 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .header-actions {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .primary-actions {
+    flex: 1;
+    min-width: 200px;
   }
   
   .header-content {

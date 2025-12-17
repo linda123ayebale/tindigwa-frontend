@@ -1,0 +1,109 @@
+/* PaymentHistoryTable Component Styles */
+
+.payment-history-table {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.payment-history-table:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.payment-history-table h3 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.payment-history-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.payment-history-table thead {
+  background: #f9fafb;
+}
+
+.payment-history-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  color: #555;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.payment-history-table td {
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #222;
+}
+
+.payment-history-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.payment-history-table tbody tr:hover {
+  background-color: #f9fafb;
+}
+
+.payment-history-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Payment Method Badge */
+.payment-method {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.payment-method.cash {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.payment-method.bank {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.payment-method.mobile {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .payment-history-table {
+    overflow-x: auto;
+  }
+  
+  .payment-history-table table {
+    min-width: 600px;
+  }
+}

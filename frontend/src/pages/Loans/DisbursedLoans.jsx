@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Filter, Eye, Edit, Trash2, Plus } from 'lucide-react';
+import { Search, Filter, Eye, Edit, Trash2, Plus, DollarSign, BarChart3 } from 'lucide-react';
+import LoanService from '../../services/LoanService';
+import '../../styles/actions.css';
 import './DisbursedLoans.css';
+import AppLayout from '../../components/Layout/AppLayout';
 
 const DisbursedLoans = () => {
   const navigate = useNavigate();
   const [loans, setLoans] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -43,89 +48,72 @@ const DisbursedLoans = () => {
     return { status: 'defaulted', color: '#dc3545', bgColor: '#f8d7da' };
   };
 
-  // Sample data - in a real app, this would come from an API
+  // Fetch disbursed loans from API
+  const fetchLoans = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      console.log('🔄 Fetching disbursed loans from backend...');
+      // Fetch approved loans - these are the disbursed/active loans
+      const response = await LoanService.getApproved();
+      console.log('✅ Fetched', response.length, 'disbursed loans from backend');
+      
+      // Transform backend data to match component expectations
+      const transformedLoans = response.map(loan => ({
+        id: loan.loanNumber || loan.id,
+        clientId: loan.clientId,
+        clientName: loan.clientName || 'Unknown Client',
+        branch: loan.lendingBranch || 'N/A',
+        amount: loan.principalAmount || 0,
+        duration: calculateDurationInDays(loan.loanDuration, loan.durationUnit),
+        frequency: loan.repaymentFrequency || 'N/A',
+        interestRate: loan.interestRate || 0,
+        startDate: loan.releaseDate || loan.disbursedAt || loan.createdAt,
+        officer: loan.loanOfficerName || 'N/A',
+        amountPaid: 0, // TODO: Calculate from payments
+        totalAmount: loan.totalPayable || 0,
+        workflowStatus: loan.workflowStatus
+      }));
+      
+      setLoans(transformedLoans);
+    } catch (error) {
+      console.error('❌ Error fetching loans:', error);
+      setError(error.message);
+      setLoans([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper function to convert loan duration to days
+  const calculateDurationInDays = (duration, unit) => {
+    if (!duration || !unit) return 0;
+    
+    const durationNum = parseInt(duration);
+    switch (unit.toUpperCase()) {
+      case 'DAYS':
+        return durationNum;
+      case 'WEEKS':
+        return durationNum * 7;
+      case 'MONTHS':
+        return durationNum * 30;
+      case 'YEARS':
+        return durationNum * 365;
+      default:
+        return durationNum;
+    }
+  };
+
   useEffect(() => {
-    const sampleLoans = [
-      {
-        id: 'LN001',
-        clientId: 'CL001',
-        clientName: 'John Doe',
-        branch: 'Main Branch - Kampala',
-        amount: 500000,
-        duration: 90,
-        frequency: 'Weekly',
-        interestRate: 15.5,
-        startDate: '2024-06-01',
-        officer: 'Sarah Johnson',
-        amountPaid: 520000,
-        totalAmount: 520000
-      },
-      {
-        id: 'LN002',
-        clientId: 'CL002',
-        clientName: 'Mary Smith',
-        branch: 'Entebbe Branch',
-        amount: 300000,
-        duration: 60,
-        frequency: 'Monthly',
-        interestRate: 12.0,
-        startDate: '2024-07-15',
-        officer: 'James Wilson',
-        amountPaid: 150000,
-        totalAmount: 336000
-      },
-      {
-        id: 'LN003',
-        clientId: 'CL003',
-        clientName: 'Peter Mukasa',
-        branch: 'Jinja Branch',
-        amount: 750000,
-        duration: 120,
-        frequency: 'Bi-weekly',
-        interestRate: 18.0,
-        startDate: '2024-02-01',
-        officer: 'Grace Nakato',
-        amountPaid: 200000,
-        totalAmount: 885000
-      },
-      {
-        id: 'LN004',
-        clientId: 'CL004',
-        clientName: 'Alice Nambi',
-        branch: 'Mbarara Branch',
-        amount: 200000,
-        duration: 45,
-        frequency: 'Weekly',
-        interestRate: 20.0,
-        startDate: '2023-12-01',
-        officer: 'Robert Kasozi',
-        amountPaid: 50000,
-        totalAmount: 240000
-      },
-      {
-        id: 'LN005',
-        clientId: 'CL005',
-        clientName: 'David Okello',
-        branch: 'Gulu Branch',
-        amount: 400000,
-        duration: 75,
-        frequency: 'Monthly',
-        interestRate: 16.0,
-        startDate: '2024-08-01',
-        officer: 'Christine Auma',
-        amountPaid: 100000,
-        totalAmount: 464000
-      }
-    ];
-    setLoans(sampleLoans);
+    fetchLoans();
   }, []);
 
   // Filter loans based on search term and status
   const filteredLoans = loans.filter(loan => {
     const matchesSearch = 
-      loan.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      loan.clientId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      loan.id.toLowerCase().includes(searchTerm.toLowerCase());
+      loan.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      loan.clientId?.toString().toLowerCase().includes(searchTerm.toLowerCase()) ||
+      loan.id?.toString().toLowerCase().includes(searchTerm.toLowerCase());
     
     if (statusFilter === 'all') return matchesSearch;
     
@@ -146,23 +134,9 @@ const DisbursedLoans = () => {
   };
 
   return (
-    <div className="disbursed-loans-layout">
-      {/* Sidebar */}
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-header">
-          <h2>TINDIGWA</h2>
-        </div>
-        
-        <nav className="sidebar-nav">
-          <button className="nav-item" onClick={() => navigate('/dashboard')}>
-            <ArrowLeft size={20} />
-            <span>Back to Dashboard</span>
-          </button>
-        </nav>
-      </aside>
-
-      {/* Main Content */}
-      <main className="disbursed-loans-main">
+    <AppLayout>
+      <div className="disbursed-loans-layout">
+        <main className="disbursed-loans-main">
         <div className="disbursed-loans-header">
           <div className="header-content">
             <div>
@@ -171,7 +145,7 @@ const DisbursedLoans = () => {
             </div>
             <button 
               className="new-loan-button"
-              onClick={() => navigate('/loans/disbursement')}
+              onClick={() => navigate('/loans/add')}
             >
               <Plus size={16} />
               Register New Loan
@@ -211,6 +185,26 @@ const DisbursedLoans = () => {
 
           {/* Loans Table */}
           <div className="loans-table-container">
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <div>Loading disbursed loans...</div>
+              </div>
+            ) : error ? (
+              <div style={{ textAlign: 'center', padding: '40px', color: '#dc3545' }}>
+                <div>Error: {error}</div>
+                <button 
+                  onClick={fetchLoans}
+                  style={{ marginTop: '10px', padding: '8px 16px', cursor: 'pointer' }}
+                >
+                  Retry
+                </button>
+              </div>
+            ) : filteredLoans.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <div>No disbursed loans found</div>
+                {searchTerm && <div style={{ marginTop: '10px' }}>Try adjusting your search criteria</div>}
+              </div>
+            ) : (
             <table className="loans-table">
               <thead>
                 <tr>
@@ -277,17 +271,54 @@ const DisbursedLoans = () => {
                           {statusInfo.status}
                         </span>
                       </td>
-                      <td>
-                        <div className="action-buttons">
-                          <button className="action-btn view-btn" title="View Details">
+                      <td className="actions-cell">
+                        <div className="actions-group">
+                          {/* View Details - Always visible */}
+                          <button 
+                            className="action-btn view" 
+                            title="View Details"
+                            onClick={() => navigate(`/loans/details/${loan.id}`)}
+                          >
                             <Eye size={16} />
                           </button>
-                          <button className="action-btn edit-btn" title="Edit Loan">
-                            <Edit size={16} />
+                          
+                          {/* View Payment Tracking - Always visible */}
+                          <button 
+                            className="action-btn tracking" 
+                            title="View Payment Tracking"
+                            onClick={() => navigate(`/loans/tracking/${loan.id}`)}
+                          >
+                            <BarChart3 size={16} />
                           </button>
-                          <button className="action-btn delete-btn" title="Delete Loan">
-                            <Trash2 size={16} />
-                          </button>
+                          
+                          {/* Edit & Delete - Only when loanStatus === 'OPEN' */}
+                          {loan.loanStatus?.toUpperCase() === 'OPEN' && (
+                            <>
+                              <button 
+                                className="action-btn edit" 
+                                title="Edit Loan"
+                                onClick={() => navigate(`/loans/edit/${loan.id}`)}
+                              >
+                                <Edit size={16} />
+                              </button>
+                              <button 
+                                className="action-btn delete" 
+                                title="Delete Loan"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </>
+                          )}
+                          
+                          {/* Add Payment - Only for disbursed loans with balance */}
+                          {loan.workflowStatus?.toUpperCase() === 'DISBURSED' && loan.amountPaid < loan.totalAmount && (
+                            <button 
+                              className="action-btn payment" 
+                              title="Add Payment"
+                            >
+                              <DollarSign size={16} />
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -295,6 +326,7 @@ const DisbursedLoans = () => {
                 })}
               </tbody>
             </table>
+            )}
           </div>
 
           {/* Summary Statistics */}
@@ -335,7 +367,8 @@ const DisbursedLoans = () => {
           </div>
         </div>
       </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 

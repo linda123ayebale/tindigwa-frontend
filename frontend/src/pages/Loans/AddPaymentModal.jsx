@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Save, DollarSign, Calculator, Receipt, AlertTriangle, CheckCircle, Clock, CreditCard } from 'lucide-react';
+import { X, Save, DollarSign, Receipt, AlertTriangle, CheckCircle } from 'lucide-react';
 import './AddPaymentModal.css';
+import { generateSchedule } from '../../services/scheduleService';
+import api from '../../services/api';
 
 const AddPaymentModal = ({ loan, isOpen, onClose, onSave }) => {
   const [paymentData, setPaymentData] = useState({
@@ -14,6 +16,66 @@ const AddPaymentModal = ({ loan, isOpen, onClose, onSave }) => {
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showOverpaymentWarning, setShowOverpaymentWarning] = useState(false);
+  const [loanBalance, setLoanBalance] = useState(null);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
+  const [balanceError, setBalanceError] = useState(null);
+
+  // Fetch loan details from loans API
+  const fetchLoanBalance = async (loanId) => {
+    if (!loanId) return;
+    
+    setIsLoadingBalance(true);
+    setBalanceError(null);
+    
+    try {
+      // Use the working loans API endpoint
+      const loanData = await api.get(`/loans/${loanId}`);
+      
+      console.log('Fetched loan data:', loanData);
+      
+      if (!loanData) {
+        throw new Error('No loan data received from API');
+      }
+      
+      // Transform loan data to balance format for compatibility
+      const transformedBalance = {
+        totalLoanAmount: loanData.totalPayable || loanData.principalAmount || 0,
+        principalAmount: loanData.principalAmount || 0,
+        totalPaid: loanData.amountPaid || 0, // This might be 0 if not tracked yet
+        outstandingBalance: (loanData.totalPayable || loanData.principalAmount || 0) - (loanData.amountPaid || 0),
+        loanId: loanData.id,
+        paymentCount: 0, // Will be 0 until we implement payment tracking
+        startDate: loanData.releaseDate || loanData.paymentStartDate || loanData.createdAt
+      };
+      
+      console.log('Transformed balance data:', transformedBalance);
+      setLoanBalance(transformedBalance);
+      
+    } catch (error) {
+      console.error('Error fetching loan details:', error);
+      console.error('Loan ID:', loanId);
+      console.error('API URL:', `/loans/${loanId}`);
+      
+      // Check if it's a network error or API not found
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', error.response.data);
+      } else if (error.request) {
+        console.error('No response received:', error.request);
+      } else {
+        console.error('Request setup error:', error.message);
+      }
+      
+      // For now, silently fall back to computed data without showing error
+      // TODO: Re-enable error display once backend API is fully implemented
+      // setBalanceError(`Failed to load loan details: ${error.message}`);
+      
+      // Use fallback calculation without showing error
+      setLoanBalance(null);
+    } finally {
+      setIsLoadingBalance(false);
+    }
+  };
 
   // Initialize form data when modal opens
   useEffect(() => {
@@ -28,6 +90,9 @@ const AddPaymentModal = ({ loan, isOpen, onClose, onSave }) => {
       });
       setErrors({});
       setShowOverpaymentWarning(false);
+      
+      // Fetch real-time balance data
+      fetchLoanBalance(loan.id);
     }
   }, [loan, isOpen]);
 
@@ -40,28 +105,74 @@ const AddPaymentModal = ({ loan, isOpen, onClose, onSave }) => {
     'Debit Card'
   ];
 
-  // Calculate loan financial details
+  // Calculate loan financial details (with real-time balance data)
   const calculateLoanDetails = () => {
     if (!loan) return {};
+
+    // Use real-time balance data if available, otherwise fallback to computed data
+    let totalAmount, amountPaid, remainingBalance;
     
-    const totalAmount = loan.totalAmount || loan.amount;
-    const amountPaid = loan.amountPaid || 0;
-    const remainingBalance = totalAmount - amountPaid;
+    if (loanBalance) {
+      // Use real-time data from API
+      totalAmount = loanBalance.totalLoanAmount || 0;
+      amountPaid = loanBalance.totalPaid || 0;
+      remainingBalance = loanBalance.outstandingBalance || 0;
+    } else {
+      // Fallback to computed data from loan object
+      let schedule = Array.isArray(loan.schedule) && loan.schedule.length
+        ? loan.schedule
+        : [];
+
+      if (!schedule.length) {
+        try {
+          const termDays = loan.loanDurationDays || loan.duration || 0;
+          const startDate = loan.paymentStartDate || loan.startDate || new Date().toISOString().split('T')[0];
+          const { schedule: gen } = generateSchedule({
+            principal: Number(loan.principalAmount || loan.amount || 0),
+            ratePct: Number(loan.interestRate || 0),
+            frequency: loan.repaymentFrequency || loan.frequency || 'monthly',
+            termDays: Number(termDays),
+            startDate,
+            method: loan.interestMethod || 'reducing_equal_installments',
+            feesTotal: Number(loan.processingFee || loan.loanProcessingFee || 0)
+          });
+          schedule = gen;
+        } catch (e) {
+          schedule = [];
+        }
+      }
+
+      // Try multiple property names for total amount
+      totalAmount = loan.totalPayable || loan.totalAmount || loan.principalAmount || loan.amount || 0;
+      
+      // Add interest and fees to principal if totalPayable not available
+      if (!loan.totalPayable && !loan.totalAmount && loan.principalAmount) {
+        const principal = Number(loan.principalAmount || 0);
+        const interestRate = Number(loan.interestRate || 0);
+        const processingFee = Number(loan.processingFee || loan.loanProcessingFee || 0);
+        const interestAmount = principal * (interestRate / 100);
+        totalAmount = principal + interestAmount + processingFee;
+      }
+      
+      amountPaid = Number(loan.amountPaid || 0);
+      remainingBalance = Math.max(0, totalAmount - amountPaid);
+    }
+
     const paymentAmount = parseFloat(paymentData.amount) || 0;
-    const newBalance = remainingBalance - paymentAmount;
+    const newBalance = Math.max(0, remainingBalance - paymentAmount);
     const isOverpayment = paymentAmount > remainingBalance;
     const willBeCompleted = paymentAmount >= remainingBalance;
-    
+
     return {
       totalAmount,
       amountPaid,
       remainingBalance,
       paymentAmount,
-      newBalance: Math.max(0, newBalance),
+      newBalance,
       overpaymentAmount: isOverpayment ? paymentAmount - remainingBalance : 0,
       isOverpayment,
       willBeCompleted,
-      paymentProgress: ((amountPaid + paymentAmount) / totalAmount) * 100
+      paymentProgress: totalAmount > 0 ? (((amountPaid + paymentAmount) / totalAmount) * 100) : 0
     };
   };
 
@@ -133,44 +244,67 @@ const AddPaymentModal = ({ loan, isOpen, onClose, onSave }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
-    
+
     try {
       const paymentAmount = parseFloat(paymentData.amount);
-      const newAmountPaid = loanDetails.amountPaid + paymentAmount;
       
-      // Create payment record
-      const payment = {
-        id: `PAY${Date.now()}`,
+      // Create payment request for backend API
+      const paymentRequest = {
         loanId: loan.id,
-        amount: paymentAmount,
+        amountPaid: paymentAmount, // Backend expects 'amountPaid' not 'amount'
+        paymentDate: paymentData.paymentDate,
+        paymentMethod: paymentData.paymentMethod,
+        referenceNumber: paymentData.referenceNumber || null,
+        notes: paymentData.notes || null,
+        createdBy: 1 // TODO: Get from auth context
+      };
+      
+      // Submit payment to backend API
+      const paymentResponse = await api.post('/payments', paymentRequest);
+      console.log('Payment submitted to database successfully:', paymentResponse);
+      
+      if (!paymentResponse || !paymentResponse.id) {
+        throw new Error('Failed to save payment to database');
+      }
+      
+      // Refresh loan data after payment
+      await fetchLoanBalance(loan.id);
+      
+      // Create payment record for frontend state update
+      const payment = {
+        id: paymentResponse.id,
+        loanId: loan.id,
+        amountPaid: paymentAmount,
+        amount: paymentAmount, // For compatibility
         paymentDate: paymentData.paymentDate,
         paymentMethod: paymentData.paymentMethod,
         referenceNumber: paymentData.referenceNumber,
         notes: paymentData.notes,
-        createdAt: new Date().toISOString()
+        createdAt: paymentResponse.createdAt || new Date().toISOString()
       };
-
-      // Update loan with new payment
+      
+      // Update loan object for frontend state
+      const currentPaid = loan.amountPaid || 0;
       const updatedLoan = {
         ...loan,
-        amountPaid: newAmountPaid,
+        amountPaid: currentPaid + paymentAmount,
+        outstandingBalance: Math.max(0, (loan.totalPayable || loan.principalAmount || 0) - (currentPaid + paymentAmount)),
         lastPaymentDate: paymentData.paymentDate,
         lastPaymentAmount: paymentAmount,
         payments: [...(loan.payments || []), payment],
         lastUpdated: new Date().toISOString()
       };
-
+      
       await onSave(updatedLoan, payment);
       onClose();
     } catch (error) {
       console.error('Error processing payment:', error);
-      // You can add error handling here, like showing a toast notification
     } finally {
       setIsSubmitting(false);
     }
@@ -231,7 +365,15 @@ const AddPaymentModal = ({ loan, isOpen, onClose, onSave }) => {
               <h3>
                 <Receipt size={16} />
                 Loan Summary
+                {isLoadingBalance && <span className="loading-indicator">Loading...</span>}
               </h3>
+              
+              {balanceError && (
+                <div className="balance-error">
+                  <AlertTriangle size={14} />
+                  {balanceError}
+                </div>
+              )}
               
               <div className="loan-summary-grid">
                 <div className="summary-item">
@@ -258,7 +400,12 @@ const AddPaymentModal = ({ loan, isOpen, onClose, onSave }) => {
                 </div>
                 <div className="summary-item">
                   <span className="summary-label">Start Date</span>
-                  <span className="summary-value">{formatDate(loan.startDate)}</span>
+                  <span className="summary-value">
+                    {loanBalance?.startDate 
+                      ? formatDate(loanBalance.startDate) 
+                      : formatDate(loan.releaseDate || loan.paymentStartDate || loan.disbursementDate || loan.startDate || loan.createdAt)
+                    }
+                  </span>
                 </div>
               </div>
             </div>

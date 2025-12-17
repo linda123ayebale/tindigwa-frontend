@@ -1,0 +1,40 @@
+/* Import common table styles */
+@import '../../styles/table-common.css';
+@import './AllExpenses.css';
+
+/* Rejection Comment Column */
+.rejection-comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 300px;
+}
+
+.rejection-comment svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.rejection-comment span {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.no-comment {
+  color: #cbd5e1;
+  font-style: italic;
+  font-size: 13px;
+}
+
+/* Status Badge for Rejected */
+.status-rejected {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #fee2e2;
+  color: #991b1b;
+}

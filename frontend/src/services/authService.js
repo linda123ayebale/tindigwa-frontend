@@ -4,6 +4,19 @@ class AuthService {
   constructor() {
     this.TOKEN_KEY = 'authToken';
     this.USER_KEY = 'currentUser';
+    this.USERNAME_KEY = 'username'; // For backward compatibility
+  }
+
+  // Decode JWT token to extract user information
+  decodeToken(token) {
+    try {
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      return decoded;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
   }
 
   // Login user with username and password
@@ -15,12 +28,44 @@ class AuthService {
       });
 
       if (response.token) {
-        // Store the token in localStorage
+        // Store the token in localStorage with both keys for compatibility
         localStorage.setItem(this.TOKEN_KEY, response.token);
+        localStorage.setItem('tindigwa_token', response.token); // Backup key for compatibility
         
-        // If user info is returned, store it too
-        if (response.user) {
-          localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
+        // Extract user info from JWT token
+        const tokenData = this.decodeToken(response.token);
+        
+        if (tokenData) {
+          // Create user info object from JWT claims
+          const userInfo = {
+            userId: tokenData.userId,
+            username: tokenData.sub, // JWT subject is the email/username
+            firstName: tokenData.firstName || '',
+            lastName: tokenData.lastName || '',
+            fullName: tokenData.fullName || '',
+            email: tokenData.sub || username,
+            role: tokenData.role || 'user',
+            branch: response.user?.branch || 'Main',
+            phoneNumber: response.user?.phoneNumber || '',
+            profilePicture: response.user?.profilePicture || null,
+            permissions: response.user?.permissions || [],
+            status: response.user?.status || 'active',
+            loginTime: new Date().toISOString()
+          };
+          
+          localStorage.setItem(this.USER_KEY, JSON.stringify(userInfo));
+          localStorage.setItem(this.USERNAME_KEY, userInfo.username);
+          
+          console.log('✅ User info extracted from JWT and stored:', userInfo);
+        } else {
+          // Fallback if token decoding fails
+          const minimalUserInfo = {
+            username: username,
+            loginTime: new Date().toISOString()
+          };
+          localStorage.setItem(this.USER_KEY, JSON.stringify(minimalUserInfo));
+          localStorage.setItem(this.USERNAME_KEY, username);
+          console.warn('⚠️ Could not decode JWT token, stored minimal user info');
         }
 
         return response;
@@ -36,7 +81,10 @@ class AuthService {
   // Logout user
   logout() {
     localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem('tindigwa_token'); // Remove backup key too
     localStorage.removeItem(this.USER_KEY);
+    localStorage.removeItem(this.USERNAME_KEY);
+    localStorage.removeItem('tindigwa_setup_complete'); // Clear setup flag if needed
   }
 
   // Check if user is authenticated
@@ -49,6 +97,70 @@ class AuthService {
   getCurrentUser() {
     const userStr = localStorage.getItem(this.USER_KEY);
     return userStr ? JSON.parse(userStr) : null;
+  }
+
+  // Get user's full name
+  getUserFullName() {
+    const user = this.getCurrentUser();
+    if (!user) return 'Unknown User';
+    
+    if (user.firstName && user.lastName) {
+      return `${user.firstName} ${user.lastName}`.trim();
+    }
+    return user.username || 'Unknown User';
+  }
+
+  // Get user's first name
+  getUserFirstName() {
+    const user = this.getCurrentUser();
+    return user?.firstName || user?.username || 'User';
+  }
+
+  // Get username (for backward compatibility)
+  getUsername() {
+    const user = this.getCurrentUser();
+    return user?.username || localStorage.getItem(this.USERNAME_KEY) || 'system';
+  }
+
+  // Get user's role
+  getUserRole() {
+    const user = this.getCurrentUser();
+    return user?.role || 'user';
+  }
+
+  // Get user's branch
+  getUserBranch() {
+    const user = this.getCurrentUser();
+    return user?.branch || 'Main';
+  }
+
+  // Check if user has specific permission
+  hasPermission(permission) {
+    const user = this.getCurrentUser();
+    if (!user || !user.permissions) return false;
+    return user.permissions.includes(permission);
+  }
+
+  // Check if user has specific role
+  hasRole(role) {
+    return this.getUserRole() === role;
+  }
+
+  // Get user full name by user ID from stored user data
+  getUserFullNameById(userId) {
+    if (!userId) return '-';
+    
+    const currentUser = this.getCurrentUser();
+    
+    // If the user ID matches the current logged-in user, return their name
+    if (currentUser && currentUser.userId === userId) {
+      return this.getUserFullName();
+    }
+    
+    // For other users, we don't have their data in token
+    // So we just return a placeholder or the ID
+    // In a real app, you might want to cache user data or make an API call
+    return `User ${userId}`;
   }
 
   // Get auth token
@@ -80,6 +192,38 @@ class AuthService {
     }
     return true;
   }
+
+  // Refresh user info from current JWT token (useful after updates)
+  refreshUserInfoFromToken() {
+    const token = this.getToken();
+    if (!token) return false;
+
+    const tokenData = this.decodeToken(token);
+    if (!tokenData) return false;
+
+    const currentUser = this.getCurrentUser();
+    const userInfo = {
+      userId: tokenData.userId,
+      username: tokenData.sub,
+      firstName: tokenData.firstName || '',
+      lastName: tokenData.lastName || '',
+      fullName: tokenData.fullName || '',
+      email: tokenData.sub,
+      role: tokenData.role || 'user',
+      branch: currentUser?.branch || 'Main',
+      phoneNumber: currentUser?.phoneNumber || '',
+      profilePicture: currentUser?.profilePicture || null,
+      permissions: currentUser?.permissions || [],
+      status: currentUser?.status || 'active',
+      loginTime: currentUser?.loginTime || new Date().toISOString()
+    };
+
+    localStorage.setItem(this.USER_KEY, JSON.stringify(userInfo));
+    localStorage.setItem(this.USERNAME_KEY, userInfo.username);
+    console.log('✅ User info refreshed from JWT token:', userInfo);
+    return true;
+  }
 }
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default new AuthService();

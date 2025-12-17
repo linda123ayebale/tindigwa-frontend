@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff } from 'lucide-react';
+import { validateEmail } from '../../utils/validation';
 import './Setup.css';
 
-const Setup = () => {
+const Setup = ({ onSetupComplete }) => {
   const [formData, setFormData] = useState({
     adminName: '',
     email: '',
@@ -37,6 +38,14 @@ const Setup = () => {
       return;
     }
 
+    // Email validation
+    const emailValidation = validateEmail(formData.email, true);
+    if (!emailValidation.isValid) {
+      setError(emailValidation.error);
+      setLoading(false);
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
@@ -57,7 +66,7 @@ const Setup = () => {
       });
 
       // Call the actual backend setup API
-      const response = await fetch('http://localhost:8080/api/auth/setup', {
+      const response = await fetch('http://localhost:8081/api/auth/setup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,6 +104,11 @@ const Setup = () => {
           console.log('🎉 First admin user created!');
         }
         
+        // Call the callback to refresh setup status
+        if (onSetupComplete) {
+          onSetupComplete();
+        }
+        
         // Navigate to dashboard
         navigate('/dashboard');
       } else {
@@ -107,7 +121,7 @@ const Setup = () => {
       console.error('🚨 Network error:', err);
       
       if (err.message.includes('fetch')) {
-        setError('Cannot connect to backend server. Please ensure the backend is running on http://localhost:8080');
+        setError('Cannot connect to backend server. Please ensure the backend is running on http://localhost:8081');
       } else {
         setError('Setup failed. Please try again.');
       }

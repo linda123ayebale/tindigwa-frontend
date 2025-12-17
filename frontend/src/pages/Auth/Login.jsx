@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';import AuthService from '../../services/authService';
+import { useNavigate } from 'react-router-dom';
+import AuthService from '../../services/authService';
+import { validateEmail } from '../../utils/validation';
 import './Login.css';
 
 const Login = ({ setIsAuthenticated }) => {
@@ -15,53 +17,15 @@ const Login = ({ setIsAuthenticated }) => {
 
   // Clear form data when component mounts to prevent session persistence
   useEffect(() => {
+    // Clear authentication state on mount
+    localStorage.removeItem('tindigwa_token');
+    localStorage.removeItem('tindigwa_user');
     setFormData({
       email: '',
       password: ''
     });
     setError('');
-    
-    // Clear any existing authentication tokens to ensure fresh login
-    AuthService.logout();
-    
-    // Generate new field key to force re-render
     setFieldKey(Date.now());
-    
-    // Multiple aggressive form clearing attempts
-    const clearInputs = () => {
-      const form = document.querySelector('.login-form');
-      if (form) {
-        form.reset();
-      }
-      
-      const emailInput = document.getElementById('email');
-      const passwordInput = document.getElementById('password');
-      
-      if (emailInput) {
-        emailInput.value = '';
-        emailInput.setAttribute('value', '');
-        emailInput.removeAttribute('value');
-      }
-      if (passwordInput) {
-        passwordInput.value = '';
-        passwordInput.setAttribute('value', '');
-        passwordInput.removeAttribute('value');
-      }
-    };
-    
-    // Clear immediately
-    clearInputs();
-    
-    // Clear after small delay (for browser autofill)
-    const timer1 = setTimeout(clearInputs, 100);
-    const timer2 = setTimeout(clearInputs, 500);
-    const timer3 = setTimeout(clearInputs, 1000);
-    
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-    };
   }, []);
 
   const handleChange = (e) => {
@@ -78,15 +42,30 @@ const Login = ({ setIsAuthenticated }) => {
     setError('');
 
     try {
+      // Validate email format
+      const emailValidation = validateEmail(formData.email, true);
+      if (!emailValidation.isValid) {
+        setError(emailValidation.error);
+        setLoading(false);
+        return;
+      }
+      
       if (formData.email && formData.password) {
         // Use real authentication service
         const response = await AuthService.login(formData.email, formData.password);
         
+        console.log('Login successful:', response);
+        
         // Clear form data after successful login
         clearForm();
         
+        // Set authentication state
         setIsAuthenticated(true);
-        navigate('/dashboard');
+        
+        // Small delay to ensure token is properly stored before navigation
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 100);
       } else {
         setError('Please enter both email and password');
       }

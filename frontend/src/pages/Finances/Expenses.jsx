@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ApiService from '../../services/api';
+import categoryStore from '../../services/categoryStore';
 import { 
   Plus,
   Search,
@@ -21,6 +22,7 @@ const Expenses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [newCategory, setNewCategory] = useState({
     name: '',
@@ -29,85 +31,39 @@ const Expenses = () => {
   });
 
 
-  // Get categories from API
+  // Get categories from central store (auto-updates when categories change)
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await ApiService.get('/expense-categories/names');
-        setCategories(response.data);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-        alert('Failed to load categories');
-      }
-    };
-    
-    fetchCategories();
+    const unsub = categoryStore.subscribe((cats) => setCategories(Array.isArray(cats) ? cats : []));
+    categoryStore.refresh();
+    return () => unsub();
   }, []);
 
-  // Sample expenses data (to be replaced with real API)
+  // Fetch expenses from backend
   useEffect(() => {
-    const sampleExpenses = [
-      {
-        id: 'EXP001',
-        expenseType: 'Operational Expenses',
-        amount: 75000,
-        date: '2024-08-15',
-        description: 'Office rent for August 2024',
-        createdBy: 'Admin User',
-        category: 'operational',
-        createdAt: '2024-08-15T09:00:00Z'
-      },
-      {
-        id: 'EXP002',
-        expenseType: 'Salaries & Benefits',
-        amount: 150000,
-        date: '2024-08-01',
-        description: 'Monthly salary payments for staff',
-        createdBy: 'HR Manager',
-        category: 'salaries',
-        createdAt: '2024-08-01T10:30:00Z'
-      },
-      {
-        id: 'EXP003',
-        expenseType: 'Marketing & Advertising',
-        amount: 25000,
-        date: '2024-08-10',
-        description: 'Social media advertising campaign',
-        createdBy: 'Marketing Team',
-        category: 'marketing',
-        createdAt: '2024-08-10T14:15:00Z'
-      },
-      {
-        id: 'EXP004',
-        expenseType: 'Office Supplies',
-        amount: 35000,
-        date: '2024-08-20',
-        description: 'Stationery and office equipment',
-        createdBy: 'Office Manager',
-        category: 'operational',
-        createdAt: '2024-08-20T11:45:00Z'
-      },
-      {
-        id: 'EXP005',
-        expenseType: 'Utilities',
-        amount: 45000,
-        date: '2024-08-25',
-        description: 'Electricity and water bills',
-        createdBy: 'Admin User',
-        category: 'operational',
-        createdAt: '2024-08-25T16:20:00Z'
+    const fetchExpenses = async () => {
+      setLoading(true);
+      try {
+        const response = await ApiService.get('/expenses');
+        const list = Array.isArray(response) ? response : (response && response.data) || [];
+        setExpenses(list);
+      } catch (error) {
+        console.error('Error fetching expenses:', error);
+        setExpenses([]);
+      } finally {
+        setLoading(false);
       }
-    ];
-    setExpenses(sampleExpenses);
+    };
+
+    fetchExpenses();
   }, []);
 
   const handleCreateCategory = async () => {
     try {
-      const response = await ApiService.post('/expense-categories', {
-        categoryName: newCategory,
-        colorCode: '#3498db'
-      });
-      setCategories(prev => [...prev, response.data.categoryName]);
+      // Support creating with a name string or object
+      const payload = typeof newCategory === 'string' ? { categoryName: newCategory } : { categoryName: newCategory.name || '', description: newCategory.description || '', colorCode: newCategory.colorCode || '#3498db' };
+      await ApiService.post('/expense-categories', payload);
+      // refresh centralized store so all dropdowns update
+      await categoryStore.refresh();
       setNewCategory('');
     } catch (error) {
       console.error('Error creating category:', error);

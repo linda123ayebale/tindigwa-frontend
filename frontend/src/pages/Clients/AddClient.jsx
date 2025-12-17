@@ -1,19 +1,39 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import ClientService from '../../services/clientService';
+import Stepper from '../../components/Stepper/Stepper';
+import BasicInfoStep from '../../components/ClientSteps/BasicInfoStep';
+import ContactAddressStep from '../../components/ClientSteps/ContactAddressStep';
+import GuarantorStep from '../../components/ClientSteps/GuarantorStep';
+import EmploymentStep from '../../components/ClientSteps/EmploymentStep';
+import DocumentsReviewStep from '../../components/ClientSteps/DocumentsReviewStep';
+import NotificationModal from '../../components/NotificationModal';
+import { useNotification } from '../../hooks/useNotification';
+import { validatePhoneNumber, validateEmail } from '../../utils/validation';
 import './AddClient.css';
 
 const AddClient = () => {
   const navigate = useNavigate();
+  const [currentStep, setCurrentStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { notification, showSuccess, showError, hideNotification } = useNotification();
+  
   const [formData, setFormData] = useState({
     // Basic Information
     firstName: '',
     middleName: '',
     lastName: '',
+    gender: '',
     age: '',
     nationalId: '',
     phoneNumber: '',
     email: '',
+    maritalStatus: '',
+    spouseName: '',
+    spousePhone: '',
     
     // Photo Information
     passportPhotoFile: null,
@@ -24,11 +44,12 @@ const AddClient = () => {
     parish: '',
     district: '',
     
-    // Next of Kin Information
-    nextOfKinFirstName: '',
-    nextOfKinLastName: '',
-    nextOfKinPhone: '',
-    nextOfKinRelationship: '',
+    // Guarantor Information
+    guarantorFirstName: '',
+    guarantorLastName: '',
+    guarantorGender: '',
+    guarantorPhone: '',
+    guarantorRelationship: '',
     
     // Employment Information
     employmentStatus: '',
@@ -39,470 +60,310 @@ const AddClient = () => {
     agreementSigned: false
   });
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+  const steps = [
+    { title: 'Basic Information', description: 'Personal details' },
+    { title: 'Contact & Address', description: 'Location information' },
+    { title: 'Guarantor', description: 'Guarantor information' },
+    { title: 'Employment', description: 'Work & income' },
+    { title: 'Review & Submit', description: 'Documents & confirmation' }
+  ];
+
+  const updateFormData = (updates) => {
+    setFormData(prev => ({ ...prev, ...updates }));
   };
 
-  // Handle photo file upload
-  const handlePhotoUpload = (e) => {
-    const file = e.target.files[0];
+  const validateStep = (step) => {
+    const newErrors = {};
     
-    if (file) {
-      // Validate file type
-      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-      if (!allowedTypes.includes(file.type)) {
-        alert('Please upload a valid image file (JPEG, PNG, or GIF)');
-        return;
-      }
+    switch (step) {
+      case 1: // Basic Information
+        if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
+        if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
+        if (!formData.gender?.trim()) newErrors.gender = 'Gender is required';
+        if (!formData.nationalId?.trim()) newErrors.nationalId = 'National ID is required';
+        if (!formData.maritalStatus?.trim()) newErrors.maritalStatus = 'Marital status is required';
+        
+        // Phone number validation - MANDATORY
+        const phoneValidation = validatePhoneNumber(formData.phoneNumber);
+        if (!phoneValidation.isValid) {
+          newErrors.phoneNumber = phoneValidation.error;
+        }
+        
+        // Spouse validation - MANDATORY if married
+        if (formData.maritalStatus === 'MARRIED') {
+          if (!formData.spouseName?.trim()) {
+            newErrors.spouseName = 'Spouse name is required for married clients';
+          }
+          if (!formData.spousePhone?.trim()) {
+            newErrors.spousePhone = 'Spouse phone number is required for married clients';
+          } else {
+            const spousePhoneValidation = validatePhoneNumber(formData.spousePhone);
+            if (!spousePhoneValidation.isValid) {
+              newErrors.spousePhone = spousePhoneValidation.error;
+            }
+          }
+        }
+        
+        if (formData.age && (formData.age < 18 || formData.age > 100)) {
+          newErrors.age = 'Age must be between 18 and 100';
+        }
+        break;
+      
+      case 2: // Contact & Address - optional fields, minimal validation
+        // Email validation (optional but must be valid if provided)
+        const emailValidation = validateEmail(formData.email, false);
+        if (!emailValidation.isValid) {
+          newErrors.email = emailValidation.error;
+        }
+        break;
+        
+      case 3: // Guarantor - optional fields
+        // Validate guarantor phone if provided
+        if (formData.guarantorPhone && formData.guarantorPhone.trim()) {
+          const guarantorPhoneValidation = validatePhoneNumber(formData.guarantorPhone);
+          if (!guarantorPhoneValidation.isValid) {
+            newErrors.guarantorPhone = guarantorPhoneValidation.error;
+          }
+        }
+        break;
+        
+      case 4: // Employment - optional fields
+        break;
+        
+      case 5: // Documents & Review
+        if (!formData.agreementSigned) {
+          newErrors.agreementSigned = 'You must confirm the client agreement';
+        }
+        break;
+        
+      default:
+        break;
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        alert('File size must be less than 5MB');
-        return;
+  const handleNext = () => {
+    if (validateStep(currentStep)) {
+      setCompletedSteps(prev => [...new Set([...prev, currentStep])]);
+      if (currentStep < steps.length) {
+        setCurrentStep(currentStep + 1);
       }
+    }
+  };
 
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData(prev => ({
-          ...prev,
-          passportPhotoFile: file,
-          passportPhotoPreview: e.target.result
-        }));
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const renderCurrentStep = () => {
+    switch (currentStep) {
+      case 1:
+        return <BasicInfoStep formData={formData} updateFormData={updateFormData} errors={errors} />;
+      case 2:
+        return <ContactAddressStep formData={formData} updateFormData={updateFormData} errors={errors} />;
+      case 3:
+        return <GuarantorStep formData={formData} updateFormData={updateFormData} errors={errors} />;
+      case 4:
+        return <EmploymentStep formData={formData} updateFormData={updateFormData} errors={errors} />;
+      case 5:
+        return <DocumentsReviewStep formData={formData} updateFormData={updateFormData} errors={errors} />;
+      default:
+        return <BasicInfoStep formData={formData} updateFormData={updateFormData} errors={errors} />;
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!validateStep(currentStep)) {
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Map form data to new backend API format (ClientRegistrationRequest)
+      const clientData = {
+        // Basic Information - NEW BACKEND FORMAT
+        firstName: formData.firstName,
+        middleName: formData.middleName || '',
+        lastName: formData.lastName,
+        gender: formData.gender,
+        age: formData.age ? parseInt(formData.age) : undefined,
+        nationalId: formData.nationalId || '',
+        phoneNumber: formData.phoneNumber,
+        email: formData.email || '',
+        maritalStatus: formData.maritalStatus || 'SINGLE',
+        spouseName: formData.spouseName || '',
+        spousePhone: formData.spousePhone || '',
+        
+        // Address Information
+        village: formData.village || '',
+        parish: formData.parish || '',
+        district: formData.district || '',
+        
+        // Guarantor Information (new format)
+        guarantorFirstName: formData.guarantorFirstName || '',
+        guarantorLastName: formData.guarantorLastName || '',
+        guarantorGender: formData.guarantorGender || '',
+        guarantorPhone: formData.guarantorPhone || '',
+        guarantorRelationship: formData.guarantorRelationship || '',
+        
+        // Legacy guarantor fields (for backwards compatibility)
+        guarantorName: formData.guarantorFirstName && formData.guarantorLastName 
+          ? `${formData.guarantorFirstName} ${formData.guarantorLastName}`.trim() 
+          : '',
+        guarantorAge: formData.guarantorAge || undefined,
+        guarantorContact: formData.guarantorPhone || '',
+        guarantorNationalId: formData.guarantorNationalId || '',
+        guarantorVillage: formData.guarantorVillage || '',
+        guarantorParish: formData.guarantorParish || '',
+        guarantorDistrict: formData.guarantorDistrict || '',
+        
+        // Legacy Next of Kin fields (for staff registration)
+        nextOfKinFirstName: '',
+        nextOfKinLastName: '',
+        nextOfKinGender: '',
+        nextOfKinPhone: '',
+        nextOfKinRelationship: '',
+        
+        // Employment Information
+        employmentStatus: formData.employmentStatus || '',
+        occupation: formData.occupation || '',
+        monthlyIncome: formData.monthlyIncome || '',
+        
+        // System Information
+        branch: 'Main',
+        agreementSigned: formData.agreementSigned || true,
+        
+        // Legacy fields for backward compatibility
+        surname: formData.lastName,
+        givenName: formData.firstName,
+        nationalIdNumber: formData.nationalId || '',
+        sourceOfIncome: formData.occupation || ''
       };
-      reader.readAsDataURL(file);
+      
+      console.log('Submitting client data:', clientData);
+      
+      // Call the API
+      const result = await ClientService.createClient(clientData);
+      
+      console.log('Client created successfully:', result);
+      
+      // Show success notification
+      showSuccess('Client saved successfully! The client has been registered in the system.');
+      
+      // Navigate back to clients list after a short delay
+      setTimeout(() => navigate('/clients'), 2000);
+      
+    } catch (error) {
+      console.error('Error creating client:', error);
+      
+      // Show user-friendly error message
+      let errorMessage = error.message;
+      if (errorMessage.includes('First name is required')) {
+        errorMessage = 'Please fill in the first name field.';
+      } else if (errorMessage.includes('Last name is required')) {
+        errorMessage = 'Please fill in the last name field.';
+      } else if (errorMessage.includes('Gender is required')) {
+        errorMessage = 'Please select a gender.';
+      } else if (errorMessage.includes('Gender must be either MALE or FEMALE')) {
+        errorMessage = 'Please select a valid gender (Male or Female).';
+      } else if (errorMessage.includes('National ID is required')) {
+        errorMessage = 'Please fill in the National ID field.';
+      } else if (errorMessage.includes('Phone number is required')) {
+        errorMessage = 'Please fill in the phone number field.';
+      } else if (errorMessage.includes('Duplicate entry') && errorMessage.includes('national_id')) {
+        errorMessage = 'This National ID is already registered. Please check the National ID number.';
+      }
+      
+      showError(`Error saving client: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
-
-  // Remove uploaded photo
-  const removePhoto = () => {
-    setFormData(prev => ({
-      ...prev,
-      passportPhotoFile: null,
-      passportPhotoPreview: ''
-    }));
-    
-    // Clear file input
-    const fileInput = document.getElementById('passportPhotoFile');
-    if (fileInput) {
-      fileInput.value = '';
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    // Basic validation
-    if (!formData.firstName || !formData.lastName || !formData.phoneNumber) {
-      alert('Please fill in all required fields (First Name, Last Name, Phone Number)');
-      return;
-    }
-    
-    if (!formData.agreementSigned) {
-      alert('Client must sign the agreement to proceed');
-      return;
-    }
-    
-    console.log('Client Registration Data:', formData);
-    
-    // Simulate saving
-    alert('Client registered successfully!');
-    navigate('/clients');
-  };
-
-  const employmentOptions = [
-    'Employed',
-    'Self-Employed', 
-    'Business Owner',
-    'Farmer',
-    'Student',
-    'Unemployed',
-    'Retired'
-  ];
-
-  const relationshipOptions = [
-    'Parent',
-    'Spouse',
-    'Sibling',
-    'Child',
-    'Uncle/Aunt',
-    'Cousin',
-    'Friend',
-    'Other'
-  ];
 
   return (
-    <div className="add-client-layout">
-      {/* Sidebar */}
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <h2>TINDIGWA</h2>
+    <div className="stepper-form-layout">
+      {/* Header */}
+      <div className="stepper-header">
+        <div className="header-nav">
+          <button 
+            className="back-button"
+            onClick={() => navigate('/clients')}
+          >
+            <ArrowLeft size={20} />
+            Back to Clients
+          </button>
         </div>
-        
-        <nav className="sidebar-nav">
-          <button className="nav-item" onClick={() => navigate('/dashboard')}>
-            <span>Dashboard</span>
-          </button>
-          <button className="nav-item active">
-            <span>Clients</span>
-          </button>
-          <button className="nav-item" onClick={() => navigate('/loans')}>
-            <span>Loans</span>
-          </button>
-          <button className="nav-item" onClick={() => navigate('/payments')}>
-            <span>Payments</span>
-          </button>
-          <button className="nav-item" onClick={() => navigate('/settings')}>
-            <span>Settings</span>
-          </button>
-        </nav>
-      </aside>
+        <div className="header-title">
+          <h1>Add New Client</h1>
+          <p>Complete all steps to register a new client</p>
+        </div>
+      </div>
 
-      {/* Main Content */}
-      <main className="main-content">
-        <div className="page-header">
-          <div className="header-content">
+      {/* Stepper */}
+      <Stepper 
+        steps={steps} 
+        currentStep={currentStep} 
+        completedSteps={completedSteps} 
+      />
+
+      {/* Step Content */}
+      <div className="stepper-content">
+        {renderCurrentStep()}
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="stepper-navigation">
+        <div className="nav-buttons">
+          {currentStep > 1 && (
             <button 
-              className="back-button"
-              onClick={() => navigate('/clients')}
+              type="button" 
+              className="nav-button secondary"
+              onClick={handlePrevious}
             >
-              <ArrowLeft size={20} />
-              Back to Clients
+              <ChevronLeft size={20} />
+              Previous
             </button>
-            <h1>Add New Client</h1>
-          </div>
+          )}
+          
+          <div className="nav-spacer"></div>
+          
+          {currentStep < steps.length ? (
+            <button 
+              type="button" 
+              className="nav-button primary"
+              onClick={handleNext}
+            >
+              Next
+              <ChevronRight size={20} />
+            </button>
+          ) : (
+            <button 
+              type="button" 
+              className="nav-button primary submit"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Submitting...' : 'Submit Client'}
+            </button>
+          )}
         </div>
-
-        <div className="content-container">
-          <form onSubmit={handleSubmit}>
-            {/* Basic Information Section */}
-            <div className="info-section">
-              <h2>Basic Information</h2>
-              
-              <div className="info-grid">
-                <div className="info-row">
-                  <span className="info-label">First Name *</span>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    placeholder="Enter first name"
-                    className="info-input"
-                    required
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Middle Name</span>
-                  <input
-                    type="text"
-                    name="middleName"
-                    value={formData.middleName}
-                    onChange={handleInputChange}
-                    placeholder="Enter middle name (optional)"
-                    className="info-input"
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Last Name *</span>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    placeholder="Enter last name"
-                    className="info-input"
-                    required
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Age</span>
-                  <input
-                    type="number"
-                    name="age"
-                    value={formData.age}
-                    onChange={handleInputChange}
-                    placeholder="Enter age"
-                    className="info-input"
-                    min="18"
-                    max="100"
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">National ID</span>
-                  <input
-                    type="text"
-                    name="nationalId"
-                    value={formData.nationalId}
-                    onChange={handleInputChange}
-                    placeholder="Enter national ID number"
-                    className="info-input"
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Phone Number *</span>
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
-                    placeholder="Enter phone number"
-                    className="info-input"
-                    required
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Email Address</span>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="Enter email address (optional)"
-                    className="info-input"
-                  />
-                </div>
-                
-                <div className="info-row photo-upload-row">
-                  <span className="info-label">Passport Photo</span>
-                  
-                  {/* Photo Preview */}
-                  {formData.passportPhotoPreview && (
-                    <div className="photo-preview">
-                      <img 
-                        src={formData.passportPhotoPreview} 
-                        alt="Passport preview" 
-                        className="preview-image"
-                      />
-                      <button 
-                        type="button" 
-                        onClick={removePhoto}
-                        className="remove-photo-btn"
-                        title="Remove photo"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  )}
-                  
-                  {/* File Upload */}
-                  <div className="photo-upload">
-                    <input
-                      type="file"
-                      id="passportPhotoFile"
-                      name="passportPhotoFile"
-                      accept="image/*"
-                      onChange={handlePhotoUpload}
-                      className="photo-input"
-                    />
-                    <label htmlFor="passportPhotoFile" className="photo-upload-label">
-                      <span className="upload-icon">📷</span>
-                      <span className="upload-text">
-                        {formData.passportPhotoPreview ? 'Change Photo' : 'Upload Photo'}
-                      </span>
-                      <span className="upload-hint">JPEG, PNG, or GIF (Max 5MB)</span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Address Information Section */}
-            <div className="info-section">
-              <h2>Address Information</h2>
-              
-              <div className="info-grid">
-                <div className="info-row">
-                  <span className="info-label">Village</span>
-                  <input
-                    type="text"
-                    name="village"
-                    value={formData.village}
-                    onChange={handleInputChange}
-                    placeholder="Enter village"
-                    className="info-input"
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Parish</span>
-                  <input
-                    type="text"
-                    name="parish"
-                    value={formData.parish}
-                    onChange={handleInputChange}
-                    placeholder="Enter parish"
-                    className="info-input"
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">District</span>
-                  <input
-                    type="text"
-                    name="district"
-                    value={formData.district}
-                    onChange={handleInputChange}
-                    placeholder="Enter district"
-                    className="info-input"
-                  />
-                </div>
-              </div>
-            </div>
-
-
-            {/* Next of Kin Information Section */}
-            <div className="info-section">
-              <h2>Next of Kin Information</h2>
-              
-              <div className="info-grid">
-                <div className="info-row">
-                  <span className="info-label">Next of Kin First Name</span>
-                  <input
-                    type="text"
-                    name="nextOfKinFirstName"
-                    value={formData.nextOfKinFirstName}
-                    onChange={handleInputChange}
-                    placeholder="Enter next of kin first name"
-                    className="info-input"
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Next of Kin Last Name</span>
-                  <input
-                    type="text"
-                    name="nextOfKinLastName"
-                    value={formData.nextOfKinLastName}
-                    onChange={handleInputChange}
-                    placeholder="Enter next of kin last name"
-                    className="info-input"
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Next of Kin Phone</span>
-                  <input
-                    type="tel"
-                    name="nextOfKinPhone"
-                    value={formData.nextOfKinPhone}
-                    onChange={handleInputChange}
-                    placeholder="Enter next of kin phone number"
-                    className="info-input"
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Relationship</span>
-                  <select
-                    name="nextOfKinRelationship"
-                    value={formData.nextOfKinRelationship}
-                    onChange={handleInputChange}
-                    className="info-input"
-                  >
-                    <option value="">Select Relationship</option>
-                    {relationshipOptions.map((relationship, index) => (
-                      <option key={index} value={relationship}>{relationship}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* Employment Information Section */}
-            <div className="info-section">
-              <h2>Employment Information</h2>
-              
-              <div className="info-grid">
-                <div className="info-row">
-                  <span className="info-label">Employment Status</span>
-                  <select
-                    name="employmentStatus"
-                    value={formData.employmentStatus}
-                    onChange={handleInputChange}
-                    className="info-input"
-                  >
-                    <option value="">Select Employment Status</option>
-                    {employmentOptions.map((status, index) => (
-                      <option key={index} value={status}>{status}</option>
-                    ))}
-                  </select>
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Occupation</span>
-                  <input
-                    type="text"
-                    name="occupation"
-                    value={formData.occupation}
-                    onChange={handleInputChange}
-                    placeholder="Enter occupation/job title"
-                    className="info-input"
-                  />
-                </div>
-                
-                <div className="info-row">
-                  <span className="info-label">Monthly Income (UGX)</span>
-                  <input
-                    type="number"
-                    name="monthlyIncome"
-                    value={formData.monthlyIncome}
-                    onChange={handleInputChange}
-                    placeholder="Enter estimated monthly income"
-                    className="info-input"
-                    min="0"
-                    step="1000"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Agreement Section */}
-            <div className="info-section">
-              <h2>Agreement</h2>
-              
-              <div className="agreement-section">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    name="agreementSigned"
-                    checked={formData.agreementSigned}
-                    onChange={handleInputChange}
-                    className="checkbox-input"
-                  />
-                  <span className="checkbox-text">
-                    I confirm that the client has signed all required agreement forms and consents to data processing.
-                  </span>
-                </label>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <div className="submit-section">
-              <button type="submit" className="submit-button">
-                Register Client
-              </button>
-              <button 
-                type="button" 
-                className="cancel-button"
-                onClick={() => navigate('/clients')}
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      </main>
+      </div>
+      
+      {/* Notification Modal */}
+      <NotificationModal
+        isOpen={notification.isOpen}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={hideNotification}
+        autoClose={notification.autoClose}
+        position={notification.position}
+      />
     </div>
   );
 };

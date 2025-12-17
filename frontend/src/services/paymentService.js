@@ -55,15 +55,84 @@ class PaymentService {
     }
   }
 
-  // Get payments by loan ID (if this endpoint exists in backend)
+  // Get payments by loan ID
   async getPaymentsByLoanId(loanId) {
     try {
-      // Note: This endpoint might need to be added to the backend
       return await ApiService.get(`${this.basePath}/loan/${loanId}`);
     } catch (error) {
       console.error(`Error fetching payments for loan ${loanId}:`, error);
       throw error;
     }
+  }
+
+  // Get all payments with enhanced details
+  async getAllPaymentsWithDetails() {
+    try {
+      const payments = await this.getAllPayments();
+      
+      // Enhance with loan information if available
+      const enhancedPayments = await Promise.all(
+        payments.map(async (payment) => {
+          try {
+            // Try to get loan details for this payment
+            const loanResponse = await ApiService.get(`/loans/${payment.loanId}`);
+            return {
+              ...payment,
+              clientName: loanResponse.clientName || 'Unknown Client',
+              loanReference: loanResponse.loanReference || `LN-${payment.loanId}`,
+              loanAmount: loanResponse.totalPayable || loanResponse.principalAmount
+            };
+          } catch (error) {
+            // If loan details not available, return payment as is
+            return {
+              ...payment,
+              clientName: 'Unknown Client',
+              loanReference: `LN-${payment.loanId}`
+            };
+          }
+        })
+      );
+      
+      // Sort by payment date (most recent first)
+      return enhancedPayments.sort((a, b) => 
+        new Date(b.paymentDate || b.createdAt) - new Date(a.paymentDate || a.createdAt)
+      );
+    } catch (error) {
+      console.error('Error fetching payments with details:', error);
+      throw error;
+    }
+  }
+
+  // Get payment statistics
+  getPaymentStats(payments) {
+    const totalAmount = payments.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+    const totalCount = payments.length;
+    
+    const today = new Date();
+    const thisMonth = payments.filter(payment => {
+      const paymentDate = new Date(payment.paymentDate || payment.createdAt);
+      return paymentDate.getMonth() === today.getMonth() && 
+             paymentDate.getFullYear() === today.getFullYear();
+    });
+    
+    const thisWeek = payments.filter(payment => {
+      const paymentDate = new Date(payment.paymentDate || payment.createdAt);
+      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      return paymentDate >= weekAgo;
+    });
+    
+    return {
+      totalAmount: Math.round(totalAmount * 100) / 100,
+      totalCount,
+      thisMonth: {
+        count: thisMonth.length,
+        amount: Math.round(thisMonth.reduce((sum, p) => sum + (p.amount || 0), 0) * 100) / 100
+      },
+      thisWeek: {
+        count: thisWeek.length,
+        amount: Math.round(thisWeek.reduce((sum, p) => sum + (p.amount || 0), 0) * 100) / 100
+      }
+    };
   }
 
   // Validate payment data

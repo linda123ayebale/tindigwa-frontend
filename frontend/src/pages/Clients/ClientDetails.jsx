@@ -9,185 +9,105 @@ import {
   Users,
   Briefcase,
   FileText,
-  Calendar,
-  Edit
+  Calendar
 } from 'lucide-react';
 // Removed EditClientModal import - using page-based approach instead
+import ClientService from '../../services/clientService';
+import NotificationModal from '../../components/NotificationModal';
+import { useNotification } from '../../hooks/useNotification';
 import './ClientDetails.css';
 
 const ClientDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { notification, showNotification, hideNotification } = useNotification();
+  
   const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simulate fetching client data - replace with actual API call
     const fetchClient = async () => {
-      setLoading(true);
-      
-      // Sample clients data (same as in Clients.jsx)
-      const sampleClients = [
-        {
-          id: 1,
-          // Profile Information
-          surname: 'Smith',
-          givenName: 'John',
-          fullName: 'John Smith',
-          age: '35',
-          nationalIdNumber: 'CM123456789',
-          village: 'Buea Village',
-          parish: 'Buea Parish',
-          district: 'Fako',
-          lengthOfStay: '10 years',
-          sourceOfIncome: 'Small Business',
-          passportPhotoUrl: 'https://via.placeholder.com/150',
-          phoneNumber: '+237654321098',
-          email: 'john.smith@email.com',
-          
-          // Spouse Information
-          spouseName: 'Mary Smith',
-          spouseId: 'CM987654321',
-          
-          // Guarantor Information
-          guarantorName: 'Paul Ndongmo',
-          guarantorAge: '45',
-          guarantorContact: '+237698765432',
-          guarantorNationalId: 'CM456789123',
-          guarantorVillage: 'Limbe Village',
-          guarantorParish: 'Limbe Parish',
-          guarantorDistrict: 'Fako',
-          guarantorSourceOfIncome: 'Civil Servant',
-          
-          // Employment Information
-          employerName: 'Local Market Association',
-          position: 'Shop Owner',
-          monthlyIncome: '150000',
-          employmentLength: '5 years',
-          
-          // System Information
-          clientType: 'business',
-          status: 'active',
-          createdAt: '2024-01-15T10:00:00Z',
-          
-          // Documents
-          agreementSigned: true,
-          agreementNotes: 'All documents verified and signed properly.'
-        },
-        {
-          id: 2,
-          // Profile Information
-          surname: 'Doe',
-          givenName: 'Jane',
-          fullName: 'Jane Doe',
-          age: '28',
-          nationalIdNumber: 'CM234567890',
-          village: 'Douala Village',
-          parish: 'Douala Parish',
-          district: 'Wouri',
-          lengthOfStay: '5 years',
-          sourceOfIncome: 'Farming',
-          passportPhotoUrl: 'https://via.placeholder.com/150',
-          phoneNumber: '+237654321097',
-          email: 'jane.doe@email.com',
-          
-          // Spouse Information
-          spouseName: '',
-          spouseId: '',
-          
-          // Guarantor Information
-          guarantorName: 'Alice Fotso',
-          guarantorAge: '40',
-          guarantorContact: '+237698765431',
-          guarantorNationalId: 'CM567890234',
-          guarantorVillage: 'Douala Village',
-          guarantorParish: 'Douala Parish',
-          guarantorDistrict: 'Wouri',
-          guarantorSourceOfIncome: 'Teacher',
-          
-          // Employment Information
-          employerName: '',
-          position: 'Self-employed Farmer',
-          monthlyIncome: '80000',
-          employmentLength: '3 years',
-          
-          // System Information
-          clientType: 'individual',
-          status: 'active',
-          createdAt: '2024-01-20T14:30:00Z',
-          
-          // Documents
-          agreementSigned: true,
-          agreementNotes: ''
-        },
-        {
-          id: 3,
-          // Profile Information
-          surname: 'Johnson',
-          givenName: 'Michael',
-          fullName: 'Michael Johnson',
-          age: '42',
-          nationalIdNumber: 'CM345678901',
-          village: 'Bamenda Village',
-          parish: 'Bamenda Parish',
-          district: 'Mezam',
-          lengthOfStay: '15 years',
-          sourceOfIncome: 'Technology Services',
-          passportPhotoUrl: 'https://via.placeholder.com/150',
-          phoneNumber: '+237654321096',
-          email: 'michael.j@email.com',
-          
-          // Spouse Information
-          spouseName: 'Sarah Johnson',
-          spouseId: 'CM876543210',
-          
-          // Guarantor Information
-          guarantorName: 'Emmanuel Tabi',
-          guarantorAge: '50',
-          guarantorContact: '+237698765430',
-          guarantorNationalId: 'CM678901345',
-          guarantorVillage: 'Bamenda Village',
-          guarantorParish: 'Bamenda Parish',
-          guarantorDistrict: 'Mezam',
-          guarantorSourceOfIncome: 'Business Owner',
-          
-          // Employment Information
-          employerName: 'Tech Solutions Inc',
-          position: 'IT Consultant',
-          monthlyIncome: '300000',
-          employmentLength: '8 years',
-          
-          // System Information
-          clientType: 'business',
-          status: 'prospect',
-          createdAt: '2024-02-01T09:15:00Z',
-          
-          // Documents
-          agreementSigned: false,
-          agreementNotes: 'Pending final document review.'
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await ClientService.getById(id);
+        
+        if (response && response.id) {
+          // Map backend data structure to component state
+          // Backend returns ClientResponse directly (not wrapped in success/data)
+          const clientData = response;
+          setClient({
+            id: clientData.id,
+            // Profile Information - matching actual backend response structure
+            surname: clientData.lastName,
+            givenName: clientData.firstName,
+            fullName: clientData.fullName || `${clientData.firstName || ''} ${clientData.middleName || ''} ${clientData.lastName || ''}`.trim(),
+            age: clientData.age?.toString(),
+            nationalIdNumber: clientData.nationalId,
+            village: clientData.village,
+            parish: clientData.parish,
+            district: clientData.district,
+            lengthOfStay: clientData.lengthOfStay,
+            sourceOfIncome: clientData.occupation,
+            phoneNumber: clientData.phoneNumber,
+            email: clientData.email,
+            gender: clientData.gender,
+            
+            // Spouse Information - not in current backend response
+            spouseName: clientData.spouseName,
+            spouseId: clientData.spouseId,
+            
+            // Next of Kin/Guarantor Information - mapping from backend nextOfKin object
+            guarantorName: clientData.nextOfKin?.fullName || '',
+            guarantorAge: clientData.nextOfKin?.age?.toString() || '',
+            guarantorContact: clientData.nextOfKin?.phoneNumber || '',
+            guarantorNationalId: clientData.nextOfKin?.nationalId || '',
+            guarantorVillage: clientData.nextOfKin?.village || '',
+            guarantorParish: clientData.nextOfKin?.parish || '',
+            guarantorDistrict: clientData.nextOfKin?.district || '',
+            guarantorSourceOfIncome: clientData.nextOfKin?.sourceOfIncome || '',
+            guarantorGender: clientData.nextOfKin?.gender || '',
+            
+            // Employment Information
+            employerName: clientData.employerName || 'Self-employed',
+            position: clientData.position,
+            monthlyIncome: clientData.monthlyIncome?.toString(),
+            employmentLength: clientData.employmentLength,
+            
+            // System Information
+            clientType: 'individual', // Default since backend response doesn't include this
+            status: 'active', // Default since backend doesn't have status field
+            createdAt: clientData.createdAt,
+            updatedAt: clientData.updatedAt,
+            
+            // Documents - these fields may not exist in backend yet
+            agreementSigned: clientData.agreementSigned || false,
+            agreementNotes: clientData.agreementNotes || ''
+          });
+        } else {
+          setError('Client not found');
+          showNotification('Client not found', 'error');
         }
-      ];
-
-      // Find client by ID
-      const foundClient = sampleClients.find(c => c.id === parseInt(id));
-      
-      setTimeout(() => {
-        setClient(foundClient);
+      } catch (err) {
+        console.error('Error fetching client:', err);
+        setError('Failed to load client details');
+        showNotification('Failed to load client details', 'error');
+      } finally {
         setLoading(false);
-      }, 500);
+      }
     };
 
-    fetchClient();
-  }, [id]);
+    if (id) {
+      fetchClient();
+    }
+  }, [id, showNotification]);
 
   const handleBack = () => {
     navigate('/clients');
   };
 
-  const handleEditClient = () => {
-    // Navigate to edit client page instead of opening modal
-    navigate(`/clients/edit/${client.id}`);
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -217,11 +137,16 @@ const ClientDetails = () => {
     );
   }
 
-  if (!client) {
+  if (error || !client) {
     return (
       <div className="client-details-error">
-        <h2>Client not found</h2>
-        <p>The client you're looking for doesn't exist or has been removed.</p>
+        <h2>{error || 'Client not found'}</h2>
+        <p>
+          {error === 'Client not found' 
+            ? "The client you're looking for doesn't exist or has been removed."
+            : "An error occurred while loading the client details. Please try again."
+          }
+        </p>
         <button onClick={handleBack} className="back-button">
           <ArrowLeft size={16} />
           Back to Clients
@@ -232,11 +157,9 @@ const ClientDetails = () => {
 
   return (
     <div className="client-details-layout">
-      {/* Page Header - Reusing the same structure as Clients page */}
+      {/* Page Header - Title on left, back button on right */}
       <div className="page-header">
-        <div className="header-content">
-          <h1>Client Details</h1>
-        </div>
+        <h1>Client Details</h1>
         <button onClick={handleBack} className="back-button">
           <ArrowLeft size={18} />
           <span>Back to Clients</span>
@@ -260,6 +183,10 @@ const ClientDetails = () => {
               <div className="detail-item">
                 <label>Age</label>
                 <span>{client.age || 'Not specified'}</span>
+              </div>
+              <div className="detail-item">
+                <label>Gender</label>
+                <span>{client.gender ? (client.gender === 'MALE' ? 'Male' : 'Female') : 'Not specified'}</span>
               </div>
               <div className="detail-item">
                 <label>National ID Number</label>
@@ -364,6 +291,10 @@ const ClientDetails = () => {
               <div className="detail-item">
                 <label>Age</label>
                 <span>{client.guarantorAge || 'Not specified'}</span>
+              </div>
+              <div className="detail-item">
+                <label>Gender</label>
+                <span>{client.guarantorGender ? (client.guarantorGender === 'MALE' ? 'Male' : 'Female') : 'Not specified'}</span>
               </div>
               <div className="detail-item">
                 <label>Contact</label>
@@ -484,6 +415,15 @@ const ClientDetails = () => {
       </div>
 
       {/* Modal removed - using page-based editing instead */}
+      
+      {/* Notification Modal */}
+      {notification.show && (
+        <NotificationModal
+          type={notification.type}
+          message={notification.message}
+          onClose={hideNotification}
+        />
+      )}
     </div>
   );
 };

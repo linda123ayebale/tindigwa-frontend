@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Home, 
   Users, 
-  CreditCard, 
-  DollarSign, 
-  FileText, 
-  Settings,
   Plus,
   Search,
   Filter,
   Edit,
   Trash2,
-  Phone,
-  BarChart3,
-  Eye
+  Eye,
+  Phone
 } from 'lucide-react';
-// Removed EditClientModal import - using page-based approach instead
 import ClientService from '../../services/clientService';
+import NotificationModal from '../../components/NotificationModal';
+import ConfirmDeleteModal from '../../components/ConfirmDeleteModal';
+import { useNotification } from '../../hooks/useNotification';
+import Sidebar from '../../components/Layout/Sidebar';
+import '../../styles/table-common.css';
 import './Clients.css';
 
 const Clients = () => {
@@ -27,6 +25,11 @@ const Clients = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [clientToDelete, setClientToDelete] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { notification, showSuccess, showError, hideNotification } = useNotification();
 
   // Fetch clients from API
   const fetchClients = async () => {
@@ -38,18 +41,41 @@ const Clients = () => {
       const clientsData = await ClientService.getAllClients();
       console.log('✅ Clients fetched successfully:', clientsData);
       
-      // Transform backend data to match frontend expectations
+      // Transform NEW backend data structure (User-Person-NextOfKin-Guarantor)
       const transformedClients = (clientsData || []).map(client => ({
         ...client,
-        // Ensure required fields for table display
-        fullName: `${client.givenName || client.firstName || ''} ${client.surname || client.lastName || ''}`.trim() || 'N/A',
-        firstName: client.givenName || client.firstName || '',
-        lastName: client.surname || client.lastName || '',
-        email: client.email || client.phoneNumber || 'No email',
-        phone: client.phoneNumber || client.phone || 'No phone',
-        company: client.company || '',
-        clientType: client.clientType || 'individual',
-        status: client.status || 'active',
+        // Build full name from new backend structure
+        fullName: [client.firstName, client.middleName, client.lastName]
+          .filter(name => name && name.trim())
+          .join(' ') || 'N/A',
+        
+        // Map new backend fields
+        firstName: client.firstName || '',
+        lastName: client.lastName || '',
+        gender: client.gender || '',
+        age: client.age || '',
+        nationalId: client.nationalId || '',
+        email: client.email || 'No email',
+        phone: client.phoneNumber || 'No phone',
+        village: client.village || '',
+        parish: client.parish || '',
+        district: client.district || '',
+        branch: client.branch || 'Main',
+        
+        // Next of Kin and Guarantor info
+        nextOfKin: client.nextOfKin ? {
+          fullName: client.nextOfKin.fullName || 'N/A',
+          phoneNumber: client.nextOfKin.phoneNumber || 'N/A'
+        } : null,
+        
+        guarantor: client.guarantor ? {
+          fullName: client.guarantor.fullName || 'N/A', 
+          phoneNumber: client.guarantor.phoneNumber || 'N/A'
+        } : null,
+        
+        // Default values for table display
+        clientType: 'individual', // All our clients are individuals
+        status: 'active', // Default to active
         createdAt: client.createdAt || new Date().toISOString(),
       }));
       
@@ -69,21 +95,45 @@ const Clients = () => {
     fetchClients();
   }, []);
 
-  const sidebarItems = [
-    { title: 'Dashboard', icon: Home, path: '/dashboard' },
-    { title: 'Clients', icon: Users, path: '/clients', active: true },
-    { title: 'Loans', icon: CreditCard, path: '/loans' },
-    { title: 'Payments', icon: DollarSign, path: '/payments' },
-    { title: 'Finances', icon: BarChart3, path: '/finances' },
-    { title: 'Reports', icon: FileText, path: '/reports' },
-    { title: 'Settings', icon: Settings, path: '/settings' }
-  ];
 
-
-  const handleDeleteClient = (clientId) => {
-    if (window.confirm('Are you sure you want to delete this client?')) {
-      setClients(prevClients => prevClients.filter(client => client.id !== clientId));
+  const handleDeleteClient = (client) => {
+    console.log('🗑️ Delete button clicked for client:', client);
+    setClientToDelete(client);
+    setShowDeleteModal(true);
+  };
+  
+  const handleDeleteConfirm = async () => {
+    if (!clientToDelete) return;
+    
+    try {
+      setIsDeleting(true);
+      console.log('🗑️ Proceeding with deletion of client ID:', clientToDelete.id);
+      
+      const response = await ClientService.deleteClient(clientToDelete.id);
+      console.log('🗑️ Delete response:', response);
+      
+      // Remove client from local state
+      setClients(prevClients => prevClients.filter(c => c.id !== clientToDelete.id));
+      
+      // Show success notification
+      showSuccess(`${clientToDelete.fullName} has been deleted successfully.`);
+      
+      // Close modal
+      setShowDeleteModal(false);
+      setClientToDelete(null);
+      
+    } catch (error) {
+      console.error('❌ Error deleting client:', error);
+      showError(`Failed to delete ${clientToDelete.fullName}: ${error.message}`);
+    } finally {
+      setIsDeleting(false);
     }
+  };
+  
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setClientToDelete(null);
+    setIsDeleting(false);
   };
 
   const handleViewClient = (clientId) => {
@@ -92,6 +142,10 @@ const Clients = () => {
   };
 
   const handleEditClient = (client) => {
+    console.log('🔧 Edit button clicked for client:', client);
+    console.log('🔧 Client ID:', client.id);
+    console.log('🔧 Navigating to:', `/clients/edit/${client.id}`);
+    
     // Navigate to edit client page instead of opening modal
     navigate(`/clients/edit/${client.id}`);
   };
@@ -106,38 +160,52 @@ const Clients = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  // Pagination logic
+  const itemsPerPage = 5;
+  const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentClients = filteredClients.slice(startIndex, endIndex);
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
   };
+
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const maxVisibleButtons = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisibleButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+    
+    if (endPage - startPage + 1 < maxVisibleButtons) {
+      startPage = Math.max(1, endPage - maxVisibleButtons + 1);
+    }
+    
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <button
+          key={i}
+          className={`pagination-btn ${currentPage === i ? 'active' : ''}`}
+          onClick={() => handlePageChange(i)}
+        >
+          {i}
+        </button>
+      );
+    }
+    
+    return buttons;
+  };
+
+  // Reset to page 1 when search or filter changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus]);
+
 
   return (
     <div className="dashboard-layout">
       {/* Sidebar */}
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-header">
-          <h2>TINDIGWA</h2>
-        </div>
-        
-        <nav className="sidebar-nav">
-          {sidebarItems.map((item, index) => {
-            const IconComponent = item.icon;
-            return (
-              <button
-                key={index}
-                className={`nav-item ${item.active ? 'active' : ''}`}
-                onClick={() => navigate(item.path)}
-              >
-                <IconComponent size={20} />
-                <span>{item.title}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
+      <Sidebar />
 
       {/* Main Content */}
       <main className="dashboard-main">
@@ -226,85 +294,145 @@ const Clients = () => {
                 )}
               </div>
             ) : (
-              <div className="clients-table">
-                <div className="table-header">
-                  <div className="table-row header-row">
-                    <div className="table-cell">Client</div>
-                    <div className="table-cell">Contact</div>
-                    <div className="table-cell">Type</div>
-                    <div className="table-cell">Status</div>
-                    <div className="table-cell">Date Added</div>
-                    <div className="table-cell">Actions</div>
-                  </div>
-                </div>
-                
-                <div className="table-body">
-                  {filteredClients.map((client) => (
-                    <div key={client.id} className="table-row">
-                      <div className="table-cell">
-                        <div className="client-name">{client.fullName}</div>
-                      </div>
-                      
-                      <div className="table-cell">
-                        <div className="contact-info">
+              <>
+                <table className="clients-table">
+                  <thead>
+                    <tr>
+                      <th>Client</th>
+                      <th>Contact</th>
+                      <th>Location</th>
+                      <th>National ID</th>
+                      <th>Next of Kin</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentClients.map((client) => (
+                      <tr key={client.id}>
+                        <td>
+                          <div className="client-name">{client.fullName}</div>
+                          <div className="client-meta">
+                            {client.gender && <span className="badge">{client.gender}</span>}
+                            {client.age && <span className="age-badge">{client.age} yrs</span>}
+                          </div>
+                        </td>
+                        
+                        <td>
                           <div className="contact-item">
                             <Phone size={14} />
                             <span>{client.phone}</span>
                           </div>
-                        </div>
-                      </div>
-                      
-                      <div className="table-cell">
-                        <span className={`client-type ${client.clientType}`}>
-                          {client.clientType === 'business' ? 'Business' : 'Individual'}
-                        </span>
-                      </div>
-                      
-                      <div className="table-cell">
-                        <span className={`status-badge ${client.status}`}>
-                          {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
-                        </span>
-                      </div>
-                      
-                      <div className="table-cell">
-                        {formatDate(client.createdAt)}
-                      </div>
-                      
-                      <div className="table-cell">
-                        <div className="action-buttons">
-                          <button 
-                            className="action-btn view"
-                            title="View Client Details"
-                            onClick={() => handleViewClient(client.id)}
-                          >
-                            <Eye size={14} />
-                          </button>
-                          <button 
-                            className="action-btn edit"
-                            title="Edit Client"
-                            onClick={() => handleEditClient(client)}
-                          >
-                            <Edit size={14} />
-                          </button>
-                          <button 
-                            className="action-btn delete"
-                            title="Delete Client"
-                            onClick={() => handleDeleteClient(client.id)}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </div>
+                          {client.email !== 'No email' && (
+                            <div className="contact-email">{client.email}</div>
+                          )}
+                        </td>
+                        
+                        <td>
+                          {[client.village, client.parish, client.district]
+                            .filter(Boolean)
+                            .join(', ') || <span className="no-data">-</span>}
+                        </td>
+                        
+                        <td>{client.nationalId || '-'}</td>
+                        
+                        <td>
+                          {client.nextOfKin ? (
+                            <>
+                              <div>{client.nextOfKin.fullName}</div>
+                              {client.nextOfKin.phoneNumber !== 'N/A' && (
+                                <div className="nok-phone">{client.nextOfKin.phoneNumber}</div>
+                              )}
+                            </>
+                          ) : (
+                            <span>-</span>
+                          )}
+                        </td>
+                        
+                        <td>
+                          <div className="action-buttons">
+                            <button 
+                              className="action-btn view"
+                              title="View Details"
+                              onClick={() => handleViewClient(client.id)}
+                            >
+                              <Eye size={16} />
+                            </button>
+                            <button 
+                              className="action-btn edit"
+                              title="Edit"
+                              onClick={() => handleEditClient(client)}
+                            >
+                              <Edit size={16} />
+                            </button>
+                            <button 
+                              className="action-btn delete"
+                              title="Delete"
+                              onClick={() => handleDeleteClient(client)}
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* Pagination */}
+                {filteredClients.length > itemsPerPage && (
+                  <div className="pagination-container">
+                    <div className="pagination-info">
+                      <p>Showing {startIndex + 1}-{Math.min(endIndex, filteredClients.length)} of {filteredClients.length} clients</p>
                     </div>
-                  ))}
-                </div>
-              </div>
+                    <div className="pagination">
+                      <button 
+                        className="pagination-btn"
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        Previous
+                      </button>
+                      {renderPaginationButtons()}
+                      <button 
+                        className="pagination-btn"
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
       </main>
 
-      {/* Modal removed - using page-based editing instead */}
+      {/* Notification Modal */}
+      <NotificationModal
+        isOpen={notification.isOpen}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={hideNotification}
+        autoClose={notification.autoClose}
+        position={notification.position}
+      />
+      
+      {/* Delete Confirmation Modal */}
+      <ConfirmDeleteModal
+        isOpen={showDeleteModal}
+        itemType="client"
+        itemName={clientToDelete?.fullName}
+        itemDetails={[
+          `National ID: ${clientToDelete?.nationalId || 'Not provided'}`,
+          `Phone: ${clientToDelete?.phone || 'Not provided'}`
+        ]}
+        onConfirm={handleDeleteConfirm}
+        onCancel={handleDeleteCancel}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 };

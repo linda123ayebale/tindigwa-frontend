@@ -112,7 +112,7 @@ const ConnectionStatus = () => {
       )}
       
       <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
-        Backend: http://localhost:8080
+        Backend: http://localhost:8081
       </div>
     </div>
   );

@@ -1,11 +1,11 @@
+// src/services/BranchService.js
 import ApiService from './api';
 
 class BranchService {
   constructor() {
-    this.basePath = '/branches';
+    this.basePath = '/branches'; // or '/api/branches' depending on ApiService
   }
 
-  // Get all branches
   async getAllBranches() {
     try {
       return await ApiService.get(this.basePath);
@@ -15,7 +15,6 @@ class BranchService {
     }
   }
 
-  // Get branch by ID
   async getBranchById(id) {
     try {
       return await ApiService.get(`${this.basePath}/${id}`);
@@ -25,8 +24,10 @@ class BranchService {
     }
   }
 
-  // Create new branch
-  async createBranch(branchData) {
+  async createBranch(formData) {
+    const branchData = this.formatBranchData(formData);
+    this.validateBranchData(branchData);
+
     try {
       return await ApiService.post(this.basePath, branchData);
     } catch (error) {
@@ -35,8 +36,10 @@ class BranchService {
     }
   }
 
-  // Update existing branch
-  async updateBranch(id, branchData) {
+  async updateBranch(id, formData) {
+    const branchData = this.formatBranchData(formData);
+    this.validateBranchData(branchData);
+
     try {
       return await ApiService.put(`${this.basePath}/${id}`, branchData);
     } catch (error) {
@@ -45,7 +48,6 @@ class BranchService {
     }
   }
 
-  // Delete branch
   async deleteBranch(id) {
     try {
       return await ApiService.delete(`${this.basePath}/${id}`);
@@ -55,11 +57,10 @@ class BranchService {
     }
   }
 
-  // Validate branch data
   validateBranchData(branchData) {
-    const required = ['name', 'location'];
-    const missing = required.filter(field => !branchData[field]);
-    
+    const required = ['branchCode', 'branchName', 'location'];
+    const missing = required.filter(field => !branchData[field]?.trim());
+
     if (missing.length > 0) {
       throw new Error(`Missing required fields: ${missing.join(', ')}`);
     }
@@ -67,16 +68,11 @@ class BranchService {
     return true;
   }
 
-  // Format branch data for API
   formatBranchData(formData) {
     return {
-      name: formData.name?.trim(),
+      branchCode: formData.branchCode?.trim(),
+      branchName: formData.branchName?.trim(),
       location: formData.location?.trim(),
-      address: formData.address?.trim() || '',
-      phoneNumber: formData.phoneNumber?.trim() || '',
-      email: formData.email?.trim() || '',
-      managerName: formData.managerName?.trim() || '',
-      status: formData.status || 'active'
     };
   }
 }

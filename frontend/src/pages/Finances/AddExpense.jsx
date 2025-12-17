@@ -1,19 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Home, 
-  Users, 
-  CreditCard, 
-  DollarSign, 
-  FileText, 
-  Settings,
-  BarChart3,
   ChevronDown,
   Calendar,
   Save,
-  X,
-  Receipt
+  X
 } from 'lucide-react';
+import Sidebar from '../../components/Layout/Sidebar';
 import './AddExpense.css';
 
 const AddExpense = () => {
@@ -25,16 +18,6 @@ const AddExpense = () => {
     description: ''
   });
 
-  const sidebarItems = [
-    { title: 'Dashboard', icon: Home, path: '/dashboard' },
-    { title: 'Clients', icon: Users, path: '/clients' },
-    { title: 'Loans', icon: CreditCard, path: '/loans' },
-    { title: 'Payments', icon: DollarSign, path: '/payments' },
-    { title: 'Finances', icon: BarChart3, path: '/finances' },
-    { title: 'Expenses', icon: Receipt, path: '/expenses', active: true },
-    { title: 'Reports', icon: FileText, path: '/reports' },
-    { title: 'Settings', icon: Settings, path: '/settings' }
-  ];
 
   const expenseTypes = [
     'Operational Expenses',
@@ -86,8 +69,8 @@ const AddExpense = () => {
     // In a real app, you would make an API call here
     alert('Expense saved successfully!');
     
-    // Navigate back to expenses list or financial dashboard
-    navigate('/expenses');
+  // Navigate back to expenses list or financial dashboard
+  navigate('/expenses/all');
   };
 
   const handleCancel = () => {
@@ -97,27 +80,7 @@ const AddExpense = () => {
   return (
     <div className="dashboard-layout">
       {/* Sidebar */}
-      <aside className="dashboard-sidebar">
-        <div className="sidebar-header">
-          <h2>TINDIGWA</h2>
-        </div>
-        
-        <nav className="sidebar-nav">
-          {sidebarItems.map((item, index) => {
-            const IconComponent = item.icon;
-            return (
-              <button
-                key={index}
-                className={`nav-item ${item.active ? 'active' : ''}`}
-                onClick={() => navigate(item.path)}
-              >
-                <IconComponent size={20} />
-                <span>{item.title}</span>
-              </button>
-            );
-          })}
-        </nav>
-      </aside>
+      <Sidebar />
 
       {/* Main Content */}
       <main className="dashboard-main">

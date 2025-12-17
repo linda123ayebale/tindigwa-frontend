@@ -1,0 +1,99 @@
+/* Import common table styles to maintain consistency */
+@import '../Clients/Clients.css';
+
+/* Product Name */
+.product-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 14px;
+}
+
+/* Product Code Badge */
+.product-code {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #dbeafe;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e40af;
+  font-family: 'Courier New', monospace;
+}
+
+/* Interest Method */
+.interest-method {
+  font-size: 13px;
+  color: #374151;
+  text-transform: capitalize;
+}
+
+/* Rate Value */
+.rate-value {
+  font-weight: 600;
+  color: #059669;
+  font-size: 14px;
+}
+
+/* Frequency */
+.frequency {
+  font-size: 13px;
+  color: #6b7280;
+  text-transform: capitalize;
+}
+
+/* Fee Value */
+.fee-value {
+  font-weight: 500;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+/* Created By */
+.created-by {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Page Description */
+.page-description {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* Retry Button */
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 16px;
+}
+
+.retry-btn:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .product-name {
+    font-size: 13px;
+  }
+  
+  .product-code,
+  .interest-method,
+  .frequency,
+  .created-by {
+    font-size: 11px;
+  }
+}
