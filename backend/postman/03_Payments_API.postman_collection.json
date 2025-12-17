@@ -1,0 +1,842 @@
+{
+  "info": {
+    "name": "03 - Payments API",
+    "description": "Complete API collection for Payments module - records payments against loans, tracks installments, generates receipts, and provides analytics",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "loanId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "paymentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clientId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Payment Recording",
+      "item": [
+        {
+          "name": "1. Record Payment (Simple)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Payment recorded successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('paymentNumber');",
+                  "    pm.expect(jsonData.paymentStatus).to.eql('RECORDED');",
+                  "    ",
+                  "    // Save payment ID for subsequent requests",
+                  "    pm.collectionVariables.set('paymentId', jsonData.id);",
+                  "});",
+                  "",
+                  "pm.test(\"Payment number is auto-generated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.paymentNumber).to.match(/^PAY-/);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanId\": {{loanId}},\n  \"amountPaid\": 25000.0,\n  \"paymentMethod\": \"CASH\",\n  \"paymentDate\": \"2024-01-15\",\n  \"referenceNumber\": \"CASH-2024-001\",\n  \"notes\": \"Monthly installment payment\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"]
+            },
+            "description": "Record a basic payment"
+          },
+          "response": []
+        },
+        {
+          "name": "2. Process Payment (Advanced)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Payment processed with calculations\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData).to.have.property('payment');",
+                  "    pm.expect(jsonData.payment).to.have.property('principalPaid');",
+                  "    pm.expect(jsonData.payment).to.have.property('interestPaid');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanId\": {{loanId}},\n  \"amount\": 25000.0,\n  \"paymentMethod\": \"BANK_TRANSFER\",\n  \"paymentDate\": \"2024-01-15\",\n  \"referenceNumber\": \"TRF-2024-001\",\n  \"notes\": \"Monthly installment via bank transfer\",\n  \"createdBy\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/process",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "process"]
+            },
+            "description": "Process payment with full calculation (principal, interest, fees)"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Record Payment (Alternative Endpoint)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanId\": {{loanId}},\n  \"amountPaid\": 30000.0,\n  \"paymentMethod\": \"MOBILE_MONEY\",\n  \"paymentDate\": \"2024-02-15\",\n  \"referenceNumber\": \"MM-2024-001\",\n  \"notes\": \"Payment via M-Pesa\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/record",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "record"]
+            },
+            "description": "Alternative endpoint for recording payments with tracking updates"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Retrieval",
+      "item": [
+        {
+          "name": "4. Get All Payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"]
+            },
+            "description": "Get all payments in the system"
+          },
+          "response": []
+        },
+        {
+          "name": "5. Get Payment By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/{{paymentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "{{paymentId}}"]
+            },
+            "description": "Get specific payment by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "6. Get Payments By Loan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/loan/{{loanId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "loan", "{{loanId}}"]
+            },
+            "description": "Get all payments for a specific loan"
+          },
+          "response": []
+        },
+        {
+          "name": "7. Get Payment History For Loan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/loan/{{loanId}}/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "loan", "{{loanId}}", "history"]
+            },
+            "description": "Get payment history in chronological order"
+          },
+          "response": []
+        },
+        {
+          "name": "8. Get Latest Payment For Loan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/loan/{{loanId}}/latest",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "loan", "{{loanId}}", "latest"]
+            },
+            "description": "Get most recent payment for a loan"
+          },
+          "response": []
+        },
+        {
+          "name": "9. Get Payments By Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/status/RECORDED",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "status", "RECORDED"]
+            },
+            "description": "Get payments by status (RECORDED, CANCELLED, REVERSED)"
+          },
+          "response": []
+        },
+        {
+          "name": "10. Get Payments By Method",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/method/CASH",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "method", "CASH"]
+            },
+            "description": "Get payments by payment method"
+          },
+          "response": []
+        },
+        {
+          "name": "11. Get Payments By Date Range",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/date-range?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "date-range"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            },
+            "description": "Get payments within a date range"
+          },
+          "response": []
+        },
+        {
+          "name": "12. Get Late Payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/late",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "late"]
+            },
+            "description": "Get all late payments"
+          },
+          "response": []
+        },
+        {
+          "name": "13. Get Partial Payments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/partial",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "partial"]
+            },
+            "description": "Get all partial payments"
+          },
+          "response": []
+        },
+        {
+          "name": "14. Get Overpayments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/overpayments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "overpayments"]
+            },
+            "description": "Get all overpayments"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Financial Summary",
+      "item": [
+        {
+          "name": "15. Get Payment Summary For Loan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/loan/{{loanId}}/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "loan", "{{loanId}}", "summary"]
+            },
+            "description": "Get comprehensive payment summary for a loan"
+          },
+          "response": []
+        },
+        {
+          "name": "16. Get Loan Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/loan/{{loanId}}/balance",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "loan", "{{loanId}}", "balance"]
+            },
+            "description": "Get detailed loan balance breakdown"
+          },
+          "response": []
+        },
+        {
+          "name": "17. Get Total Paid For Loan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/loan/{{loanId}}/total-paid",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "loan", "{{loanId}}", "total-paid"]
+            },
+            "description": "Get total amount paid for a loan"
+          },
+          "response": []
+        },
+        {
+          "name": "18. Get Outstanding Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/loan/{{loanId}}/outstanding",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "loan", "{{loanId}}", "outstanding"]
+            },
+            "description": "Get outstanding balance for a loan"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Analytics",
+      "item": [
+        {
+          "name": "19. Get Payment Trends",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/analytics/trends?startDate=2024-01-01&endDate=2024-12-31&granularity=daily",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "analytics", "trends"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                },
+                {
+                  "key": "granularity",
+                  "value": "daily"
+                }
+              ]
+            },
+            "description": "Get payment trends over time"
+          },
+          "response": []
+        },
+        {
+          "name": "20. Get Payment Methods Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/analytics/methods?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "analytics", "methods"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            },
+            "description": "Get payment method distribution"
+          },
+          "response": []
+        },
+        {
+          "name": "21. Get Payment Summary Analytics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/analytics/summary?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "analytics", "summary"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            },
+            "description": "Get comprehensive payment summary"
+          },
+          "response": []
+        },
+        {
+          "name": "22. Get Collection Efficiency",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/analytics/collection-efficiency?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "analytics", "collection-efficiency"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            },
+            "description": "Get collection efficiency metrics"
+          },
+          "response": []
+        },
+        {
+          "name": "23. Get Late Payment Analysis",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/analytics/late-payments?startDate=2024-01-01&endDate=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "analytics", "late-payments"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2024-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2024-12-31"
+                }
+              ]
+            },
+            "description": "Get late payment analysis"
+          },
+          "response": []
+        },
+        {
+          "name": "24. Get Portfolio Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/analytics/portfolio-health",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "analytics", "portfolio-health"]
+            },
+            "description": "Get overall portfolio health metrics"
+          },
+          "response": []
+        },
+        {
+          "name": "25. Get Payment Forecast",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/analytics/forecast?daysAhead=30",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "analytics", "forecast"],
+              "query": [
+                {
+                  "key": "daysAhead",
+                  "value": "30"
+                }
+              ]
+            },
+            "description": "Get payment forecasting data"
+          },
+          "response": []
+        },
+        {
+          "name": "26. Get Dashboard Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/analytics/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "analytics", "dashboard"]
+            },
+            "description": "Get dashboard metrics for current period"
+          },
+          "response": []
+        },
+        {
+          "name": "27. Get Client Payment Performance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/analytics/client/{{clientId}}/performance",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "analytics", "client", "{{clientId}}", "performance"]
+            },
+            "description": "Get payment performance for specific client"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Receipts",
+      "item": [
+        {
+          "name": "28. Get Payment Receipt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Receipt generated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('receiptNumber');",
+                  "    pm.expect(jsonData.receiptNumber).to.match(/^RCP-/);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/receipts/{{paymentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "receipts", "{{paymentId}}"]
+            },
+            "description": "Generate and retrieve payment receipt"
+          },
+          "response": []
+        },
+        {
+          "name": "29. Get Receipt By Number",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/receipts/number/RCP-20240115-1-1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "receipts", "number", "RCP-20240115-1-1"]
+            },
+            "description": "Get receipt by receipt number"
+          },
+          "response": []
+        },
+        {
+          "name": "30. Get All Receipts For Loan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/receipts/loan/{{loanId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "receipts", "loan", "{{loanId}}"]
+            },
+            "description": "Get all receipts for a loan"
+          },
+          "response": []
+        },
+        {
+          "name": "31. Get Receipt Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/receipts/statistics",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "receipts", "statistics"]
+            },
+            "description": "Get receipt generation statistics"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Update & Actions",
+      "item": [
+        {
+          "name": "32. Update Payment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notes\": \"Updated payment notes\",\n  \"referenceNumber\": \"UPDATED-REF-001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/{{paymentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "{{paymentId}}"]
+            },
+            "description": "Update payment details"
+          },
+          "response": []
+        },
+        {
+          "name": "33. Edit Payment (Guarded)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amountPaid\": 26000.0,\n  \"notes\": \"Corrected payment amount\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/{{paymentId}}/edit",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "{{paymentId}}", "edit"]
+            },
+            "description": "Edit payment (only allowed for RECORDED status)"
+          },
+          "response": []
+        },
+        {
+          "name": "34. Update Payment Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"VERIFIED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/{{paymentId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "{{paymentId}}", "status"]
+            },
+            "description": "Update payment status"
+          },
+          "response": []
+        },
+        {
+          "name": "35. Cancel Payment",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Duplicate payment entry\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/{{paymentId}}/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "{{paymentId}}", "cancel"]
+            },
+            "description": "Cancel a payment (soft delete)"
+          },
+          "response": []
+        },
+        {
+          "name": "36. Reverse Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reversedBy\": 1,\n  \"reason\": \"Payment reversal requested by client\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/{{paymentId}}/reverse",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "{{paymentId}}", "reverse"]
+            },
+            "description": "Reverse a payment"
+          },
+          "response": []
+        },
+        {
+          "name": "37. Soft Delete Payment",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/{{paymentId}}/soft-delete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "{{paymentId}}", "soft-delete"]
+            },
+            "description": "Soft delete payment (only RECORDED status)"
+          },
+          "response": []
+        },
+        {
+          "name": "38. Delete Payment (Hard)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/{{paymentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "{{paymentId}}"]
+            },
+            "description": "Hard delete payment (use with extreme caution)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment Validation",
+      "item": [
+        {
+          "name": "39. Validate Payment Amount",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/loan/{{loanId}}/validate-amount/25000",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "loan", "{{loanId}}", "validate-amount", "25000"]
+            },
+            "description": "Validate if payment amount is valid"
+          },
+          "response": []
+        },
+        {
+          "name": "40. Validate Payment Date",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/validate-date?paymentDate=2024-01-15",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", "validate-date"],
+              "query": [
+                {
+                  "key": "paymentDate",
+                  "value": "2024-01-15"
+                }
+              ]
+            },
+            "description": "Validate if payment date is valid"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

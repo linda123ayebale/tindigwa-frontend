@@ -1,9 +1,6 @@
 package org.example.Entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,11 +12,16 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Branches {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
+    @Column(name = "branch_code", unique = true, length = 8)
+    String branchCode;  // BR250001
+
     String branchName;
     String location;
-    Long loanOfficerId;
 
+    Long loanOfficerId; // Keep for future assignment
 }

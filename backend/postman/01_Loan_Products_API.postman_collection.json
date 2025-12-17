@@ -1,0 +1,424 @@
+{
+  "info": {
+    "name": "01 - Loan Products API",
+    "description": "Complete API collection for Loan Products module - creates loan products with terms and conditions",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "productCode",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Create Loan Product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Response has product data\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData).to.have.property('productCode');",
+              "    pm.expect(jsonData).to.have.property('productName');",
+              "    pm.expect(jsonData.active).to.eql(true);",
+              "    ",
+              "    // Save product ID and code for subsequent requests",
+              "    pm.collectionVariables.set('productId', jsonData.id);",
+              "    pm.collectionVariables.set('productCode', jsonData.productCode);",
+              "});",
+              "",
+              "pm.test(\"Product code is auto-generated\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.productCode).to.match(/^LP-/);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productName\": \"Personal Loan\",\n  \"displayName\": \"Quick Personal Loan\",\n  \"description\": \"Short-term personal loan for salaried individuals\",\n  \"defaultInterestRate\": 15.5,\n  \"interestMethod\": \"REDUCING_BALANCE\",\n  \"interestType\": \"MONTHLY\",\n  \"ratePer\": \"MONTH\",\n  \"minDuration\": 3,\n  \"maxDuration\": 12,\n  \"defaultDuration\": 6,\n  \"durationUnit\": \"MONTHS\",\n  \"minAmount\": 50000.0,\n  \"maxAmount\": 500000.0,\n  \"allowedRepaymentFrequencies\": \"MONTHLY,WEEKLY\",\n  \"defaultRepaymentFrequency\": \"MONTHLY\",\n  \"processingFeeType\": \"PERCENTAGE\",\n  \"processingFeeValue\": 2.0,\n  \"lateFee\": 500.0,\n  \"defaultFee\": 1000.0,\n  \"defaultGracePeriodDays\": 3,\n  \"requiresGuarantor\": true,\n  \"requiresCollateral\": false,\n  \"active\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/loan-products/addLoanProduct",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "loan-products", "addLoanProduct"]
+        },
+        "description": "Create a new loan product with auto-generated product code"
+      },
+      "response": []
+    },
+    {
+      "name": "2. Create Business Loan Product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 201\", function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test(\"Business loan created successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.productName).to.eql('Business Loan');",
+              "    pm.expect(jsonData.requiresCollateral).to.eql(true);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"productName\": \"Business Loan\",\n  \"displayName\": \"SME Business Financing\",\n  \"description\": \"Medium-term loan for small and medium enterprises\",\n  \"defaultInterestRate\": 18.0,\n  \"interestMethod\": \"FLAT\",\n  \"interestType\": \"MONTHLY\",\n  \"ratePer\": \"MONTH\",\n  \"minDuration\": 6,\n  \"maxDuration\": 24,\n  \"defaultDuration\": 12,\n  \"durationUnit\": \"MONTHS\",\n  \"minAmount\": 100000.0,\n  \"maxAmount\": 2000000.0,\n  \"allowedRepaymentFrequencies\": \"MONTHLY\",\n  \"defaultRepaymentFrequency\": \"MONTHLY\",\n  \"processingFeeType\": \"FIXED\",\n  \"processingFeeValue\": 5000.0,\n  \"lateFee\": 1000.0,\n  \"defaultFee\": 2000.0,\n  \"defaultGracePeriodDays\": 5,\n  \"requiresGuarantor\": true,\n  \"requiresCollateral\": true,\n  \"active\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/loan-products/addLoanProduct",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "loan-products", "addLoanProduct"]
+        },
+        "description": "Create a business loan product with collateral requirement"
+      },
+      "response": []
+    },
+    {
+      "name": "3. Get All Loan Products",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Returns array of products\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "    pm.expect(jsonData.length).to.be.greaterThan(0);",
+              "});",
+              "",
+              "pm.test(\"All products are active\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.forEach(product => {",
+              "        pm.expect(product.active).to.eql(true);",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/loan-products?activeOnly=true",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "loan-products"],
+          "query": [
+            {
+              "key": "activeOnly",
+              "value": "true"
+            }
+          ]
+        },
+        "description": "Get all active loan products"
+      },
+      "response": []
+    },
+    {
+      "name": "4. Get Loan Product By ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Returns correct product\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.id).to.eql(pm.collectionVariables.get('productId'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/loan-products/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "loan-products", "{{productId}}"]
+        },
+        "description": "Get a specific loan product by ID"
+      },
+      "response": []
+    },
+    {
+      "name": "5. Get Loan Product By Code",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Returns product with correct code\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.productCode).to.eql(pm.collectionVariables.get('productCode'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/loan-products/code/{{productCode}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "loan-products", "code", "{{productCode}}"]
+        },
+        "description": "Get a loan product by product code"
+      },
+      "response": []
+    },
+    {
+      "name": "6. Search Loan Products By Name",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Returns matching products\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/loan-products/search?name=Personal",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "loan-products", "search"],
+          "query": [
+            {
+              "key": "name",
+              "value": "Personal"
+            }
+          ]
+        },
+        "description": "Search loan products by name"
+      },
+      "response": []
+    },
+    {
+      "name": "7. Get Products For Amount",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Returns suitable products\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.be.an('array');",
+              "    jsonData.forEach(product => {",
+              "        pm.expect(product.minAmount).to.be.at.most(200000);",
+              "        pm.expect(product.maxAmount).to.be.at.least(200000);",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/loan-products/suitable-for-amount?amount=200000",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "loan-products", "suitable-for-amount"],
+          "query": [
+            {
+              "key": "amount",
+              "value": "200000"
+            }
+          ]
+        },
+        "description": "Get loan products suitable for a specific amount"
+      },
+      "response": []
+    },
+    {
+      "name": "8. Get Products Requiring Guarantor",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"All products require guarantor\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    jsonData.forEach(product => {",
+              "        pm.expect(product.requiresGuarantor).to.eql(true);",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/loan-products/requiring-guarantor",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "loan-products", "requiring-guarantor"]
+        },
+        "description": "Get loan products that require a guarantor"
+      },
+      "response": []
+    },
+    {
+      "name": "9. Update Loan Product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Product updated successfully\", function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData.defaultInterestRate).to.eql(16.0);",
+              "    pm.expect(jsonData.productCode).to.eql(pm.collectionVariables.get('productCode'));",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"defaultInterestRate\": 16.0,\n  \"minAmount\": 60000.0,\n  \"maxAmount\": 600000.0,\n  \"lateFee\": 750.0\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/loan-products/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "loan-products", "{{productId}}"]
+        },
+        "description": "Update loan product details (productCode cannot be changed)"
+      },
+      "response": []
+    },
+    {
+      "name": "10. Deactivate Loan Product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Product deactivated successfully\", function () {",
+              "    pm.sendRequest({",
+              "        url: pm.collectionVariables.get('baseUrl') + '/api/loan-products/' + pm.collectionVariables.get('productId'),",
+              "        method: 'GET'",
+              "    }, function (err, response) {",
+              "        var product = response.json();",
+              "        pm.expect(product.active).to.eql(false);",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/loan-products/{{productId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "loan-products", "{{productId}}"]
+        },
+        "description": "Deactivate a loan product (soft delete)"
+      },
+      "response": []
+    }
+  ]
+}

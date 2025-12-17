@@ -26,11 +26,15 @@ public class UserService {
     }
 
     public List<User> getAllClients () {
-        return userRepository.findAllClientDetails();
+        return userRepository.findByRole(User.UserRole.CLIENT);
     }
 
     public List<User> getAllLoanOfficersWithNextOfKin() {
-        return userRepository.findAllLoanOfficersWithNextOfKin();
+        return userRepository.findByRole(User.UserRole.LOAN_OFFICER);
+    }
+
+    public List<User> getAllCashiers() {
+        return userRepository.findByRole(User.UserRole.CASHIER);
     }
 
     public List<User> getAllAdmins() {

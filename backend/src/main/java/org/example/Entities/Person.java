@@ -20,6 +20,7 @@ public class Person {
     private String firstName;
     private String givenName;
     private String lastName;
+    private String gender; // MALE or FEMALE
 
     private int age;
     private String contact;
@@ -28,5 +29,15 @@ public class Person {
     private String village;
     private String parish;
     private String district;
+    
+    // Marital Information
+    private String maritalStatus; // SINGLE or MARRIED
+    private String spouseName;
+    private String spousePhone;
+    
+    // Employment Information
+    private String occupation;
+    private String employmentStatus;
+    private String monthlyIncome;
 }
 

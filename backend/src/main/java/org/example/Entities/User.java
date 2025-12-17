@@ -18,6 +18,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(name = "user_code", unique = true, length = 8)
+    private String userCode;  // Universal user ID (e.g., US250001)
 
     // Core identity - Person contains all personal details
     @OneToOne(cascade = CascadeType.ALL)
@@ -89,6 +92,25 @@ public class User {
     public boolean isClient() {
         return UserRole.CLIENT.equals(role);
     }
+    
+    public boolean isCashier() {
+        return UserRole.CASHIER.equals(role);
+    }
+    
+    public boolean isSupervisor() {
+        return UserRole.SUPERVISOR.equals(role);
+    }
+    
+    public boolean isAuditor() {
+        return UserRole.AUDITOR.equals(role);
+    }
+    
+    public boolean isStaff() {
+        return UserRole.LOAN_OFFICER.equals(role) || 
+               UserRole.CASHIER.equals(role) || 
+               UserRole.SUPERVISOR.equals(role) ||
+               UserRole.AUDITOR.equals(role);
+    }
 
     // Role-based validation
     @PrePersist
@@ -98,11 +120,18 @@ public class User {
         if (branch == null) branch = "Main";
         if (role == null) role = UserRole.CLIENT;
         
-        // Only CLIENT users should have NextOfKin and Guarantor
-        if (!UserRole.CLIENT.equals(role)) {
+        // Validation for role-specific relationships:
+        // - CLIENT users can have both NextOfKin and Guarantor
+        // - STAFF users (LOAN_OFFICER, CASHIER, SUPERVISOR) can have NextOfKin but not Guarantor
+        // - ADMIN users have neither
+        if (UserRole.ADMIN.equals(role)) {
             this.nextOfKin = null;
             this.guarantor = null;
+        } else if (isStaff()) {
+            // Staff can have NextOfKin but not Guarantor
+            this.guarantor = null;
         }
+        // CLIENT users can keep both relationships as is
         
         // Set username as email if not provided
         if (username == null && email != null) {
@@ -114,6 +143,9 @@ public class User {
     public enum UserRole {
         ADMIN("Administrator"),
         LOAN_OFFICER("Loan Officer"),
+        CASHIER("Cashier"),
+        SUPERVISOR("Supervisor"),
+        AUDITOR("Auditor"),
         CLIENT("Client");
         
         private final String displayName;

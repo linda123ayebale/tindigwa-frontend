@@ -1,6 +1,5 @@
 package org.example.Services;
 
-
 import org.example.Entities.Branches;
 import org.example.Repositories.BranchesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,42 +7,52 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+
 @Service
 public class BranchesService {
-    @Autowired
-    private BranchesRepository repository;
 
-    // Create
+    private final BranchesRepository repository;
+
+    @Autowired
+    private UniqueIdGenerator uniqueIdGenerator;
+
+    public BranchesService(BranchesRepository repository) {
+        this.repository = repository;
+    }
+
     public Branches createBranch(Branches branch) {
+
+        // Generate correct BR + YY + XXXX ID
+        String generatedCode = uniqueIdGenerator.generateBranchId();
+        branch.setBranchCode(generatedCode);
+
+        if (branch.getBranchName() == null || branch.getLocation() == null) {
+            throw new IllegalArgumentException("Branch name and location are required");
+        }
+
         return repository.save(branch);
     }
 
-    // Read all
     public List<Branches> getAllBranches() {
         return repository.findAll();
     }
 
-    // Read by ID
     public Optional<Branches> getBranchById(Long id) {
         return repository.findById(id);
     }
 
-    // Update
     public Branches updateBranch(Long id, Branches updatedBranch) {
         return repository.findById(id)
-                .map(branch -> {
-                    branch.setBranchName(updatedBranch.getBranchName());
-                    branch.setLocation(updatedBranch.getLocation());
-                    branch.setLoanOfficerId(updatedBranch.getLoanOfficerId());
-                    return repository.save(branch);
-                }).orElseThrow(() -> new RuntimeException("Branch not found"));
+                .map(existing -> {
+                    existing.setBranchName(updatedBranch.getBranchName());
+                    existing.setLocation(updatedBranch.getLocation());
+                    // branchCode SHOULD NOT be changed after creation
+                    return repository.save(existing);
+                })
+                .orElseThrow(() -> new RuntimeException("Branch not found"));
     }
 
-    // Delete
     public void deleteBranch(Long id) {
-        if (!repository.existsById(id)) {
-            throw new RuntimeException("Branch not found");
-        }
         repository.deleteById(id);
     }
 }

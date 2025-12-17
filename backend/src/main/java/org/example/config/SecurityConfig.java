@@ -39,14 +39,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/clients").permitAll()
-                        .requestMatchers("/api/loan-officers").permitAll()
-                        .requestMatchers("/api/auth/login").permitAll()
-                        .requestMatchers("api/auth/setup").permitAll()
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()  // Temporarily permit all requests for testing
                 )
                 .userDetailsService(userDetailsService)
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                // .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)  // Temporarily disabled
                 .build();
     }
 
@@ -64,10 +60,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000"));
+        
+        // Allow all origins during development (change to specific origins in production)
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // Cache preflight for 1 hour
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

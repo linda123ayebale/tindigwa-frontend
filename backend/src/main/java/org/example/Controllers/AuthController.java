@@ -25,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.security.Principal;
+import org.example.Entities.Person;
 
 @RestController
 @RequestMapping("api/auth")
@@ -57,12 +59,12 @@ public class AuthController {
             );
 
             if (authentication.isAuthenticated()) {
-                // CORRECTED: loadUserByUsername returns a UserDetails object.
-                // We use that object directly, without casting it to the service.
-                final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getUsername());
+                // Find the user entity to get complete user information
+                User user = userRepository.findByEmail(authRequest.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
-                // CORRECTED: Pass the UserDetails object to generateToken.
-                final String token = jwtTokenService.generateToken(userDetails);
+                // Generate token with user information embedded
+                final String token = jwtTokenService.generateTokenWithUserInfo(user);
 
                 AuthResponse authResponse = new AuthResponse();
                 authResponse.setToken(token);
@@ -91,13 +93,8 @@ public class AuthController {
             // Create user using UserSetupService (handles first-user-as-admin logic)
             User createdUser = userSetupService.createUser(setupRequest);
             
-            // Generate JWT token for the new user
-            UserDetails userDetails = org.springframework.security.core.userdetails.User.withUsername(createdUser.getEmail())
-                    .password(createdUser.getPassword())
-                    .authorities("ROLE_" + createdUser.getRole().name())
-                    .build();
-            
-            String token = jwtTokenService.generateToken(userDetails);
+            // Generate JWT token with user information embedded
+            String token = jwtTokenService.generateTokenWithUserInfo(createdUser);
             
             // Prepare response
             SetupResponse response = new SetupResponse();

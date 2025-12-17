@@ -1,0 +1,624 @@
+{
+  "info": {
+    "name": "02 - Loans API",
+    "description": "Complete API collection for Loans module - creates loans based on loan products and manages workflow (PENDING → APPROVED → DISBURSED → COMPLETED)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "loanId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clientId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "loanOfficerId",
+      "value": "1",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Loan Creation",
+      "item": [
+        {
+          "name": "1. Create Loan Application",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Loan created successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('id');",
+                  "    pm.expect(jsonData).to.have.property('loanNumber');",
+                  "    pm.expect(jsonData.workflowStatus).to.eql('PENDING_APPROVAL');",
+                  "    ",
+                  "    // Save loan ID for subsequent requests",
+                  "    pm.collectionVariables.set('loanId', jsonData.id);",
+                  "});",
+                  "",
+                  "pm.test(\"Loan number is auto-generated\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.loanNumber).to.match(/^LN-/);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"clientId\": {{clientId}},\n  \"productId\": {{productId}},\n  \"principalAmount\": 200000.0,\n  \"loanPurpose\": \"Business expansion\",\n  \"requestedAmount\": 200000.0,\n  \"loanDuration\": 12,\n  \"durationUnit\": \"MONTHS\",\n  \"repaymentFrequency\": \"MONTHLY\",\n  \"numberOfRepayments\": 12,\n  \"interestRate\": 15.5,\n  \"interestMethod\": \"REDUCING_BALANCE\",\n  \"processingFee\": 4000.0,\n  \"gracePeriodDays\": 3,\n  \"lateFee\": 500.0,\n  \"defaultFee\": 1000.0,\n  \"lendingBranch\": \"Main Branch\",\n  \"description\": \"Loan for expanding retail business\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/loans",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans"]
+            },
+            "description": "Create new loan application (status: PENDING_APPROVAL)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Loan Retrieval",
+      "item": [
+        {
+          "name": "2. Get All Approved Loans",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns array of loans\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans"]
+            },
+            "description": "Get all approved loans"
+          },
+          "response": []
+        },
+        {
+          "name": "3. Get Loan By ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns correct loan\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.id).to.eql(parseInt(pm.collectionVariables.get('loanId')));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}"]
+            },
+            "description": "Get single loan by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "4. Get Complete Loan Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns complete loan details\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('loan');",
+                  "    pm.expect(jsonData).to.have.property('client');",
+                  "    pm.expect(jsonData).to.have.property('loanOfficer');",
+                  "    pm.expect(jsonData).to.have.property('payments');",
+                  "    pm.expect(jsonData).to.have.property('workflowHistory');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}", "complete"]
+            },
+            "description": "Get comprehensive loan details with client, payments, tracking"
+          },
+          "response": []
+        },
+        {
+          "name": "5. Get Loans For Table View",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/table-view",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "table-view"]
+            },
+            "description": "Get approved loans formatted for table view"
+          },
+          "response": []
+        },
+        {
+          "name": "6. Get Pending Approval Loans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/pending-approval",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "pending-approval"]
+            },
+            "description": "Get loans awaiting approval"
+          },
+          "response": []
+        },
+        {
+          "name": "7. Get Rejected Loans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/rejected",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "rejected"]
+            },
+            "description": "Get all rejected loans"
+          },
+          "response": []
+        },
+        {
+          "name": "8. Get Loans By Branch",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/branch/Main%20Branch",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "branch", "Main Branch"]
+            },
+            "description": "Get loans by lending branch"
+          },
+          "response": []
+        },
+        {
+          "name": "9. Get Loans Created By Officer",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/created-by/{{loanOfficerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "created-by", "{{loanOfficerId}}"]
+            },
+            "description": "Get loans created by specific loan officer"
+          },
+          "response": []
+        },
+        {
+          "name": "10. Get All Loans (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/admin/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "admin", "all"]
+            },
+            "description": "Admin: Get all loans regardless of status"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Loan Workflow",
+      "item": [
+        {
+          "name": "11. Approve Loan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Loan approved successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.workflowStatus).to.eql('APPROVED');",
+                  "    pm.expect(jsonData.approvalDate).to.not.be.null;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"approvedBy\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}", "approve"]
+            },
+            "description": "Approve loan (PENDING_APPROVAL → APPROVED)"
+          },
+          "response": []
+        },
+        {
+          "name": "12. Disburse Loan",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Loan disbursed successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.workflowStatus).to.eql('DISBURSED');",
+                  "    pm.expect(jsonData.disbursedAt).to.not.be.null;",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"disbursedBy\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/disburse",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}", "disburse"]
+            },
+            "description": "Disburse loan (APPROVED → DISBURSED). Auto-generates installment schedule."
+          },
+          "response": []
+        },
+        {
+          "name": "13. Reject Loan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rejectedBy\": 1,\n  \"reason\": \"Insufficient credit score\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}", "reject"]
+            },
+            "description": "Reject loan (PENDING_APPROVAL → REJECTED)"
+          },
+          "response": []
+        },
+        {
+          "name": "14. Get Workflow Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/workflow",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}", "workflow"]
+            },
+            "description": "Get workflow summary for a loan"
+          },
+          "response": []
+        },
+        {
+          "name": "15. Archive Loan",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}/archive",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}", "archive"]
+            },
+            "description": "Archive a completed loan"
+          },
+          "response": []
+        },
+        {
+          "name": "16. Get Archived Loans",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/archived",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "archived"]
+            },
+            "description": "Get all archived loans"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Loan Installment Schedule",
+      "item": [
+        {
+          "name": "17. Generate Installment Schedule",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Schedule generated successfully\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.eql(true);",
+                  "    pm.expect(jsonData.totalInstallments).to.be.greaterThan(0);",
+                  "    pm.expect(jsonData.installments).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/installments/generate/{{loanId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "installments", "generate", "{{loanId}}"]
+            },
+            "description": "Generate payment schedule for a loan"
+          },
+          "response": []
+        },
+        {
+          "name": "18. Get Loan Payment Schedule",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Returns schedule array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/installments/loan/{{loanId}}/schedule",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "installments", "loan", "{{loanId}}", "schedule"]
+            },
+            "description": "Get full payment schedule for a loan"
+          },
+          "response": []
+        },
+        {
+          "name": "19. Get Next Unpaid Installment",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/installments/loan/{{loanId}}/next",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "installments", "loan", "{{loanId}}", "next"]
+            },
+            "description": "Get next unpaid installment for a loan"
+          },
+          "response": []
+        },
+        {
+          "name": "20. Get Schedule Summary",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/installments/loan/{{loanId}}/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "installments", "loan", "{{loanId}}", "summary"]
+            },
+            "description": "Get installment schedule summary"
+          },
+          "response": []
+        },
+        {
+          "name": "21. Get Overdue Installments For Loan",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/installments/loan/{{loanId}}/overdue",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "installments", "loan", "{{loanId}}", "overdue"]
+            },
+            "description": "Get overdue installments for specific loan"
+          },
+          "response": []
+        },
+        {
+          "name": "22. Get Installments Due Today",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/installments/due/today",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "installments", "due", "today"]
+            },
+            "description": "Get all installments due today"
+          },
+          "response": []
+        },
+        {
+          "name": "23. Get Upcoming Due Installments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/installments/due/upcoming?days=7",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "installments", "due", "upcoming"],
+              "query": [
+                {
+                  "key": "days",
+                  "value": "7"
+                }
+              ]
+            },
+            "description": "Get installments due in next N days"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Loan Update & Delete",
+      "item": [
+        {
+          "name": "24. Update Loan",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"loanPurpose\": \"Updated business expansion plan\",\n  \"description\": \"Updated description for the loan\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}"]
+            },
+            "description": "Update loan details"
+          },
+          "response": []
+        },
+        {
+          "name": "25. Delete Loan",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/loans/{{loanId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "loans", "{{loanId}}"]
+            },
+            "description": "Delete loan (use with caution)"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,2 +1,19 @@
 databaseChangeLog:
-  - 
+  - changeSet:
+      id: add-gender-column-to-persons
+      author: system
+      changes:
+        - addColumn:
+            tableName: persons
+            columns:
+              - column:
+                  name: gender
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: true
+                  defaultValue: null
+                  remarks: "Gender of the person: MALE or FEMALE"
+      rollback:
+        - dropColumn:
+            tableName: persons
+            columnName: gender

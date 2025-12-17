@@ -1,6 +1,5 @@
 package org.example.Repositories;
 
-import org.example.DTO.ClientDetailsDTO;
 import org.example.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -59,30 +58,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
            WHERE u.role = org.example.Entities.User$UserRole.ADMIN
            """)
         List<User> findAllAdmins();
+        
+        // Check if person with national ID exists
+        @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM User u WHERE u.person.nationalId = :nationalId")
+        boolean existsByPersonNationalId(String nationalId);
 
-    @Query(value = """
-        SELECT 
-            p.first_name AS firstName,
-            p.given_name AS givenName,
-            p.last_name AS lastName,
-            p.national_id AS nationalId,
-            p.contact AS contact,
-            p.district AS district,
-            p.village AS village,
-            p.parish AS parish,
-            u.username AS loanOfficer,
-            CONCAT(gp.first_name, ' ', gp.last_name) AS guarantorName,
-            CONCAT(nkp.first_name, ' ', nkp.last_name) AS nextOfKinName,
-            c.status AS status
-        FROM clients c
-        JOIN person p ON c.person_id = p.person_id
-        JOIN users u ON c.loan_officer_id = u.user_id
-        LEFT JOIN guarantor g ON g.client_id = c.client_id
-        LEFT JOIN person gp ON g.person_id = gp.person_id
-        LEFT JOIN next_of_kin nk ON nk.client_id = c.client_id
-        LEFT JOIN person nkp ON nk.person_id = nkp.person_id
-        """, nativeQuery = true)
-    List<User> findAllClientDetails();
-    }
+}
 
 

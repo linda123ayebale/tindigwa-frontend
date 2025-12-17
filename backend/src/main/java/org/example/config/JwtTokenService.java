@@ -9,6 +9,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.example.Entities.User;
+import org.example.Entities.Person;
 
 import java.security.Key;
 import java.util.Date;
@@ -73,5 +75,62 @@ public class JwtTokenService {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userDetails.getUsername());
+    }
+    
+    /**
+     * Generate JWT token with additional user information
+     */
+    public String generateTokenWithUserInfo(User user) {
+        Map<String, Object> claims = new HashMap<>();
+        
+        // Add user information to claims
+        Person person = user.getPerson();
+        if (person != null) {
+            claims.put("firstName", person.getFirstName());
+            claims.put("lastName", person.getLastName());
+            claims.put("fullName", person.getFirstName() + " " + person.getLastName());
+        }
+        claims.put("role", user.getRole().name());
+        claims.put("userId", user.getId());
+        
+        return createToken(claims, user.getEmail());
+    }
+    
+    /**
+     * Extract firstName from JWT token
+     */
+    public String getFirstNameFromToken(String token) {
+        return getClaimFromToken(token, claims -> (String) claims.get("firstName"));
+    }
+    
+    /**
+     * Extract lastName from JWT token
+     */
+    public String getLastNameFromToken(String token) {
+        return getClaimFromToken(token, claims -> (String) claims.get("lastName"));
+    }
+    
+    /**
+     * Extract full name from JWT token
+     */
+    public String getFullNameFromToken(String token) {
+        return getClaimFromToken(token, claims -> (String) claims.get("fullName"));
+    }
+    
+    /**
+     * Extract role from JWT token
+     */
+    public String getRoleFromToken(String token) {
+        return getClaimFromToken(token, claims -> (String) claims.get("role"));
+    }
+    
+    /**
+     * Extract userId from JWT token
+     */
+    public Long getUserIdFromToken(String token) {
+        return getClaimFromToken(token, claims -> {
+            Object userId = claims.get("userId");
+            return userId != null ? Long.valueOf(userId.toString()) : null;
+        });
     }
 }

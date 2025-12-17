@@ -21,4 +21,7 @@ public class Guarantor {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     private Person person;
+    
+    // Relationship to the client (Parent, Spouse, etc.)
+    private String relationship;
 }
