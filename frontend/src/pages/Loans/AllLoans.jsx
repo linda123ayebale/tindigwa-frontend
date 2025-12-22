@@ -22,8 +22,10 @@ import {
 import { toast } from 'react-hot-toast';
 
 import AddPaymentModal from './AddPaymentModal';
+import DisburseLoanModal from './DisburseLoanModal';
 import StatusBadge from '../../components/StatusBadge';
 import LoanService from '../../services/loanService';
+import api from '../../services/api';
 import useLoanWebSocket from '../../hooks/useLoanWebSocket';
 // Permission checks disabled - will be handled in roles module
 // import { canPerform, canModifyLoan, canApproveLoan, canDisburseLoan, getAllowedActions } from '../../utils/permissions';
@@ -42,6 +44,8 @@ const AllLoans = () => {
   // Edit modal removed - now navigates to Edit page
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [paymentLoan, setPaymentLoan] = useState(null);
+  const [isDisburseModalOpen, setIsDisburseModalOpen] = useState(false);
+  const [loanToDisburse, setLoanToDisburse] = useState(null);
   const [activeTab, setActiveTab] = useState('loans'); // 'loans' or 'approvals'
   const [currentUserRole] = useState('ADMIN'); // Should come from auth context
   const [currentUserId] = useState(1); // Should come from auth context
@@ -99,22 +103,12 @@ const AllLoans = () => {
     
     try {
       setProcessingLoanId(loanId);
-      const response = await fetch(`http://localhost:8081/api/loans/${loanId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ approvedById: currentUserId })
-      });
-      
-      if (response.ok) {
-        toast.success('Loan approved successfully');
-        await loadLoans();
-      } else {
-        const error = await response.text();
-        toast.error(`Failed to approve loan: ${error}`);
-      }
+      await api.post(`/loans/${loanId}/approve`, { approvedById: currentUserId });
+      toast.success('Loan approved successfully');
+      await loadLoans();
     } catch (error) {
       console.error('Error approving loan:', error);
-      toast.error('Error approving loan');
+      toast.error(error.message || 'Error approving loan');
     } finally {
       setProcessingLoanId(null);
     }
@@ -127,55 +121,41 @@ const AllLoans = () => {
     
     try {
       setProcessingLoanId(loanId);
-      const response = await fetch(`http://localhost:8081/api/loans/${loanId}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rejectedById: currentUserId, rejectionReason: reason })
-      });
-      
-      if (response.ok) {
-        toast.success('Loan rejected');
-        await loadLoans();
-      } else {
-        const error = await response.text();
-        toast.error(`Failed to reject loan: ${error}`);
-      }
+      await api.post(`/loans/${loanId}/reject`, { rejectedById: currentUserId, rejectionReason: reason });
+      toast.success('Loan rejected');
+      await loadLoans();
     } catch (error) {
       console.error('Error rejecting loan:', error);
-      toast.error('Error rejecting loan');
+      toast.error(error.message || 'Error rejecting loan');
     } finally {
       setProcessingLoanId(null);
     }
   };
 
-  // Disburse loan
-  const handleDisburseLoan = async (loanId) => {
+  // Disburse loan - open modal
+  const handleDisburseLoan = (loan) => {
     // Permission check disabled - will be handled in roles module
-    // if (!canDisburseLoan(loans.find(l => l.id === loanId)?.loanStatus, currentUserRole)) {
+    // if (!canDisburseLoan(loan?.loanStatus, currentUserRole)) {
     //   toast.error('You do not have permission to disburse this loan');
     //   return;
     // }
     
-    if (!window.confirm('Disburse this loan? This action will mark the loan as DISBURSED.')) return;
-    
+    setLoanToDisburse(loan);
+    setIsDisburseModalOpen(true);
+  };
+
+  // Confirm disburse loan - actual API call
+  const handleConfirmDisburse = async (loanId) => {
     try {
       setProcessingLoanId(loanId);
-      const response = await fetch(`http://localhost:8081/api/loans/${loanId}/disburse`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ disbursedById: currentUserId })
-      });
-      
-      if (response.ok) {
-        toast.success('Loan disbursed successfully');
-        await loadLoans();
-      } else {
-        const error = await response.text();
-        toast.error(`Failed to disburse loan: ${error}`);
-      }
+      await api.post(`/loans/${loanId}/disburse`, { disbursedById: currentUserId });
+      toast.success('Loan disbursed successfully');
+      setIsDisburseModalOpen(false);
+      setLoanToDisburse(null);
+      await loadLoans();
     } catch (error) {
       console.error('Error disbursing loan:', error);
-      toast.error('Error disbursing loan');
+      toast.error(error.message || 'Error disbursing loan');
     } finally {
       setProcessingLoanId(null);
     }
@@ -614,14 +594,14 @@ const AllLoans = () => {
                             <button 
                               className="action-btn tracking"
                               title="View Payment Tracking"
-                              onClick={() => navigate(`/loans/tracking/${loan.id}`)}
+                              onClick={() => navigate(`/loans/${loan.id}/tracking`)}
                               disabled={processingLoanId === loan.id}
                             >
                               <BarChart3 size={16} />
                             </button>
                             
-                            {/* Edit - Only when loanStatus === 'OPEN' */}
-                            {loan.loanStatus?.toUpperCase() === 'OPEN' && (
+                            {/* Edit - Only when loanStatus === 'OPEN' AND not yet disbursed */}
+                            {loan.loanStatus?.toUpperCase() === 'OPEN' && loan.workflowStatus?.toUpperCase() !== 'DISBURSED' && (
                               <button 
                                 className="action-btn edit"
                                 title="Edit Loan"
@@ -683,7 +663,7 @@ const AllLoans = () => {
                               <button 
                                 className="action-btn disburse"
                                 title="Disburse Loan"
-                                onClick={() => handleDisburseLoan(loan.id)}
+                                onClick={() => handleDisburseLoan(loan)}
                                 disabled={processingLoanId === loan.id}
                               >
                                 <Send size={16} />
@@ -810,6 +790,18 @@ const AllLoans = () => {
         isOpen={isPaymentModalOpen}
         onClose={handleClosePaymentModal}
         onSave={handleSavePayment}
+      />
+
+      {/* Disburse Loan Modal */}
+      <DisburseLoanModal
+        loan={loanToDisburse}
+        isOpen={isDisburseModalOpen}
+        onClose={() => {
+          setIsDisburseModalOpen(false);
+          setLoanToDisburse(null);
+        }}
+        onConfirm={handleConfirmDisburse}
+        isProcessing={processingLoanId === loanToDisburse?.id}
       />
     </div>
   );

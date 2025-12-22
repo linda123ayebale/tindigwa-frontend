@@ -9,7 +9,7 @@ class WebSocketService {
   }
 
   connect(onConnectCallback, onErrorCallback) {
-    const WS_URL = 'http://localhost:8081/ws';
+    const WS_URL = process.env.REACT_APP_WS_URL || 'http://localhost:8081/ws';
     
     this.client = new Client({
       webSocketFactory: () => new SockJS(WS_URL),

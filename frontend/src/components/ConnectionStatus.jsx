@@ -112,7 +112,7 @@ const ConnectionStatus = () => {
       )}
       
       <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
-        Backend: http://localhost:8081
+        Backend: {process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8082'}
       </div>
     </div>
   );

@@ -286,7 +286,7 @@ const DisbursedLoans = () => {
                           <button 
                             className="action-btn tracking" 
                             title="View Payment Tracking"
-                            onClick={() => navigate(`/loans/tracking/${loan.id}`)}
+                            onClick={() => navigate(`/loans/${loan.id}/tracking`)}
                           >
                             <BarChart3 size={16} />
                           </button>

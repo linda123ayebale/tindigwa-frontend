@@ -1,6 +1,7 @@
 import axios from 'axios';
+import api from './api';
 
-const API_URL = 'http://localhost:8081/api/expenses';
+const API_URL = 'http://localhost:8082/api';
 
 const ExpensesService = {
   // Get all expenses
@@ -37,7 +38,7 @@ const ExpensesService = {
 
   // Get pending expenses (awaiting approval)
   getPendingExpenses: () => {
-    return axios.get(`${API_URL}/pending`);
+    return api.get('pending');
   },
 
   // Get rejected expenses

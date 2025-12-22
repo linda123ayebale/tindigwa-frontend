@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Plus,
   Search,
+  Filter,
   Eye,
   Edit,
   Trash2,
@@ -148,6 +149,10 @@ const LoanProducts = () => {
     setCurrentPage(1);
   }, [searchTerm]);
 
+  const formatCurrency = (amount) => {
+    return `UGX ${Number(amount || 0).toLocaleString()}`;
+  };
+
   return (
     <div className="dashboard-layout">
       <Sidebar />
@@ -230,7 +235,7 @@ const LoanProducts = () => {
                     <div className="table-cell">Rate (%)</div>
                     <div className="table-cell">Default Frequency</div>
                     <div className="table-cell">Processing Fee</div>
-                    <div className="table-cell">Penalty Rate</div>
+                    <div className="table-cell">Late Fee</div>
                     <div className="table-cell">Created By</div>
                     <div className="table-cell">Actions</div>
                   </div>
@@ -256,9 +261,7 @@ const LoanProducts = () => {
                         <span className="fee-value">{product.processingFeeValue || 0}%</span>
                       </div>
                       <div className="table-cell">
-                        <span className="fee-value">
-                          {product.penaltyRate ? `${product.penaltyRate}% /day` : 'N/A'}
-                        </span>
+                        <span className="fee-value">{product.lateFee || 0}</span>
                       </div>
                       <div className="table-cell">
                         <span className="created-by">
@@ -347,5 +350,6 @@ const LoanProducts = () => {
     </div>
   );
 };
+
 
 export default LoanProducts;

@@ -23,10 +23,13 @@ const PendingApprovals = () => {
   const itemsPerPage = 5;
 
   const fetchPendingExpenses = async () => {
+    
     try {
       setLoading(true);
       const response = await ExpensesService.getPendingExpenses();
-      setExpenses(response.data);
+      
+      setExpenses(Array.isArray(response) ? response : []);
+      console.log('Pending expenses fetched:', response);
     } catch (error) {
       console.error('Error fetching pending expenses:', error);
       toast.error('Failed to load pending expenses');
@@ -154,6 +157,7 @@ const PendingApprovals = () => {
     }).format(amount);
   };
 
+  const formatDate = (dateString) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');

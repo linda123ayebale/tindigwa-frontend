@@ -274,6 +274,7 @@ const ExpenseCategories = () => {
 
   return (
     <div className="dashboard-layout">
+    
       <Sidebar />
 
       <main className="dashboard-main">

@@ -101,7 +101,8 @@ class ApiService {
       }
 
       if (!response.ok) {
-        const errorMessage = data.message || `HTTP error! status: ${response.status}`;
+        // Backend can return either 'message' or 'error' field
+        const errorMessage = data.message || data.error || `HTTP error! status: ${response.status}`;
         if (DEBUG_MODE) console.error('❌ API Error:', errorMessage);
         throw new Error(errorMessage);
       }
@@ -117,7 +118,7 @@ class ApiService {
       
       // Enhanced error messages for common issues
       if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
-        throw new Error('Cannot connect to backend server. Please ensure the backend is running on http://localhost:8081');
+        throw new Error(`Cannot connect to backend server. Please ensure the backend is running on ${this.baseURL}`);
       }
       
       throw error;

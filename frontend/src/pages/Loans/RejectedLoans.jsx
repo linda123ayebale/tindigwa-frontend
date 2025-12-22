@@ -246,7 +246,7 @@ const RejectedLoans = () => {
                             
                             {/* View Payment Tracking - Always visible */}
                             <button
-                              onClick={() => navigate(`/loans/tracking/${loan.id}`)}
+                              onClick={() => navigate(`/loans/${loan.id}/tracking`)}
                               className="action-btn tracking"
                               title="View Payment Tracking"
                               disabled={processingLoanId === loan.id}

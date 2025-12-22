@@ -302,7 +302,7 @@ const Clients = () => {
                       <th>Contact</th>
                       <th>Location</th>
                       <th>National ID</th>
-                      <th>Next of Kin</th>
+                      <th>Guarantor</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
@@ -336,11 +336,11 @@ const Clients = () => {
                         <td>{client.nationalId || '-'}</td>
                         
                         <td>
-                          {client.nextOfKin ? (
+                          {client.guarantor ? (
                             <>
-                              <div>{client.nextOfKin.fullName}</div>
-                              {client.nextOfKin.phoneNumber !== 'N/A' && (
-                                <div className="nok-phone">{client.nextOfKin.phoneNumber}</div>
+                              <div>{client.guarantor.fullName}</div>
+                              {client.guarantor.phoneNumber !== 'N/A' && (
+                                <div className="nok-phone">{client.guarantor.phoneNumber}</div>
                               )}
                             </>
                           ) : (

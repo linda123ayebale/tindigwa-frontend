@@ -27,7 +27,7 @@ const QuickPaymentModal = ({ installment, loanId, onClose, onSuccess }) => {
     setError(null);
 
     try {
-      const response = await fetch('http://localhost:8081/api/payments/process', {
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/payments/process`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

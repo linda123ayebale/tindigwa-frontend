@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Bell, User, LogOut, Settings } from 'lucide-react';
+import AuthService from '../../services/authService';
 import './Header.css';
 
 const Header = ({ toggleSidebar }) => {
@@ -8,8 +9,11 @@ const Header = ({ toggleSidebar }) => {
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem('tindigwa_token');
-    navigate('/login');
+    // Clear all authentication data
+    AuthService.logout();
+    
+    // Navigate to login page
+    navigate('/login', { replace: true });
   };
 
   const currentUser = JSON.parse(localStorage.getItem('tindigwa_user') || '{}');

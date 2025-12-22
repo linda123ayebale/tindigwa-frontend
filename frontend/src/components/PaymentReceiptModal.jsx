@@ -21,7 +21,7 @@ const PaymentReceiptModal = ({ paymentId, onClose }) => {
     
     try {
       console.log('Fetching receipt for payment ID:', paymentId);
-      const response = await fetch(`http://localhost:8081/api/payments/receipts/${paymentId}`);
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/payments/receipts/${paymentId}`);
       
       console.log('Response status:', response.status);
       

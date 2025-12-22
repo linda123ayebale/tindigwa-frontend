@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Save,
-  X,
-  Search
+  X
 } from 'lucide-react';
 import api from '../../../services/api';
 import Sidebar from '../../../components/Layout/Sidebar';
@@ -11,9 +10,11 @@ import './RecordPayment.css';
 
 const RecordPayment = () => {
   const navigate = useNavigate();
-  const [loans, setLoans] = useState([]);
-  const [filteredLoans, setFilteredLoans] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [clients, setClients] = useState([]);
+  const [filteredClients, setFilteredClients] = useState([]);
+  const [clientSearchTerm, setClientSearchTerm] = useState('');
+  const [selectedClient, setSelectedClient] = useState(null);
+  const [clientLoans, setClientLoans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     loanId: '',
@@ -26,39 +27,128 @@ const RecordPayment = () => {
   const [selectedLoan, setSelectedLoan] = useState(null);
   const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+  const [showClientDropdown, setShowClientDropdown] = useState(false);
 
-  // Fetch active loans
+  // Fetch clients with active loans
   useEffect(() => {
-    fetchActiveLoans();
+    fetchClients();
   }, []);
 
-  const fetchActiveLoans = async () => {
+  const fetchClients = async () => {
     try {
-      const response = await api.get('/loans/table-view');
-      const activeLoans = Array.isArray(response) 
-        ? response.filter(loan => loan.loanStatus !== 'closed' && loan.loanStatus !== 'completed')
-        : [];
-      setLoans(activeLoans);
-      setFilteredLoans(activeLoans);
+      const response = await api.get('/clients');
+      const clientsData = Array.isArray(response) ? response : [];
+      setClients(clientsData);
+      setFilteredClients(clientsData);
     } catch (error) {
-      console.error('Error fetching loans:', error);
-      setLoans([]);
+      console.error('Error fetching clients:', error);
+      setClients([]);
     }
   };
 
-  // Search loans
+
+  // Search/filter clients
   useEffect(() => {
-    if (searchTerm === '') {
-      setFilteredLoans(loans);
+    if (clientSearchTerm === '') {
+      setFilteredClients(clients);
+      setShowClientDropdown(false);
     } else {
-      const filtered = loans.filter(loan => 
-        loan.loanNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        loan.clientName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        loan.id?.toString().includes(searchTerm)
+      const filtered = clients.filter(client => 
+        client.fullName?.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+        client.email?.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+        client.phone?.includes(clientSearchTerm)
       );
-      setFilteredLoans(filtered);
+      setFilteredClients(filtered);
+      setShowClientDropdown(true);
     }
-  }, [searchTerm, loans]);
+  }, [clientSearchTerm, clients]);
+
+  // Handle client selection
+  const handleClientSelect = async (client) => {
+    setSelectedClient(client);
+    setClientSearchTerm(client.fullName);
+    setShowClientDropdown(false);
+    
+    // Fetch loans and auto-select
+    try {
+      const response = await api.get('/loans');
+      const allLoans = Array.isArray(response) ? response : [];
+      
+      console.log('===============================================');
+      console.log('DEBUGGING LOAN SELECTION FOR:', client.fullName);
+      console.log('Client ID:', client.id);
+      console.log('===============================================');
+      
+      // Find all loans for this client
+      const clientLoansAll = allLoans.filter(loan => loan.clientId === client.id);
+      console.log('STEP 1: Total loans found for this client:', clientLoansAll.length);
+      
+      if (clientLoansAll.length === 0) {
+        console.log('❌ NO LOANS FOUND - Client has no loans in the system');
+      } else {
+        clientLoansAll.forEach((loan, index) => {
+          console.log(`\nLOAN ${index + 1} DETAILS:`);
+          console.log('  - Loan Number:', loan.loanNumber);
+          console.log('  - Workflow Status:', loan.workflowStatus);
+          console.log('  - Loan Status:', loan.loanStatus);
+          console.log('  - Principal Amount:', loan.principalAmount);
+        });
+      }
+      
+      console.log('\n-----------------------------------------------');
+      console.log('STEP 2: Filtering for ACTIVE loans...');
+      console.log('Filter criteria:');
+      console.log('  ✓ workflowStatus must be DISBURSED');
+      console.log('  ✓ loanStatus must NOT be COMPLETED');
+      console.log('  ✓ loanStatus must NOT be DEFAULTED');
+      console.log('-----------------------------------------------\n');
+      
+      // Filter for active loans
+      const activeClientLoans = allLoans.filter(loan => {
+        if (loan.clientId !== client.id) return false;
+        
+        const isDisbursed = loan.workflowStatus === 'DISBURSED';
+        const notCompleted = loan.loanStatus !== 'COMPLETED';
+        const notDefaulted = loan.loanStatus !== 'DEFAULTED';
+        const isActive = isDisbursed && notCompleted && notDefaulted;
+        
+        console.log(`Checking Loan ${loan.loanNumber}:`);
+        console.log(`  - Is Disbursed? ${isDisbursed} (status: ${loan.workflowStatus})`);
+        console.log(`  - Not Completed? ${notCompleted} (status: ${loan.loanStatus})`);
+        console.log(`  - Not Defaulted? ${notDefaulted}`);
+        console.log(`  - ✅ ACTIVE FOR PAYMENT? ${isActive}\n`);
+        
+        return isActive;
+      });
+      
+      console.log('===============================================');
+      console.log('FINAL RESULT: Active loans available:', activeClientLoans.length);
+      if (activeClientLoans.length > 0) {
+        console.log('✅ These loans are available for payment:', activeClientLoans.map(l => l.loanNumber));
+      } else {
+        console.log('❌ NO ACTIVE LOANS - Client cannot make payment');
+      }
+      console.log('===============================================\n');
+      
+      setClientLoans(activeClientLoans);
+      
+      // Auto-select loan if only one active loan exists
+      if (activeClientLoans.length === 1) {
+        const loan = activeClientLoans[0];
+        setSelectedLoan(loan);
+        setFormData({ ...formData, loanId: loan.id });
+      } else {
+        // Reset loan selection if multiple or no loans
+        setSelectedLoan(null);
+        setFormData({ ...formData, loanId: '' });
+      }
+    } catch (error) {
+      console.error('Error fetching client loans:', error);
+      setClientLoans([]);
+      setSelectedLoan(null);
+      setFormData({ ...formData, loanId: '' });
+    }
+  };
 
   // Handle loan selection
   const handleLoanSelect = (loan) => {
@@ -67,7 +157,6 @@ const RecordPayment = () => {
       ...formData,
       loanId: loan.id
     });
-    setSearchTerm('');
   };
 
   // Handle input change
@@ -216,19 +305,104 @@ const RecordPayment = () => {
           {/* Payment Form */}
           <div className="form-container">
             <form onSubmit={handleSubmit}>
-              {/* Loan Selection */}
+              {/* Client Selection */}
               <div className="form-section">
-                <h3>Select Loan</h3>
+                <h3>Select Client</h3>
                 
-                {!selectedLoan ? (
-                  <>
+                <div className="form-group">
+                  <label>Search Client *</label>
+                  <div className="search-container-full">
+                    <div className="searchable-dropdown-full">
+                      <input
+                        type="text"
+                        placeholder="Search by name, email, or phone..."
+                        value={clientSearchTerm}
+                        onChange={(e) => setClientSearchTerm(e.target.value)}
+                        onFocus={() => setShowClientDropdown(true)}
+                        className={errors.client ? 'error' : ''}
+                        disabled={selectedClient !== null}
+                      />
+                      {showClientDropdown && !selectedClient && filteredClients.length > 0 && (
+                        <div className="dropdown-list">
+                          {filteredClients.map(client => (
+                            <div
+                              key={client.id}
+                              className="dropdown-item"
+                              onClick={() => handleClientSelect(client)}
+                            >
+                              <strong>{client.fullName}</strong>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {selectedClient && (
+                      <button 
+                        type="button"
+                        className="btn-change"
+                        onClick={() => {
+                          setSelectedClient(null);
+                          setClientSearchTerm('');
+                          setClientLoans([]);
+                          setSelectedLoan(null);
+                          setFormData({ ...formData, loanId: '' });
+                        }}
+                      >
+                        <X size={16} />
+                        Change
+                      </button>
+                    )}
+                  </div>
+                  {errors.client && <span className="error-text">{errors.client}</span>}
+                </div>
+              </div>
+
+              {/* Loan Selection (only show if client is selected) */}
+              {selectedClient && (
+                <div className="form-section">
+                  <h3>Loan Details</h3>
+                  
+                  {clientLoans.length === 0 ? (
+                    <div className="no-loans-message">
+                      <p>No active loans found for this client.</p>
+                    </div>
+                  ) : clientLoans.length === 1 ? (
+                    // Auto-selected single loan
+                    <div className="loan-summary-card">
+                      <div className="loan-summary-header">
+                        <div className="loan-badge">
+                          <span className="badge-label">Loan Number</span>
+                          <span className="badge-value">{selectedLoan?.loanNumber || `LN-${selectedLoan?.id}`}</span>
+                        </div>
+                      </div>
+                      <div className="loan-summary-body">
+                        <div className="summary-item">
+                          <span className="summary-label">Principal Amount</span>
+                          <span className="summary-value">{formatCurrency(selectedLoan?.principalAmount || 0)}</span>
+                        </div>
+                        <div className="summary-item">
+                          <span className="summary-label">Total Payable</span>
+                          <span className="summary-value highlight">{formatCurrency(selectedLoan?.totalPayable || 0)}</span>
+                        </div>
+                        <div className="summary-item">
+                          <span className="summary-label">Outstanding Balance</span>
+                          <span className="summary-value outstanding">{formatCurrency(selectedLoan?.balance || selectedLoan?.totalPayable || 0)}</span>
+                        </div>
+                        <div className="summary-item">
+                          <span className="summary-label">Due Date</span>
+                          <span className="summary-value">{selectedLoan?.loanDueDate ? new Date(selectedLoan.loanDueDate).toLocaleDateString() : 'N/A'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    // Multiple loans - show dropdown
                     <div className="form-group">
                       <label>Select Loan *</label>
                       <select
                         name="loanId"
                         value={formData.loanId}
                         onChange={(e) => {
-                          const loan = loans.find(l => l.id.toString() === e.target.value);
+                          const loan = clientLoans.find(l => l.id.toString() === e.target.value);
                           if (loan) {
                             handleLoanSelect(loan);
                           }
@@ -236,49 +410,46 @@ const RecordPayment = () => {
                         className={errors.loanId ? 'error' : ''}
                       >
                         <option value="">-- Select a loan --</option>
-                        {loans.map(loan => (
+                        {clientLoans.map(loan => (
                           <option key={loan.id} value={loan.id}>
-                            {loan.loanNumber || `LN-${loan.id}`} - {loan.clientName || 'Unknown Client'} - {formatCurrency(loan.totalPayable || loan.balance || 0)}
+                            {loan.loanNumber || `LN-${loan.id}`} - {formatCurrency(loan.totalPayable || loan.balance || 0)}
                           </option>
                         ))}
                       </select>
                       {errors.loanId && <span className="error-text">{errors.loanId}</span>}
+                      
+                      {selectedLoan && (
+                        <div className="loan-summary-card" style={{marginTop: '1rem'}}>
+                          <div className="loan-summary-header">
+                            <div className="loan-badge">
+                              <span className="badge-label">Loan Number</span>
+                              <span className="badge-value">{selectedLoan.loanNumber || `LN-${selectedLoan.id}`}</span>
+                            </div>
+                          </div>
+                          <div className="loan-summary-body">
+                            <div className="summary-item">
+                              <span className="summary-label">Principal Amount</span>
+                              <span className="summary-value">{formatCurrency(selectedLoan.principalAmount || 0)}</span>
+                            </div>
+                            <div className="summary-item">
+                              <span className="summary-label">Total Payable</span>
+                              <span className="summary-value highlight">{formatCurrency(selectedLoan.totalPayable || 0)}</span>
+                            </div>
+                            <div className="summary-item">
+                              <span className="summary-label">Outstanding Balance</span>
+                              <span className="summary-value outstanding">{formatCurrency(selectedLoan.balance || selectedLoan.totalPayable || 0)}</span>
+                            </div>
+                            <div className="summary-item">
+                              <span className="summary-label">Due Date</span>
+                              <span className="summary-value">{selectedLoan.loanDueDate ? new Date(selectedLoan.loanDueDate).toLocaleDateString() : 'N/A'}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  </>
-                ) : (
-                  <div className="selected-loan">
-                    <div className="loan-card">
-                      <div className="loan-card-header">
-                        <h4>{selectedLoan.loanNumber || `LN-${selectedLoan.id}`}</h4>
-                        <button 
-                          type="button"
-                          className="btn-text"
-                          onClick={() => {
-                            setSelectedLoan(null);
-                            setFormData({ ...formData, loanId: '' });
-                          }}
-                        >
-                          Change
-                        </button>
-                      </div>
-                      <div className="loan-card-body">
-                        <div className="info-row">
-                          <span className="label">Client:</span>
-                          <span className="value">{selectedLoan.clientName || 'Unknown'}</span>
-                        </div>
-                        <div className="info-row">
-                          <span className="label">Total Amount:</span>
-                          <span className="value">{formatCurrency(selectedLoan.totalPayable || selectedLoan.balance)}</span>
-                        </div>
-                        <div className="info-row">
-                          <span className="label">Status:</span>
-                          <span className="value status">{selectedLoan.loanStatus || selectedLoan.status}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
 
               {/* Payment Details */}
               <div className="form-section">

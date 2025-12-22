@@ -66,7 +66,8 @@ const Setup = ({ onSetupComplete }) => {
       });
 
       // Call the actual backend setup API
-      const response = await fetch('http://localhost:8081/api/auth/setup', {
+      const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081/api';
+      const response = await fetch(`${apiBaseUrl}/auth/setup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +122,8 @@ const Setup = ({ onSetupComplete }) => {
       console.error('🚨 Network error:', err);
       
       if (err.message.includes('fetch')) {
-        setError('Cannot connect to backend server. Please ensure the backend is running on http://localhost:8081');
+        const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081/api';
+        setError(`Cannot connect to backend server. Please ensure the backend is running on ${apiBaseUrl}`);
       } else {
         setError('Setup failed. Please try again.');
       }
@@ -135,15 +137,15 @@ const Setup = ({ onSetupComplete }) => {
       <div className="setup-content">
         <div className="setup-header">
           <div className="logo">
-            <span className="logo-icon">■</span>
-            <span className="logo-text">TINDIGWA</span>
+            <span className="logo-icon">💰</span>
+            <span className="logo-text">CashtankFinance</span>
           </div>
         </div>
 
         <div className="setup-form-container">
           <div className="welcome-section">
-            <h1>Welcome to TINDIGWA</h1>
-            <p>Let's get you set up so you can start managing loans.</p>
+            <h1>Create Your Account</h1>
+            <p>Join CashtankFinance and start managing loans efficiently.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="setup-form">
@@ -154,14 +156,14 @@ const Setup = ({ onSetupComplete }) => {
             )}
 
             <div className="form-group">
-              <label htmlFor="adminName">Admin Name</label>
+              <label htmlFor="adminName">Full Name</label>
               <input
                 type="text"
                 id="adminName"
                 name="adminName"
                 value={formData.adminName}
                 onChange={handleChange}
-                placeholder="Admin Name"
+                placeholder="Enter your full name"
                 className="form-input"
                 required
               />
@@ -233,8 +235,19 @@ const Setup = ({ onSetupComplete }) => {
               disabled={loading}
             >
               <span className="button-icon">🔧</span>
-              {loading ? 'Setting up...' : 'Complete Setup'}
+              {loading ? 'Creating Account...' : 'Create Account'}
             </button>
+
+            <div className="login-link">
+              <span className="login-text">Already have an account? </span>
+              <button 
+                type="button" 
+                className="login-link-button" 
+                onClick={() => navigate('/login')}
+              >
+                Login
+              </button>
+            </div>
           </form>
         </div>
       </div>

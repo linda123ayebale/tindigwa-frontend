@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ApiService from '../../services/api';
 import { validateEmail } from '../../utils/validation';
 import './ForgotPassword.css';
 
@@ -30,14 +31,18 @@ const ForgotPassword = () => {
     }
 
     try {
-      // Simulate API call for password reset
-      setTimeout(() => {
-        // Mock successful password reset request
-        setSuccess(true);
-        setLoading(false);
-      }, 2000);
+      // Call real API endpoint for password reset
+      const response = await ApiService.post('/auth/forgot-password', { email });
+      
+      if (response && response.message) {
+        console.log('Password reset email sent successfully');
+      }
+      
+      setSuccess(true);
+      setLoading(false);
     } catch (err) {
-      setError('Failed to send reset email. Please try again.');
+      console.error('Password reset error:', err);
+      setError(err.message || 'Failed to send reset email. Please try again.');
       setLoading(false);
     }
   };
@@ -55,17 +60,17 @@ const ForgotPassword = () => {
               <div className="success-icon">✉️</div>
               <h1>Check your email</h1>
               <p>
-                We've sent a password reset link to <strong>{email}</strong>
+                We've sent a password reset code to <strong>{email}</strong>
               </p>
               <p className="success-subtitle">
-                Click the link in the email to reset your password. If you don't see it, check your spam folder.
+                Enter the 6-digit code from your email to reset your password.
               </p>
               
               <button 
                 className="back-to-login-button"
-                onClick={handleBackToLogin}
+                onClick={() => navigate('/reset-password', { state: { email } })}
               >
-                ← Back to Login
+                Enter Reset Code →
               </button>
               
               <div className="resend-section">
@@ -73,9 +78,14 @@ const ForgotPassword = () => {
                 <button 
                   type="button" 
                   className="resend-link" 
-                  onClick={handleSubmit}
+                  onClick={(e) => {
+                    setSuccess(false);
+                    setLoading(false);
+                    setError('');
+                  }}
+                  disabled={loading}
                 >
-                  Resend
+                  {loading ? 'Sending...' : 'Resend'}
                 </button>
               </div>
             </div>

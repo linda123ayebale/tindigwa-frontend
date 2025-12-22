@@ -89,7 +89,7 @@ const Sidebar = () => {
       title: 'Expenses', 
       icon: Receipt,
       children: [
-        { title: 'Add Category', icon: Plus, path: '/expenses/categories' },
+        { title: 'Add Category', icon: Plus, path: '/expenses/expense-categories' },
         { title: 'Record Expense', icon: Plus, path: '/expenses/add' },
         { title: 'All Expenses', icon: List, path: '/expenses' },
         { title: 'Pending Approvals', icon: Clock, path: '/expenses/pending-approvals' },

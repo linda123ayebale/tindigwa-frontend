@@ -9,6 +9,11 @@ import './App.css';
 import Setup from './pages/Auth/Setup.jsx';
 import Login from './pages/Auth/Login';
 import ForgotPassword from './pages/Auth/ForgotPassword';
+import OtpVerification from './pages/Auth/OtpVerification';
+
+
+
+
 
 // Dashboard
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -41,20 +46,20 @@ import RejectedLoans from './pages/Loans/RejectedLoans';
 import ArchivedLoans from './pages/Loans/ArchivedLoans';
 
 // import LoanTracking from './pages/Loans/LoanTracking';
-import LoanTrackingDetail from './pages/Loans/LoanTrackingDetail';   // THIS IS THE CORRECT TRACKING PAGE
+import LoanTrackingDetails from './pages/Loans/LoanTrackingDetails';   // NEW Payment Tracking Details Page
 
-// import DueLoans from './pages/Loans/DueLoans';
-// import MissedRepayments from './pages/Loans/MissedRepayments';
-// import ArrearsLoans from './pages/Loans/ArrearsLoans';
-// import NoRepayments from './pages/Loans/NoRepayments';
-// import PastMaturity from './pages/Loans/PastMaturity';
-// import PrincipalOutstanding from './pages/Loans/PrincipalOutstanding';
-// import LateLoansOneMonth from './pages/Loans/LateLoansOneMonth';
-// import LateLoansThreeMonths from './pages/Loans/LateLoansThreeMonths';
-// import LoanCalculator from './pages/Loans/LoanCalculator';
-// import Guarantors from './pages/Loans/Guarantors';
-// import LoanComments from './pages/Loans/LoanComments';
-// import Approvals from './pages/Loans/Approvals';
+import DueLoans from './pages/Loans/DueLoans';
+import MissedRepayments from './pages/Loans/MissedRepayments';
+import ArrearsLoans from './pages/Loans/ArrearsLoans';
+import NoRepayments from './pages/Loans/NoRepayments';
+import PastMaturity from './pages/Loans/PastMaturity';
+import PrincipalOutstanding from './pages/Loans/PrincipalOutstanding';
+import LateLoansOneMonth from './pages/Loans/LateLoansOneMonth';
+import LateLoansThreeMonths from './pages/Loans/LateLoansThreeMonths';
+import LoanCalculator from './pages/Loans/LoanCalculator';
+import Guarantors from './pages/Loans/Guarantors';
+import LoanComments from './pages/Loans/LoanComments';
+import Approvals from './pages/Loans/Approvals';
 
 // Payments
 import AllPayments from './pages/Payments/subpages/AllPayments';
@@ -65,14 +70,14 @@ import PaymentHistory from './pages/Payments/subpages/PaymentHistory';
 import PaymentAnalytics from './pages/Payments/subpages/PaymentAnalytics';
 
 // Expenses
-// import ExpenseCategories from './pages/Expenses/ExpenseCategories';
+import ExpenseCategories from './pages/Expenses/ExpenseCategories';
 import AllExpenses from './pages/Expenses/AllExpenses';
 import AddExpense from './pages/Expenses/AddExpense';
 import EditExpense from './pages/Expenses/EditExpense';
 import ExpenseDetails from './pages/Expenses/ExpenseDetails';
-// import PendingApprovals from './pages/Expenses/PendingApprovals';
-// import RejectedExpenses from './pages/Expenses/RejectedExpenses';
-// import ExpensesToPay from './pages/Expenses/ExpensesToPay';
+import PendingApprovals from './pages/Expenses/PendingApprovals';
+import RejectedExpenses from './pages/Expenses/RejectedExpenses';
+import ExpensesToPay from './pages/Expenses/ExpensesToPay';
 
 // Finances & Branches
 import FinancialDashboard from './pages/Finances/FinancialDashboard.jsx';
@@ -160,6 +165,8 @@ function App() {
         {/* Auth */}
         <Route path="/setup" element={!isSetupCompleted ? <Setup onSetupComplete={refetchSetupStatus} /> : <Navigate to="/login" replace />} />
         <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
++        <Route path="/verify-otp" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <OtpVerification setIsAuthenticated={setIsAuthenticated} />} />
+ 
         <Route path="/forgot-password" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <ForgotPassword />} />
 
         {/* Dashboard */}
@@ -193,7 +200,7 @@ function App() {
         {/* ✔ CORRECT PAYMENT TRACKING ROUTE */}
         <Route
           path="/loans/:loanId/tracking"
-          element={isAuthenticated ? <LoanTrackingDetail /> : <Navigate to="/login" replace />}
+          element={isAuthenticated ? <LoanTrackingDetails /> : <Navigate to="/login" replace />}
         />
 
         {/* Remove WRONG tracking routes */}
@@ -218,6 +225,13 @@ function App() {
         <Route path="/expenses/add" element={isAuthenticated ? <AddExpense /> : <Navigate to="/login" replace />} />
         <Route path="/expenses/edit/:id" element={isAuthenticated ? <EditExpense /> : <Navigate to="/login" replace />} />
         <Route path="/expenses/:id" element={isAuthenticated ? <ExpenseDetails /> : <Navigate to="/login" replace />} />
+
+        <Route path="/expenses/expense-categories" element={isAuthenticated ? <ExpenseCategories /> : <Navigate to="/login" replace />} />
+        <Route path="/expenses/pending-approvals" element={isAuthenticated ? <PendingApprovals /> : <Navigate to="/login" replace />} />
+        <Route path="/expenses/rejected" element={isAuthenticated ? <RejectedExpenses /> : <Navigate to="/login" replace />} />
+        <Route path="/expenses/to-pay" element={isAuthenticated ? <ExpensesToPay /> : <Navigate to="/login" replace />} />
+
+
 
         {/* Finances & Branches */}
         <Route path="/finances" element={isAuthenticated ? <FinancialDashboard /> : <Navigate to="/login" replace />} />

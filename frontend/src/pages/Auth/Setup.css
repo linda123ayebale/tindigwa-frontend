@@ -118,22 +118,32 @@
   align-items: center;
 }
 
+.password-input-container .form-input {
+  padding-right: 50px;
+}
+
 .password-toggle {
   position: absolute;
   right: 16px;
   background: none;
   border: none;
-  color: #666;
+  color: #9ca3af;
   cursor: pointer;
-  padding: 4px;
+  padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: color 0.2s ease;
+  border-radius: 6px;
+  transition: all 0.2s ease;
 }
 
 .password-toggle:hover {
+  color: #4285f4;
+  background: rgba(66, 133, 244, 0.1);
+}
+
+.password-toggle:focus {
+  outline: none;
   color: #4285f4;
 }
 
@@ -179,6 +189,34 @@
   font-size: 14px;
   text-align: center;
   margin-bottom: 8px;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.login-text {
+  color: #666;
+  font-size: 14px;
+}
+
+.login-link-button {
+  color: #4285f4;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.login-link-button:hover {
+  color: #3367d6;
+  text-decoration: underline;
 }
 
 /* Responsive Design */

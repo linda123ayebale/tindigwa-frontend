@@ -1,0 +1,83 @@
+# Netlify configuration for React SPA
+
+[build]
+  # Build command
+  command = "npm run build"
+  
+  # Output directory
+  publish = "build"
+  
+  # Base directory (if your package.json is not in root)
+  # base = "frontend"
+
+[build.environment]
+  # Node version
+  NODE_VERSION = "18"
+  
+  # Production environment
+  NODE_ENV = "production"
+
+# Redirect rules for SPA routing
+[[redirects]]
+  # API proxy - redirect to your backend
+  from = "/api/*"
+  to = "http://localhost:8082/api/:splat"
+  status = 200
+  force = true
+  
+[[redirects]]
+  # SPA fallback - all routes go to index.html
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';"
+
+# Caching headers for static assets
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Environment variables (set these in Netlify UI instead for security)
+# [context.production.environment]
+#   REACT_APP_API_URL = "https://your-production-api.com"
+
+# [context.deploy-preview.environment]
+#   REACT_APP_API_URL = "https://staging-api.com"
+
+# [context.branch-deploy.environment]
+#   REACT_APP_API_URL = "https://dev-api.com"

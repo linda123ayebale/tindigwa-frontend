@@ -48,6 +48,19 @@ class LoanService {
     }
   }
 
+  // Get comprehensive tracking data for payment tracking page
+  async getComprehensiveTracking(loanId) {
+    try {
+      console.log(`📊 Fetching comprehensive tracking for loan ID: ${loanId}`);
+      const response = await ApiService.get(`/api/loan-tracking/loan/${loanId}/comprehensive`);
+      console.log('✅ Comprehensive tracking data received:', response);
+      return response;
+    } catch (error) {
+      console.error(`❌ Error fetching comprehensive tracking for loan ${loanId}:`, error);
+      throw error;
+    }
+  }
+
   // Get loans by branch
   async getLoansByBranch(branch) {
     try {

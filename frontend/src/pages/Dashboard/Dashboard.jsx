@@ -15,9 +15,11 @@ import {
 } from 'lucide-react';
 import './Dashboard.css';
 import Sidebar from '../../components/Layout/Sidebar';
+import  LogoutButton  from '../../components/LogOut';
 
 // Import services
 import DashboardService from '../../services/dashboardService';
+import AuthService from '../../services/authService';
 import { getUserInfoFromToken, getFirstNameFromToken } from '../../utils/jwtUtils';
 import websocketService from '../../services/websocketService';
 
@@ -140,12 +142,16 @@ const Dashboard = ({ setIsAuthenticated }) => {
     // Redirect to login if not authenticated
     const token = localStorage.getItem('tindigwa_token');
     if (!token) {
-      navigate('/login');
+      // Clear auth state and redirect
+      if (setIsAuthenticated) {
+        setIsAuthenticated(false);
+      }
+      navigate('/login', { replace: true });
     } else {
       getCurrentUserFromToken();
       fetchDashboardData();
     }
-  }, [navigate]);
+  }, [navigate, setIsAuthenticated]);
 
   // Auto-refresh dashboard data every 60 seconds
   useEffect(() => {
@@ -222,18 +228,23 @@ const Dashboard = ({ setIsAuthenticated }) => {
   }, []);
 
   const handleLogout = () => {
-    // Clear all session data
-    localStorage.removeItem('tindigwa_token');
-    localStorage.removeItem('tindigwa_user');
-    localStorage.removeItem('tindigwa_setup_complete');
+    // Disconnect WebSocket before logout
+    websocketService.unsubscribeAll();
+    websocketService.disconnect();
+    
+    // Use AuthService to properly clear all authentication data
+    AuthService.logout();
     
     // Update authentication state
     if (setIsAuthenticated) {
       setIsAuthenticated(false);
     }
     
-    // Navigate to login
-    navigate('/login');
+    // Navigate to login with replace to prevent back button
+    // navigate('login', { replace: true });
+    // <Navigate to="/login" replace />
+      window.location.href = '/login';
+
   };
 
   // Define KPI Cards (Top Row)
@@ -329,7 +340,13 @@ const Dashboard = ({ setIsAuthenticated }) => {
               <h1>Dashboard</h1>
               <p className="welcome-text">Welcome back, {user?.firstName || user?.displayName || 'User'}</p>
             </div>
-            <button className="logout-button" onClick={handleLogout}>
+
+            {/* <LogoutButton
+
+  setIsAuthenticated={setIsAuthenticated}
+/> */}
+        
+             <button className="logout-button" onClick={handleLogout}>
               <LogOut size={16} />
               Logout
             </button>

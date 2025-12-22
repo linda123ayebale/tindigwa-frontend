@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
 import AuthService from '../../services/authService';
 import { validateEmail } from '../../utils/validation';
 import './Login.css';
@@ -11,6 +12,7 @@ const Login = ({ setIsAuthenticated }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [fieldKey, setFieldKey] = useState(Date.now()); // Random key to force re-render
   
   const navigate = useNavigate();
@@ -54,7 +56,20 @@ const Login = ({ setIsAuthenticated }) => {
         // Use real authentication service
         const response = await AuthService.login(formData.email, formData.password);
         
-        console.log('Login successful:', response);
+        console.log('Login response:', response);
+        
+        // Check if OTP is required (2FA enabled)
+        if (response.requiresOtp) {
+          console.log('2FA enabled - redirecting to OTP verification');
+          // Clear form but keep error state
+          setFormData({ email: '', password: '' });
+          // Redirect to OTP verification page
+          navigate('/verify-otp');
+          return;
+        }
+        
+        // Normal login flow (no 2FA)
+        console.log('Login successful (no 2FA)');
         
         // Clear form data after successful login
         clearForm();
@@ -71,7 +86,31 @@ const Login = ({ setIsAuthenticated }) => {
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError(err.message || 'Login failed. Please check your credentials.');
+      
+      // Provide user-friendly error messages
+      let errorMessage = 'Login failed. Please try again.';
+      
+      if (err.message) {
+        const msg = err.message.toLowerCase();
+        
+        // Handle specific error cases
+        if (msg.includes('invalid username or password') || 
+            msg.includes('bad credentials') || 
+            msg.includes('401')) {
+          errorMessage = 'Incorrect email or password. Please try again.';
+        } else if (msg.includes('user not found') || msg.includes('404')) {
+          errorMessage = 'No account found with this email address.';
+        } else if (msg.includes('cannot connect') || msg.includes('network') || msg.includes('fetch')) {
+          errorMessage = 'Unable to connect to server. Please check your internet connection.';
+        } else if (msg.includes('session has expired') || msg.includes('403')) {
+          errorMessage = 'Your session has expired. Please try logging in again.';
+        } else if (!msg.includes('http error')) {
+          // If it's a clear message from backend (not a generic HTTP error), use it
+          errorMessage = err.message;
+        }
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -95,27 +134,17 @@ const Login = ({ setIsAuthenticated }) => {
     navigate('/forgot-password');
   };
 
-  const handleClearBrowserData = () => {
+  const handleClearFormData = () => {
     // Clear all browser stored data
     localStorage.clear();
     sessionStorage.clear();
     
-    // Clear form data
-    setFormData({ email: '', password: '' });
-    setFieldKey(Date.now());
-    
-    // Force form reset
-    const form = document.querySelector('.login-form');
-    if (form) {
-      form.reset();
-    }
-    
-    alert('Browser data cleared! Please refresh the page if autofill persists.');
-    
-    // Force page reload as last resort
-    setTimeout(() => {
-      window.location.reload();
-    }, 1000);
+    // Reload the page to clear form and remain on login
+    window.location.reload();
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -162,23 +191,33 @@ const Login = ({ setIsAuthenticated }) => {
 
             <div className="form-group">
               <label htmlFor={`password-${fieldKey}`}>Password</label>
-              <input
-                key={`password-${fieldKey}`}
-                type="password"
-                id={`password-${fieldKey}`}
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Password"
-                className="form-input"
-                autoComplete="new-password"
-                autoCorrect="off"
-                autoCapitalize="off"
-                spellCheck="false"
-                data-form-type="other"
-                data-lpignore="true"
-                required
-              />
+              <div className="password-input-wrapper">
+                <input
+                  key={`password-${fieldKey}`}
+                  type={showPassword ? "text" : "password"}
+                  id={`password-${fieldKey}`}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Password"
+                  className="form-input password-input"
+                  autoComplete="new-password"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
+                  data-form-type="other"
+                  data-lpignore="true"
+                  required
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
             </div>
 
            <div className="forgot-password">
@@ -193,7 +232,7 @@ const Login = ({ setIsAuthenticated }) => {
                 <button 
                   type="button" 
                   className="clear-form-link" 
-                  onClick={handleClearBrowserData}
+                  onClick={handleClearFormData}
                 >
                   Clear Form Data
                 </button>

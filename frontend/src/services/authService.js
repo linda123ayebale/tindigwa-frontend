@@ -27,6 +27,14 @@ class AuthService {
         password
       });
 
+      // Check if OTP is required (2FA enabled)
+      if (response.requiresOtp) {
+        // Store user info temporarily for OTP verification
+        sessionStorage.setItem('otp_userId', response.userId);
+        sessionStorage.setItem('otp_userEmail', username);
+        return response; // Return OTP response to trigger verification flow
+      }
+
       if (response.token) {
         // Store the token in localStorage with both keys for compatibility
         localStorage.setItem(this.TOKEN_KEY, response.token);
@@ -222,6 +230,68 @@ class AuthService {
     localStorage.setItem(this.USERNAME_KEY, userInfo.username);
     console.log('✅ User info refreshed from JWT token:', userInfo);
     return true;
+  }
+
+  // Verify OTP code for 2FA
+  async verifyOtp(userId, otpCode) {
+    try {
+      const response = await ApiService.post('/auth/verify-otp', {
+        userId,
+        otpCode
+      });
+
+      if (response.token) {
+        // Store the token
+        localStorage.setItem(this.TOKEN_KEY, response.token);
+        localStorage.setItem('tindigwa_token', response.token);
+        
+        // Extract user info from JWT token
+        const tokenData = this.decodeToken(response.token);
+        
+        if (tokenData) {
+          const userInfo = {
+            userId: tokenData.userId,
+            username: tokenData.sub,
+            firstName: tokenData.firstName || '',
+            lastName: tokenData.lastName || '',
+            fullName: tokenData.fullName || '',
+            email: tokenData.sub,
+            role: tokenData.role || 'user',
+            branch: tokenData.branch || 'Main',
+            phoneNumber: tokenData.phoneNumber || '',
+            profilePicture: null,
+            permissions: [],
+            status: 'active',
+            loginTime: new Date().toISOString()
+          };
+          
+          localStorage.setItem(this.USER_KEY, JSON.stringify(userInfo));
+          localStorage.setItem(this.USERNAME_KEY, userInfo.username);
+          
+          console.log('✅ OTP verified, user logged in:', userInfo);
+        }
+
+        return response;
+      } else {
+        throw new Error('No token received from server');
+      }
+    } catch (error) {
+      console.error('OTP verification failed:', error);
+      throw error;
+    }
+  }
+
+  // Resend OTP code
+  async resendOtp(userId) {
+    try {
+      const response = await ApiService.post('/auth/resend-otp', {
+        userId
+      });
+      return response;
+    } catch (error) {
+      console.error('Resend OTP failed:', error);
+      throw error;
+    }
   }
 }
 

@@ -99,6 +99,7 @@ const RejectedExpenses = () => {
     }).format(amount);
   };
 
+     const formatDate = (dateString) => {
     if (!dateString) return '-';
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
