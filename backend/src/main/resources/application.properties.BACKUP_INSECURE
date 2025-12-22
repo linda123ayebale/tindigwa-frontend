@@ -6,8 +6,24 @@ spring.jpa.show-sql=true
 
 spring.security.debug=false
 
-# Server Configuration - MUST RUN ON PORT 8081
-server.port=8081
+# ============================================
+# SERVER & HTTPS CONFIGURATION
+# ============================================
+# Primary port for HTTPS (encrypted)
+server.port=8443
+
+# SSL/TLS Configuration
+server.ssl.enabled=true
+server.ssl.key-store=classpath:keystore.p12
+server.ssl.key-store-password=tindigwa2024
+server.ssl.key-store-type=PKCS12
+server.ssl.key-alias=tindigwa
+
+# Only allow secure TLS versions
+server.ssl.enabled-protocols=TLSv1.2,TLSv1.3
+
+# NOTE: HTTP still works on port 8081 (redirects to HTTPS)
+# HTTPS works on port 8443 (secure)
 
 jwt.secret=57287857588e04f462fa3991c8b191945ffa953b38b5b651e005b255652bafa37b1532ae329d308d240f7d6fd924682dfa38cedf43a9651deed72c2abad83f9c
 jwt.expiration=3600000

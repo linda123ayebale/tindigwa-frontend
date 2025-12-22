@@ -1,7 +1,9 @@
 package org.example.Services;
 
+import org.example.Entities.Branches;
 import org.example.Entities.LoanDetails;
 import org.example.Entities.OperationalExpenses;
+import org.example.Repositories.BranchesRepository;
 import org.example.Repositories.LoanDetailsRepository;
 import org.example.Repositories.OperationalExpensesRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,9 @@ class IdMigrationServiceTest {
 
     @Mock
     private OperationalExpensesRepository operationalExpensesRepository;
+
+    @Mock
+    private BranchesRepository branchesRepository;
 
     @InjectMocks
     private IdMigrationService idMigrationService;
@@ -98,6 +103,7 @@ class IdMigrationServiceTest {
         // Arrange
         when(loanDetailsRepository.findAll()).thenReturn(Arrays.asList());
         when(operationalExpensesRepository.findAll()).thenReturn(Arrays.asList());
+        when(branchesRepository.findAll()).thenReturn(Arrays.asList());
 
         // Act & Assert - should not throw
         assertDoesNotThrow(() -> idMigrationService.migrateAllIds());
@@ -115,10 +121,15 @@ class IdMigrationServiceTest {
         OperationalExpenses expense1 = new OperationalExpenses();
         expense1.setExpenseReference("EX250001");
 
+        Branches branch1 = new Branches();
+        branch1.setBranchCode("BR250001");
+
         when(loanDetailsRepository.count()).thenReturn(2L);
         when(loanDetailsRepository.findAll()).thenReturn(Arrays.asList(loan1, loan2));
         when(operationalExpensesRepository.count()).thenReturn(1L);
         when(operationalExpensesRepository.findAll()).thenReturn(Arrays.asList(expense1));
+        when(branchesRepository.count()).thenReturn(1L);
+        when(branchesRepository.findAll()).thenReturn(Arrays.asList(branch1));
 
         // Act
         IdMigrationService.MigrationStatus status = idMigrationService.getMigrationStatus();
@@ -128,6 +139,8 @@ class IdMigrationServiceTest {
         assertEquals(1, status.loansWithNewId);
         assertEquals(1, status.totalExpenses);
         assertEquals(1, status.expensesWithNewId);
+        assertEquals(1, status.totalBranches);
+        assertEquals(1, status.branchesWithNewId);
         assertFalse(status.isComplete());
     }
 }

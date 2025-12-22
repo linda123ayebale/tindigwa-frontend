@@ -1,0 +1,90 @@
+# ============================================
+# SECURE APPLICATION CONFIGURATION TEMPLATE
+# ============================================
+# Copy this file to application.properties and replace placeholders with actual values
+# NEVER commit application.properties to version control!
+
+# ============================================
+# DATABASE CONFIGURATION
+# ============================================
+spring.datasource.url=${DB_URL:jdbc:mysql://localhost:3306/tindigwa}
+spring.datasource.username=${DB_USERNAME:root}
+spring.datasource.password=${DB_PASSWORD}
+spring.jpa.hibernate.ddl-auto=${DB_DDL_AUTO:validate}
+spring.jpa.show-sql=${DB_SHOW_SQL:false}
+
+# ============================================
+# SECURITY CONFIGURATION
+# ============================================
+spring.security.debug=false
+
+# ============================================
+# SERVER CONFIGURATION
+# ============================================
+server.port=${SERVER_PORT:8081}
+
+# ============================================
+# JWT CONFIGURATION
+# ============================================
+# CRITICAL: Generate a new secret with: openssl rand -base64 64
+jwt.secret=${JWT_SECRET}
+jwt.expiration=${JWT_EXPIRATION:3600000}
+
+# ============================================
+# LIQUIBASE CONFIGURATION
+# ============================================
+# spring.liquibase.change-log=classpath:/db/changelog/db.changelog-master.yaml
+spring.liquibase.enabled=${LIQUIBASE_ENABLED:false}
+
+# ============================================
+# FILE UPLOAD CONFIGURATION
+# ============================================
+spring.servlet.multipart.enabled=true
+spring.servlet.multipart.max-file-size=${MAX_FILE_SIZE:5MB}
+spring.servlet.multipart.max-request-size=${MAX_REQUEST_SIZE:5MB}
+
+# ============================================
+# CUSTOM FILE STORAGE CONFIGURATION
+# ============================================
+file.upload-dir=${FILE_UPLOAD_DIR:./uploads}
+file.max-file-size=5242880
+file.allowed-extensions=jpg,jpeg,png,gif,pdf
+file.serve-path=/api/images
+file.client-photos-dir=client-photos
+file.loan-officer-photos-dir=loan-officer-photos
+file.documents-dir=documents
+file.signatures-dir=signatures
+
+# ============================================
+# CORS CONFIGURATION
+# ============================================
+app.frontend.url=${FRONTEND_URL:http://localhost:3000}
+
+# ============================================
+# PRODUCTION SETTINGS (Enable for production)
+# ============================================
+# Disable detailed error responses
+server.error.include-message=never
+server.error.include-binding-errors=never
+server.error.include-stacktrace=never
+server.error.include-exception=false
+
+# Enable HTTPS (configure with your SSL certificate)
+# server.ssl.enabled=true
+# server.ssl.key-store=classpath:keystore.p12
+# server.ssl.key-store-password=${SSL_KEYSTORE_PASSWORD}
+# server.ssl.key-store-type=PKCS12
+# server.ssl.key-alias=tomcat
+
+# ============================================
+# LOGGING CONFIGURATION
+# ============================================
+logging.level.root=INFO
+logging.level.org.springframework.security=INFO
+logging.level.org.example=${APP_LOG_LEVEL:INFO}
+
+# ============================================
+# ACTUATOR (PRODUCTION: Secure or disable)
+# ============================================
+management.endpoints.web.exposure.include=health,info
+management.endpoint.health.show-details=never

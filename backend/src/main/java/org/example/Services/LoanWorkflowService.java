@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -304,12 +305,22 @@ public class LoanWorkflowService {
     }
     
     /**
-     * Get approved loans
+     * Get all active loans (APPROVED, DISBURSED, CLOSED)
+     * Excludes PENDING_APPROVAL and REJECTED loans
      * Returns lightweight DTOs for table display
      */
     public List<LoanResponse> getApprovedLoans() {
-        List<LoanDetails> loans = loanDetailsRepository.findByWorkflowStatus("APPROVED");
-        return loans.stream()
+        List<LoanDetails> approvedLoans = loanDetailsRepository.findByWorkflowStatus("APPROVED");
+        List<LoanDetails> disbursedLoans = loanDetailsRepository.findByWorkflowStatus("DISBURSED");
+        List<LoanDetails> closedLoans = loanDetailsRepository.findByWorkflowStatus("CLOSED");
+        
+        // Combine all active loan lists (excludes PENDING_APPROVAL and REJECTED)
+        List<LoanDetails> allLoans = new ArrayList<>();
+        allLoans.addAll(approvedLoans);
+        allLoans.addAll(disbursedLoans);
+        allLoans.addAll(closedLoans);
+        
+        return allLoans.stream()
                 .map(loanMapper::toLoanResponse)
                 .collect(Collectors.toList());
     }

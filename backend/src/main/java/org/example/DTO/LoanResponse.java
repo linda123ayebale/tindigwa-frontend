@@ -17,10 +17,13 @@ import java.time.LocalDateTime;
 public class LoanResponse {
     private Long id;
     private String loanNumber;
+    private Long clientId;              // Client ID for filtering
     private String clientName;
     private String loanProductName;
     private String loanOfficerName;     // Name of loan officer who created the loan
     private Double principalAmount;
+    private Double totalPayable;        // Total amount to be repaid (principal + interest + fees)
+    private Double processingFee;       // Processing fee
     private String workflowStatus;      // PENDING_APPROVAL, APPROVED, REJECTED
     private String loanStatus;          // pending, approved, active, closed, defaulted
     private LocalDate createdAt;

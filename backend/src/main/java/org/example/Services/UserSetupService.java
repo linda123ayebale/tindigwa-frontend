@@ -69,6 +69,9 @@ public class UserSetupService {
         user.setBranch("Main"); // Default branch
         user.setCreatedAt(LocalDateTime.now());
         
+        // Enable 2FA by default for all new users
+        user.setTwoFactorEnabled(true);
+        
         // Mark as setup user only if this is the first admin
         user.setSetupUser(assignedRole == User.UserRole.ADMIN && isFirstUser());
         
@@ -167,11 +170,11 @@ public class UserSetupService {
         }
         
         // Set other fields to defaults (can be updated later)
-        person.setContact(""); // Will be updated in profile
-        person.setNationalId(""); // Will be updated in profile
-        person.setVillage("");
-        person.setParish("");
-        person.setDistrict("");
+        person.setContact(null); // Will be updated in profile
+        person.setNationalId(null); // Will be updated in profile - null to avoid unique constraint issues
+        person.setVillage(null);
+        person.setParish(null);
+        person.setDistrict(null);
         person.setAge(0); // Will be updated in profile
         
         return person;

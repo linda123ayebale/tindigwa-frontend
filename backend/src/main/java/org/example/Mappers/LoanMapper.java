@@ -39,7 +39,10 @@ public class LoanMapper {
         LoanResponse dto = new LoanResponse();
         dto.setId(loan.getId());
         dto.setLoanNumber(loan.getLoanNumber());
+        dto.setClientId(loan.getClientId());  // Set clientId for frontend filtering
         dto.setPrincipalAmount(loan.getPrincipalAmount());
+        dto.setTotalPayable(loan.getTotalPayable());
+        dto.setProcessingFee(loan.getProcessingFee());
         dto.setWorkflowStatus(loan.getWorkflowStatus());
         dto.setLoanStatus(loan.getLoanStatus());
         dto.setCreatedAt(loan.getCreatedAt() != null ? loan.getCreatedAt().toLocalDate() : null);

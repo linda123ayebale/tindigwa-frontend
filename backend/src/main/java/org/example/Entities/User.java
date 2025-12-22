@@ -46,6 +46,10 @@ public class User {
     private String branch;
     private LocalDateTime createdAt;
     private boolean isSetupUser;
+    
+    // Two-Factor Authentication
+    @Column(nullable = false)
+    private boolean twoFactorEnabled = false;
 
     // Optional role-specific relationships (primarily for CLIENT role)
     @OneToOne(cascade = CascadeType.ALL)

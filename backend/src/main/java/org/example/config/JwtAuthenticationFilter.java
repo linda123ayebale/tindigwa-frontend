@@ -28,6 +28,25 @@ public class  JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
 
+//    CODE TO ADD FOR PRODUCTION
+@Override
+protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    String path = request.getRequestURI();
+
+    // Add logging to debug
+    System.out.println("🔍 JWT Filter - Checking path: " + path);
+
+    boolean skip = path.startsWith("/auth/") ||
+            path.startsWith("/api/auth/") ||
+            path.startsWith("/expense-categories") ||
+            path.equals("/actuator/health") ||
+            path.startsWith("/swagger-ui/") ||
+            path.startsWith("/v3/api-docs/");
+
+    System.out.println("   Should skip JWT filter: " + skip);
+
+    return skip;
+}
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

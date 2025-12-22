@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableCaching
-public class Tindigwa {
+public class CashtankfinanceApplication {
     public static void main(String[] args) {
-        SpringApplication.run(Tindigwa.class, args);
+        SpringApplication.run(CashtankfinanceApplication.class, args);
     }
 }

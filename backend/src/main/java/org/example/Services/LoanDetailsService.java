@@ -249,8 +249,23 @@ public class LoanDetailsService {
                     break;
                     
                 case "reducing":
-                    // For reducing balance, use simple calculation for now
-                    interestAmount = principal * interestRate * 0.6; // Approximation
+                case "reducing_balance":
+                    // Reducing balance: Calculate based on rate per period
+                    // For reducing balance, interest is calculated on outstanding balance
+                    // For simplicity, we calculate total interest based on duration
+                    if ("year".equalsIgnoreCase(loan.getRatePer())) {
+                        double years = Math.min(loan.getLoanDurationDays() / 365.0, 10);
+                        interestAmount = principal * interestRate * years;
+                    } else if ("month".equalsIgnoreCase(loan.getRatePer())) {
+                        double months = Math.min(loan.getLoanDurationDays() / 30.0, 120);
+                        interestAmount = principal * interestRate * months;
+                    } else if ("day".equalsIgnoreCase(loan.getRatePer())) {
+                        double days = Math.min(loan.getLoanDurationDays(), 3650);
+                        interestAmount = principal * Math.min(interestRate, 0.01) * days;
+                    } else {
+                        // Default to treating it as per loan duration
+                        interestAmount = principal * interestRate;
+                    }
                     break;
                     
                 default:
@@ -269,7 +284,37 @@ public class LoanDetailsService {
             interestAmount = principal * 0.2; // Default to 20% of principal
         }
         
-        double totalPayable = principal + interestAmount + loan.getProcessingFee();
+        // Add registration fee for first-time borrowers
+        double registrationFee = 0.0;
+        if (loan.getClientId() != null) {
+            try {
+                // Count existing loans for this client (excluding current loan being created)
+                long existingLoans = repository.countByClientId(loan.getClientId());
+                
+                // If this is their first loan (count is 0 or 1, depending on whether loan is already saved)
+                boolean isFirstTimeBorrower = (loan.getId() == null) ? (existingLoans == 0) : (existingLoans <= 1);
+                
+                if (isFirstTimeBorrower) {
+                    // Try to get registration fee from product first
+                    if (loan.getProductId() != null) {
+                        Optional<LoanProduct> productOpt = loanProductRepository.findById(loan.getProductId());
+                        if (productOpt.isPresent()) {
+                            registrationFee = productOpt.get().calculateRegistrationFee(principal);
+                        }
+                    }
+                    
+                    // If no product-based fee, use default registration fee
+                    if (registrationFee == 0) {
+                        registrationFee = 15000.0; // Default registration fee for first-time borrowers
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Error checking first-time borrower status: " + e.getMessage());
+                // Don't add registration fee if check fails
+            }
+        }
+        
+        double totalPayable = principal + interestAmount + loan.getProcessingFee() + registrationFee;
         
         // Final sanity check
         if (!Double.isFinite(totalPayable) || totalPayable < principal) {

@@ -35,4 +35,10 @@ build/
 .vscode/
 
 ### Mac OS ###
-.DS_Store
+.DS_Storekeystore.p12
+*.p12
+# Sensitive configuration files
+src/main/resources/application.properties
+src/main/resources/application-*.properties
+.env
+.env.*
