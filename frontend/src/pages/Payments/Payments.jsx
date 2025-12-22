@@ -28,7 +28,7 @@ const Payments = () => {
   // Fetch loans data
   const fetchLoans = async () => {
     try {
-      const response = await fetch('http://localhost:8081/api/loans/table-view');
+      const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/loans/table-view`);
       if (response.ok) {
         const loansData = await response.json();
         setLoans(loansData);

@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "http://localhost:8082/api/$1"
+      "destination": "REACT_APP_API_BASE_URL/$1"
     },
     {
       "source": "/(.*)",

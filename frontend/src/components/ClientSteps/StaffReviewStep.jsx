@@ -1,10 +1,12 @@
 import React from 'react';
 import { User, Mail, MapPin, Users } from 'lucide-react';
 import './StepStyles.css';
+import Sidebar from '../Layout/Sidebar';
 
 const StaffReviewStep = ({ formData, updateFormData, errors = {} }) => {
   return (
     <div className="step-container">
+       <Sidebar />
       <div className="step-header">
         <h2>Review & Submit</h2>
         <p>Please review all staff information before submitting</p>

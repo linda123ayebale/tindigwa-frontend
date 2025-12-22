@@ -1,5 +1,6 @@
 import React from 'react';
 import './StepStyles.css';
+import Sidebar from '../Layout/Sidebar';
 
 const NextOfKinStep = ({ formData, onInputChange, updateFormData, errors = {}, isEditMode = false }) => {
   const handleChange = (e) => {
@@ -27,6 +28,7 @@ const NextOfKinStep = ({ formData, onInputChange, updateFormData, errors = {}, i
 
   return (
     <div className="step-container">
+       <Sidebar />
       <div className="step-header">
         <h2>Next of Kin</h2>
         <p>{isEditMode ? 'Please update next of kin information' : 'Please provide next of kin information'}</p>

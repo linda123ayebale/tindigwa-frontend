@@ -93,6 +93,7 @@ import useSessionTimeout from './hooks/useSessionTimeout';
 import { isTokenExpired } from './utils/tokenUtils';
 import { clearAuthData } from './services/api';
 import AuthService from './services/authService';
+import LoanTracking from './pages/Loans/LoanTracking.jsx';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -113,6 +114,7 @@ function App() {
     localStorage.removeItem('currentUser');
     clearAuthData();
     setIsAuthenticated(false);
+    
   };
 
   useSessionTimeout(handleSessionTimeout, 30 * 60 * 1000, isAuthenticated);
@@ -163,8 +165,8 @@ function App() {
       <Routes>
 
         {/* Auth */}
-        <Route path="/setup" element={!isSetupCompleted ? <Setup onSetupComplete={refetchSetupStatus} /> : <Navigate to="/login" replace />} />
-        <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/setup" element={isSetupCompleted ? <Setup onSetupComplete={refetchSetupStatus} /> : <Navigate to="/login" replace />} />
+        <Route path="/login" element={isAuthenticated ? <OtpVerification setIsAuthenticated={setIsAuthenticated} />: <Login setIsAuthenticated={setIsAuthenticated} />} />
 +        <Route path="/verify-otp" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <OtpVerification setIsAuthenticated={setIsAuthenticated} />} />
  
         <Route path="/forgot-password" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <ForgotPassword />} />
@@ -189,6 +191,8 @@ function App() {
         <Route path="/loans/add" element={isAuthenticated ? <AddLoan /> : <Navigate to="/login" replace />} />
         <Route path="/loans/edit/:id" element={isAuthenticated ? <EditLoan /> : <Navigate to="/login" replace />} />
         <Route path="/loans/details/:id" element={isAuthenticated ? <LoanDetails /> : <Navigate to="/login" replace />} />
+        <Route path="/loans/tracking" element={isAuthenticated ? <LoanTrackingDetails /> : <Navigate to="/login" replace />} />
+
 
 
         {/* Loan Products */}

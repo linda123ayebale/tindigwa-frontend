@@ -12,6 +12,8 @@ import NotificationModal from '../../components/NotificationModal';
 import { useNotification } from '../../hooks/useNotification';
 import { validatePhoneNumber, validateEmail } from '../../utils/validation';
 import './AddClient.css';
+import Sidebar from '../../components/Layout/Sidebar';
+
 
 const AddClient = () => {
   const navigate = useNavigate();
@@ -287,6 +289,7 @@ const AddClient = () => {
 
   return (
     <div className="stepper-form-layout">
+      <Sidebar />
       {/* Header */}
       <div className="stepper-header">
         <div className="header-nav">

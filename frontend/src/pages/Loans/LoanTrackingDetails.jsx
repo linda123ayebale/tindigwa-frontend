@@ -9,7 +9,7 @@ import './LoanTrackingDetails.css';
 const LoanTrackingDetails = () => {
   const { loanId } = useParams();  // Match route param name
   const navigate = useNavigate();
-  const [data, setData] = useState(null);
+  const [resData, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,16 +22,18 @@ const LoanTrackingDetails = () => {
       console.log('🔍 Fetching tracking data for loan ID:', loanId);
       const response = await LoanService.getComprehensiveTracking(loanId);
       console.log('📦 Full API response:', response);
-      console.log('📊 Response data:', response.data);
+      console.log('📊 Response data:', response);
       
-      if (!response || !response.data) {
+      if (!response || !response) {
         console.error('❌ No data in response');
         toast.error('No tracking data received from server');
         return;
       }
       
-      setData(response.data);
-      console.log('✅ Data set successfully:', response.data);
+      setData(response);
+
+      
+      console.log('✅ Data set successfully:', response);
     } catch (error) {
       console.error('❌ Error fetching tracking data:', error);
       console.error('Error details:', error.response?.data || error.message);
@@ -79,7 +81,7 @@ const LoanTrackingDetails = () => {
     );
   }
 
-  if (!data) {
+  if (!resData) {
     return (
       <div className="dashboard-layout">
         <Sidebar />
@@ -87,8 +89,8 @@ const LoanTrackingDetails = () => {
           <div className="empty-state">
             <AlertCircle size={48} />
             <p>No tracking data available for this loan</p>
-            <button onClick={() => navigate('/loans/tracking')} className="btn-primary">
-              Back to Loan Tracking
+            <button onClick={() => navigate('/loans')} className="btn-primary">
+              Back to Loans
             </button>
           </div>
         </main>
@@ -96,7 +98,7 @@ const LoanTrackingDetails = () => {
     );
   }
 
-  const { loan, tracking, paymentHistory, balance, metrics, status } = data;
+  const { loan, tracking, paymentHistory, balance, metrics, status } = resData;
   const completionPercentage = metrics?.completionPercentage || 0;
 
   return (
@@ -106,9 +108,9 @@ const LoanTrackingDetails = () => {
       <main className="dashboard-main">
         {/* Header */}
         <div className="tracking-header">
-          <button onClick={() => navigate('/loans/tracking')} className="back-btn">
+          <button onClick={() => navigate('/loans')} className="back-btn">
             <ArrowLeft size={20} />
-            Back to Tracking
+            Back to Loans
           </button>
           <div className="header-info">
             <h1>Payment Tracking</h1>

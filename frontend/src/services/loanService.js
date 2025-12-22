@@ -52,10 +52,14 @@ class LoanService {
   async getComprehensiveTracking(loanId) {
     try {
       console.log(`📊 Fetching comprehensive tracking for loan ID: ${loanId}`);
-      const response = await ApiService.get(`/api/loan-tracking/loan/${loanId}/comprehensive`);
+      
+      const response = await ApiService.get(`/loan-tracking/loan/${loanId}/comprehensive`);
+      // const response = await ApiService.get(`/loan-tracking/late`);
+
       console.log('✅ Comprehensive tracking data received:', response);
       return response;
     } catch (error) {
+       alert(`Loan data for ID ${loanId} not found. Please verify the loan ID.`);
       console.error(`❌ Error fetching comprehensive tracking for loan ${loanId}:`, error);
       throw error;
     }

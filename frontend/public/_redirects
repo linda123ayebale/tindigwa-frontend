@@ -1,7 +1,7 @@
 # Netlify/Vercel redirects file for React SPA
 
 # API Proxy - Redirect API calls to backend (update with your backend URL)
-/api/*  http://localhost:8082/api/:splat  200
+/api/*  REACT_APP_API_BASE_URL/:splat  200
 
 # SPA Fallback - All other routes go to index.html for client-side routing
 /*    /index.html   200

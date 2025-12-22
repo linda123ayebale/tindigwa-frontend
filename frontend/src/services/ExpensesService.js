@@ -1,17 +1,17 @@
 import axios from 'axios';
 import api from './api';
 
-const API_URL = 'http://localhost:8082/api';
+const API_URL = process.env.REACT_APP_API_BASE_URL ;
 
 const ExpensesService = {
   // Get all expenses
   getAllExpenses: () => {
-    return axios.get(API_URL);
+    return axios.get(API_URL + '/expense');
   },
 
   // Get expense by ID
   getExpenseById: (id) => {
-    return axios.get(`${API_URL}/${id}`);
+    return axios.get(`${API_URL}/expense/${id}`);
   },
 
   // Create expense
@@ -21,68 +21,68 @@ const ExpensesService = {
 
   // Update expense
   updateExpense: (id, data) => {
-    return axios.put(`${API_URL}/${id}`, data);
+    return axios.put(`${API_URL}/expense/${id}`, data);
   },
 
   // Delete expense
   deleteExpense: (id) => {
-    return axios.delete(`${API_URL}/${id}`);
+    return axios.delete(`${API_URL}/expense/${id}`);
   },
 
   // Get expenses with filters
   getFilteredExpenses: (filters) => {
-    return axios.get(`${API_URL}/filter`, { params: filters });
+    return axios.get(`${API_URL}/expense/filter`, { params: filters });
   },
 
   // === Approval Workflow Methods ===
 
   // Get pending expenses (awaiting approval)
   getPendingExpenses: () => {
-    return api.get('pending');
+    return api.get('/expense/pending');
   },
 
   // Get rejected expenses
   getRejectedExpenses: () => {
-    return axios.get(`${API_URL}/rejected`);
+    return axios.get(`${API_URL}/expense/rejected`);
   },
 
   // Get approved unpaid expenses (expenses to pay)
   getApprovedUnpaidExpenses: () => {
-    return axios.get(`${API_URL}/approved-unpaid`);
+    return axios.get(`${API_URL}/expense/approved-unpaid`);
   },
 
   // Approve expense
   approveExpense: (id, data) => {
-    return axios.post(`${API_URL}/${id}/approve`, data);
+    return axios.post(`${API_URL}/expense/${id}/approve`, data);
   },
 
   // Reject expense
   rejectExpense: (id, data) => {
-    return axios.post(`${API_URL}/${id}/reject`, data);
+    return axios.post(`${API_URL}/expense/${id}/reject`, data);
   },
 
   // Mark expense as paid
   markExpenseAsPaid: (id, data) => {
-    return axios.post(`${API_URL}/${id}/mark-paid`, data);
+    return axios.post(`${API_URL}/expense/${id}/mark-paid`, data);
   },
 
   // Get expense statistics
   getExpenseStatistics: (startDate, endDate) => {
-    return axios.get(`${API_URL}/statistics`, {
+    return axios.get(`${API_URL}/expense/statistics`, {
       params: { startDate, endDate }
     });
   },
 
   // Get expense summary by category
   getExpenseSummaryByCategory: (startDate, endDate) => {
-    return axios.get(`${API_URL}/summary/category`, {
+    return axios.get(`${API_URL}/expense/summary/category`, {
       params: { startDate, endDate }
     });
   },
 
   // Get monthly expense totals
   getMonthlyExpenseTotals: (startDate, endDate) => {
-    return axios.get(`${API_URL}/summary/monthly`, {
+    return axios.get(`${API_URL}/expense/summary/monthly`, {
       params: { startDate, endDate }
     });
   },
@@ -91,7 +91,7 @@ const ExpensesService = {
   uploadReceipt: (expenseId, file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return axios.post(`${API_URL}/${expenseId}/receipt`, formData, {
+    return axios.post(`${API_URL}/expense/${expenseId}/receipt`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -100,14 +100,14 @@ const ExpensesService = {
 
   // Delete receipt
   deleteReceipt: (expenseId) => {
-    return axios.delete(`${API_URL}/${expenseId}/receipt`);
+    return axios.delete(`${API_URL}/expense/${expenseId}/receipt`);
   },
 
   // Bulk import from CSV
   importExpenses: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return axios.post(`${API_URL}/import`, formData, {
+    return axios.post(`${API_URL}/expense/import`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data'
       }
@@ -116,7 +116,7 @@ const ExpensesService = {
 
   // Export to CSV
   exportExpenses: (filters) => {
-    return axios.get(`${API_URL}/export`, {
+    return axios.get(`${API_URL}/expense/export`, {
       params: filters,
       responseType: 'blob'
     });

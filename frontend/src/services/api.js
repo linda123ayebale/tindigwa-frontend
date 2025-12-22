@@ -1,5 +1,5 @@
 // API Configuration and Base Service
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081/api';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 // const API_TIMEOUT = process.env.REACT_APP_API_TIMEOUT || 10000; // Unused for now
 
 // Debug logging enabled for troubleshooting

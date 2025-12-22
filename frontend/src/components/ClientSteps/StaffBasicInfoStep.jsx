@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Camera, X } from 'lucide-react';
 import './StepStyles.css';
+import Sidebar from '../Layout/Sidebar';
 
 const StaffBasicInfoStep = ({ formData, onInputChange, updateFormData, errors = {}, isEditMode = false }) => {
   const [roles, setRoles] = useState([]);
@@ -105,6 +106,9 @@ const StaffBasicInfoStep = ({ formData, onInputChange, updateFormData, errors = 
 
   return (
     <div className="step-container">
+
+            <Sidebar />
+
       <div className="step-header">
         <h2>Basic Information</h2>
         <p>{isEditMode ? 'Please update the staff member\'s personal details' : 'Please provide the staff member\'s personal details'}</p>

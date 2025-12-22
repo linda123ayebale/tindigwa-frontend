@@ -202,7 +202,7 @@ const PaymentService = {
   // Get payment receipt
   getReceipt: async (id) => {
     try {
-      const response = await api.get(`/payments/${id}/receipt`);
+      const response = await api.get(`/payments/receipts/${id}`);
       return response;
     } catch (error) {
       console.error(`Error fetching receipt for payment ${id}:`, error);

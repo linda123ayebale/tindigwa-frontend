@@ -11,6 +11,7 @@ import NotificationModal from '../../components/NotificationModal';
 import { useNotification } from '../../hooks/useNotification';
 import { validatePhoneNumber, validateEmail } from '../../utils/validation';
 import '../Clients/AddClient.css'; // Reuse the same styles
+import Sidebar from '../../components/Layout/Sidebar';
 
 const EditStaff = () => {
   const { id } = useParams();
@@ -327,6 +328,8 @@ const EditStaff = () => {
   // JSX return - matching EditClient structure
   return (
     <div className="stepper-form-layout">
+            <Sidebar />
+
       {/* Header */}
       <div className="stepper-header">
         <div className="header-nav">

@@ -221,7 +221,7 @@ npx playwright test tests/e2e/loan-edit.spec.ts -g "should navigate to Edit page
 
 # Run with custom URLs
 FRONTEND_BASE_URL=http://localhost:3001 \
-BACKEND_BASE_URL=http://localhost:8082/api \
+BACKEND_BASE_URL=REACT_APP_API_BASE_URL \
 npm run test:e2e:loan-edit
 
 # View test report

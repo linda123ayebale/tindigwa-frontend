@@ -1,5 +1,6 @@
 import React from 'react';
 import './StepStyles.css';
+import Sidebar from '../Layout/Sidebar';
 
 const ContactAddressStep = ({ formData, updateFormData, errors = {}, isEditMode = false }) => {
   const handleChange = (e) => {
@@ -9,6 +10,7 @@ const ContactAddressStep = ({ formData, updateFormData, errors = {}, isEditMode 
 
   return (
     <div className="step-container">
+      <Sidebar />
       <div className="step-header">
         <h2>Contact & Address</h2>
         <p>{isEditMode ? 'Please update contact information and address details' : 'Please provide contact information and address details'}</p>

@@ -40,7 +40,7 @@ const EditExpense = () => {
         let expense = location.state?.expense;
         
         if (!expense) {
-          const response = await api.get(`/expenses/${id}`);
+          const response = await api.get(`/expense/${id}`);
           expense = response;
         }
 
@@ -53,7 +53,7 @@ const EditExpense = () => {
         });
       } catch (error) {
         showError('Failed to load expense details');
-        navigate('/expenses');
+        navigate('/expense');
       } finally {
         setLoading(false);
       }
@@ -86,7 +86,7 @@ const EditExpense = () => {
         amount: parseFloat(formData.amount),
         expenseDate: formData.expenseDate
       };
-      await api.put(`/expenses/${id}`, payload);
+      await api.put(`/expense/${id}`, payload);
       showSuccess('Expense updated successfully');
       navigate('/expenses');
     } catch (error) {

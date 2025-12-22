@@ -21,7 +21,7 @@
 [[redirects]]
   # API proxy - redirect to your backend
   from = "/api/*"
-  to = "http://localhost:8082/api/:splat"
+  to = "REACT_APP_API_BASE_URL/:splat"
   status = 200
   force = true
   

@@ -68,7 +68,7 @@ const Sidebar = () => {
         { title: 'Pending Approvals', icon: Clock, path: '/loans/pending' },
         { title: 'Rejected Loans', icon: XCircle, path: '/loans/rejected' },
         { title: 'Archived Loans', icon: Archive, path: '/loans/archived' },
-        { title: 'Loan Tracking', icon: Target, path: '/loans/tracking' }
+        // { title: 'Loan Tracking', icon: Target, path: '/loans/tracking' }
       ]
     },
     { 
@@ -105,26 +105,26 @@ const Sidebar = () => {
 },
 
 
-    { 
-      key: 'finances',
-      title: 'Finances', 
-      icon: BarChart3, 
-      path: '/finances' 
-    },
+  //   { 
+  //     key: 'finances',
+  //     title: 'Finances', 
+  //     icon: BarChart3, 
+  //     path: '/finances' 
+  //   },
 
-    { 
-      key: 'reports',
-      title: 'Reports', 
-      icon: FileText, 
-      path: '/reports' 
-    },
-    { 
-      key: 'settings',
-      title: 'Settings', 
-      icon: Settings, 
-      path: '/settings' 
-    }
-  ];
+  //   { 
+  //     key: 'reports',
+  //     title: 'Reports', 
+  //     icon: FileText, 
+  //     path: '/reports' 
+  //   },
+  //   { 
+  //     key: 'settings',
+  //     title: 'Settings', 
+  //     icon: Settings, 
+  //     path: '/settings' 
+  //   }
+   ];
 
   const isActive = (path) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
@@ -136,9 +136,9 @@ const Sidebar = () => {
 
   return (
     <aside className="dashboard-sidebar">
-      <div className="sidebar-header">
-        <h2>TINDIGWA</h2>
-      </div>
+     <div className="sidebar-header">
+  <h3 style={{ padding: '20px' }}>CASH TANK FINANCE</h3>
+</div>
       
       <nav className="sidebar-nav">
         {sidebarItems.map((item) => {

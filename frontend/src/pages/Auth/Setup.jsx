@@ -66,7 +66,7 @@ const Setup = ({ onSetupComplete }) => {
       });
 
       // Call the actual backend setup API
-      const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8081/api';
+      const apiBaseUrl = process.env.REACT_APP_API_BASE_URL ;
       const response = await fetch(`${apiBaseUrl}/auth/setup`, {
         method: 'POST',
         headers: {

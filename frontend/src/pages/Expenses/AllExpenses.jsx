@@ -39,7 +39,7 @@ const AllExpenses = () => {
       setError(null);
       console.log('🔄 Fetching expenses from API...');
       
-      const response = await api.get('/expenses');
+      const response = await api.get('/expense');
       console.log('✅ Expenses fetched:', response);
       
       setExpenses(Array.isArray(response) ? response : []);
@@ -76,7 +76,7 @@ const AllExpenses = () => {
     if (!deletingExpense) return;
     
     try {
-      await api.delete(`/expenses/${deletingExpense.id}`);
+      await api.delete(`/expense/${deletingExpense.id}`);
       showSuccess(`Expense "${deletingExpense.expenseName || deletingExpense.description}" deleted successfully`);
       setShowDeleteModal(false);
       setDeletingExpense(null);

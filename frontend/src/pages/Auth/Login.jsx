@@ -38,84 +38,164 @@ const Login = ({ setIsAuthenticated }) => {
     setError('');
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError('');
 
-    try {
-      // Validate email format
-      const emailValidation = validateEmail(formData.email, true);
-      if (!emailValidation.isValid) {
-        setError(emailValidation.error);
-        setLoading(false);
+  //   try {
+  //     // Validate email format
+  //     const emailValidation = validateEmail(formData.email, true);
+  //     if (!emailValidation.isValid) {
+  //       setError(emailValidation.error);
+  //       setLoading(false);
+  //       return;
+  //     }
+      
+  //     if (formData.email && formData.password) {
+  //       // Use real authentication service
+  //       const response = await AuthService.login(formData.email, formData.password);
+        
+  //       console.log('Login response:', response);
+        
+  //       // Check if OTP is required (2FA enabled)
+  //       if (response.requiresOtp) {
+  //         console.log('2FA enabled - redirecting to OTP verification');
+  //         // Clear form but keep error state
+  //         setFormData({ email: '', password: '' });
+  //         // Redirect to OTP verification page
+  //         navigate('/verify-otp');
+  //         return;
+  //       }
+        
+  //       // Normal login flow (no 2FA)
+  //       console.log('Login successful (no 2FA)');
+        
+  //       // Clear form data after successful login
+  //       clearForm();
+        
+  //       // Set authentication state
+  //       setIsAuthenticated(true);
+        
+  //     console.log('Login successful (no 2FA)');
+  //     // Store auth token if provided
+  //     if (response.token) {
+  //       localStorage.setItem('authToken', response.token);
+  //     }
+
+  //       // Small delay to ensure token is properly stored before navigation
+  //       setTimeout(() => {
+  //         navigate('/dashboard');
+  //       }, 100);
+  //     } else {
+  //       setError('Please enter both email and password');
+  //     }
+  //   } catch (err) {
+  //     console.error('Login error:', err);
+      
+  //     // Provide user-friendly error messages
+  //     let errorMessage = 'Login failed. Please try again.';
+      
+  //     if (err.message) {
+  //       const msg = err.message.toLowerCase();
+        
+  //       // Handle specific error cases
+  //       if (msg.includes('invalid username or password') || 
+  //           msg.includes('bad credentials') || 
+  //           msg.includes('401')) {
+  //         errorMessage = 'Incorrect email or password. Please try again.';
+  //       } else if (msg.includes('user not found') || msg.includes('404')) {
+  //         errorMessage = 'No account found with this email address.';
+  //       } else if (msg.includes('cannot connect') || msg.includes('network') || msg.includes('fetch')) {
+  //         errorMessage = 'Unable to connect to server. Please check your internet connection.';
+  //       } else if (msg.includes('session has expired') || msg.includes('403')) {
+  //         errorMessage = 'Your session has expired. Please try logging in again.';
+  //       } else if (!msg.includes('http error')) {
+  //         // If it's a clear message from backend (not a generic HTTP error), use it
+  //         errorMessage = err.message;
+  //       }
+  //     }
+      
+  //     setError(errorMessage);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+
+  try {
+    // Validate email format
+    const emailValidation = validateEmail(formData.email, true);
+    if (!emailValidation.isValid) {
+      setError(emailValidation.error);
+      setLoading(false);
+      return;
+    }
+
+    if (formData.email && formData.password) {
+      // Call login API
+      const response = await AuthService.login(formData.email, formData.password);
+      console.log('Login response:', response);
+
+      // Check if OTP is required
+      if (response.requiresOtp) {
+        console.log('2FA enabled - redirecting to OTP verification');
+        // Save email or other info if needed
+        setFormData({ email: '', password: '' }); // Reset form
+        // Redirect to OTP verification page
+        navigate('/verify-otp', { state: { email: formData.email } });
         return;
       }
-      
-      if (formData.email && formData.password) {
-        // Use real authentication service
-        const response = await AuthService.login(formData.email, formData.password);
-        
-        console.log('Login response:', response);
-        
-        // Check if OTP is required (2FA enabled)
-        if (response.requiresOtp) {
-          console.log('2FA enabled - redirecting to OTP verification');
-          // Clear form but keep error state
-          setFormData({ email: '', password: '' });
-          // Redirect to OTP verification page
-          navigate('/verify-otp');
-          return;
-        }
-        
-        // Normal login flow (no 2FA)
-        console.log('Login successful (no 2FA)');
-        
-        // Clear form data after successful login
-        clearForm();
-        
-        // Set authentication state
-        setIsAuthenticated(true);
-        
-        // Small delay to ensure token is properly stored before navigation
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 100);
-      } else {
-        setError('Please enter both email and password');
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      
-      // Provide user-friendly error messages
-      let errorMessage = 'Login failed. Please try again.';
-      
-      if (err.message) {
-        const msg = err.message.toLowerCase();
-        
-        // Handle specific error cases
-        if (msg.includes('invalid username or password') || 
-            msg.includes('bad credentials') || 
-            msg.includes('401')) {
-          errorMessage = 'Incorrect email or password. Please try again.';
-        } else if (msg.includes('user not found') || msg.includes('404')) {
-          errorMessage = 'No account found with this email address.';
-        } else if (msg.includes('cannot connect') || msg.includes('network') || msg.includes('fetch')) {
-          errorMessage = 'Unable to connect to server. Please check your internet connection.';
-        } else if (msg.includes('session has expired') || msg.includes('403')) {
-          errorMessage = 'Your session has expired. Please try logging in again.';
-        } else if (!msg.includes('http error')) {
-          // If it's a clear message from backend (not a generic HTTP error), use it
-          errorMessage = err.message;
-        }
-      }
-      
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
 
+      // If no OTP required, login success
+      console.log('Login successful (no 2FA)');
+      // Store auth token if any
+      if (response.token) {
+        localStorage.setItem('authToken', response.token);
+      }
+      // Set auth state
+      setIsAuthenticated(true);
+      // Redirect to login page
+      navigate('/login');
+    } else {
+      setError('Please enter both email and password');
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    let errorMessage = 'Login failed. Please try again.';
+    if (err.message) {
+      const msg = err.message.toLowerCase();
+      if (
+        msg.includes('invalid username or password') ||
+        msg.includes('bad credentials') ||
+        msg.includes('401')
+      ) {
+        errorMessage = 'Incorrect email or password. Please try again.';
+      } else if (msg.includes('user not found') || msg.includes('404')) {
+        errorMessage = 'No account found with this email address.';
+      } else if (
+        msg.includes('cannot connect') ||
+        msg.includes('network') ||
+        msg.includes('fetch')
+      ) {
+        errorMessage =
+          'Unable to connect to server. Please check your internet connection.';
+      } else if (msg.includes('session has expired') || msg.includes('403')) {
+        errorMessage = 'Your session has expired. Please try logging in again.';
+      } else {
+        errorMessage = err.message;
+      }
+    }
+    setError(errorMessage);
+  } finally {
+    setLoading(false);
+  }
+};
   const clearForm = () => {
     setFormData({
       email: '',
