@@ -14,7 +14,7 @@ spring.security.debug=false
 # SERVER CONFIGURATION
 # ============================================
 # Running on HTTP for development (SSL disabled temporarily)
-server.port=8081
+server.port=8082
 
 # SSL/TLS Configuration (DISABLED for development)
 # TODO: Enable SSL for production deployment

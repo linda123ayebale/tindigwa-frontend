@@ -7,7 +7,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-BASE_URL="http://localhost:8081/api/loans"
+BASE_URL="http://localhost:8082/api/loans"
 
 echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}  Loan Status Harmonization Tests${NC}"

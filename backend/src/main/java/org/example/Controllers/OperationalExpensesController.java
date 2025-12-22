@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/expenses")
+@RequestMapping("/api/expense")
 @CrossOrigin(origins = "*")
 public class OperationalExpensesController {
     @Autowired
@@ -87,7 +87,7 @@ public class OperationalExpensesController {
     }
 
     // Update expense
-    @PutMapping("/{id}")
+    @PutMapping("/edit/{id}")
     public ResponseEntity<OperationalExpenseResponseDTO> updateExpense(@PathVariable Long id, @Valid @RequestBody OperationalExpenseRequestDTO request) {
         OperationalExpenseResponseDTO updated = facadeService.updateExpense(id, request);
         return ResponseEntity.ok(updated);

@@ -57,6 +57,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/expense-categories/**").permitAll()
                         .requestMatchers("/api/expense/**").permitAll()
                         .requestMatchers("/api/actuator/health").permitAll()
+                        .requestMatchers("/api/loan-tracking/**").permitAll()
+                        .requestMatchers("/api/payments/receipts/**").permitAll()
+                        .requestMatchers("/api/staff/**").permitAll()
+
 
                         // Public endpoints - authentication/setup/OTP
                         .requestMatchers("/api/auth/login", "/api/auth/setup", "/api/auth/setup-status", 
@@ -70,6 +74,7 @@ public class SecurityConfig {
                         
                         // Admin-only endpoints
                         .requestMatchers("/api/loans/admin/**", "/api/users/admins/**").hasRole("ADMIN")
+
                         .requestMatchers("/api/*/admin/**").hasRole("ADMIN")
                         
                         // Loan officer endpoints

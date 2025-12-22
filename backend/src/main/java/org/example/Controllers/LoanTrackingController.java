@@ -51,11 +51,16 @@ public class LoanTrackingController {
      */
     @GetMapping("/loan/{loanId}/comprehensive")
     public ResponseEntity<?> getComprehensiveTracking(@PathVariable Long loanId) {
+        System.out.println("Fetching comprehensive data for loanId: " + loanId);
+
         try {
             Map<String, Object> comprehensive = new HashMap<>();
             
             // 1. Get tracking data
             Optional<LoanTracking> trackingOpt = trackingService.getTrackingByLoanId(loanId);
+
+            System.out.println("track oo1: " + trackingOpt.toString());
+
             if (trackingOpt.isEmpty()) {
                 return ResponseEntity.notFound().build();
             }

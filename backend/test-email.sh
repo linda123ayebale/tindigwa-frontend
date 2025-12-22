@@ -3,7 +3,7 @@
 # Test Email Configuration Script
 # This script tests the SMTP email functionality
 
-BACKEND_URL="http://localhost:8081/api"
+BACKEND_URL="http://localhost:8082/api"
 TEST_EMAIL="lindakellen9@gmail.com"
 
 echo "=========================================="
