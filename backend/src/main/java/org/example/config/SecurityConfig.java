@@ -54,6 +54,8 @@ public class SecurityConfig {
 
                         //just added for production environment
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/forgot-password").permitAll()
+                        .requestMatchers("/api/auth/reset-password").permitAll()
                         .requestMatchers("/api/expense-categories/**").permitAll()
                         .requestMatchers("/api/expense/**").permitAll()
                         .requestMatchers("/api/actuator/health").permitAll()
