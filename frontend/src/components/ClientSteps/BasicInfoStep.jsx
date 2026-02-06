@@ -117,9 +117,19 @@ const BasicInfoStep = ({ formData, onInputChange, updateFormData, errors = {}, i
               id="nationalId"
               name="nationalId"
               value={formData.nationalId || ''}
-              onChange={handleChange}
+              onChange={(e) => {
+                // Auto-convert to uppercase as user types
+                const { name } = e.target;
+                const value = e.target.value.toUpperCase();
+                if (onInputChange) {
+                  onInputChange(name, value);
+                } else if (updateFormData) {
+                  updateFormData({ [name]: value });
+                }
+              }}
               className={`form-input ${errors.nationalId ? 'error' : ''}`}
-              placeholder="Enter national ID number"
+              placeholder="Enter National ID"
+              maxLength="14"
               required
             />
             {errors.nationalId && <span className="error-message">{errors.nationalId}</span>}

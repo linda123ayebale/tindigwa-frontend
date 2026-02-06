@@ -29,6 +29,7 @@ const ExpenseCategories = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
@@ -87,6 +88,7 @@ const ExpenseCategories = () => {
   const handleDeleteCategory = (category) => {
     console.log('🗑️ Delete button clicked for category:', category);
     setCategoryToDelete(category);
+    setDeleteError(null); // Clear any previous error
     setShowDeleteModal(true);
   };
   
@@ -115,11 +117,11 @@ const ExpenseCategories = () => {
       console.error('❌ Error deleting category:', error);
       const errorMessage = error.response?.data?.message || error.message;
       
-      // Check if it's a 409 conflict (category in use)
+      // Show error in the modal instead of closing it
       if (error.response?.status === 409) {
-        showError(`Cannot delete "${categoryToDelete.categoryName}": ${errorMessage}. Please deactivate it instead.`);
+        setDeleteError(errorMessage || `Cannot delete "${categoryToDelete.categoryName}" because it has associated expenses. Consider deactivating it instead.`);
       } else {
-        showError(`Failed to delete ${categoryToDelete.categoryName}: ${errorMessage}`);
+        setDeleteError(`Failed to delete: ${errorMessage}`);
       }
     } finally {
       setIsDeleting(false);
@@ -130,6 +132,7 @@ const ExpenseCategories = () => {
     setShowDeleteModal(false);
     setCategoryToDelete(null);
     setIsDeleting(false);
+    setDeleteError(null);
   };
 
   const handleToggleActive = async (category) => {
@@ -489,6 +492,7 @@ const ExpenseCategories = () => {
           isDeleting={isDeleting}
           itemName={categoryToDelete.categoryName}
           itemType="category"
+          errorMessage={deleteError}
         />
       )}
 

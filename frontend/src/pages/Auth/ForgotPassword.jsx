@@ -36,10 +36,11 @@ const ForgotPassword = () => {
       
       if (response && response.message) {
         console.log('Password reset email sent successfully');
+          setSuccess(true);
+      setLoading(false);
       }
       
-      setSuccess(true);
-      setLoading(false);
+     
     } catch (err) {
       console.error('Password reset error:', err);
       setError(err.message || 'Failed to send reset email. Please try again.');

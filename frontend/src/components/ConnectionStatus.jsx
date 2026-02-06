@@ -7,6 +7,7 @@ const ConnectionStatus = () => {
     lastCheck: null,
     error: null
   });
+  const [isVisible, setIsVisible] = useState(true);
 
   const checkBackendConnection = async () => {
     try {
@@ -39,6 +40,17 @@ const ConnectionStatus = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Auto-hide after 5 seconds regardless of status
+  useEffect(() => {
+    if (status.backend === 'connected' || status.backend === 'disconnected') {
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [status.backend]);
+
   const getStatusColor = () => {
     switch (status.backend) {
       case 'connected': return '#28a745';
@@ -57,6 +69,11 @@ const ConnectionStatus = () => {
     }
   };
 
+  // Don't render if closed
+  if (!isVisible) {
+    return null;
+  }
+
   return (
     <div style={{
       position: 'fixed',
@@ -71,26 +88,47 @@ const ConnectionStatus = () => {
       zIndex: 1000,
       minWidth: '250px'
     }}>
+      {/* Header with status and buttons */}
       <div style={{ 
         display: 'flex', 
         alignItems: 'center', 
-        gap: '10px',
+        justifyContent: 'space-between',
         marginBottom: '5px'
       }}>
-        <span style={{ fontWeight: 'bold', color: getStatusColor() }}>
-          {getStatusText()}
-        </span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontWeight: 'bold', color: getStatusColor() }}>
+            {getStatusText()}
+          </span>
+          <button
+            onClick={checkBackendConnection}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '16px',
+              padding: '0'
+            }}
+            title="Refresh connection status"
+          >
+            🔄
+          </button>
+        </div>
+        
+        {/* Close button */}
         <button
-          onClick={checkBackendConnection}
+          onClick={() => setIsVisible(false)}
           style={{
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            fontSize: '16px'
+            fontSize: '18px',
+            padding: '0',
+            lineHeight: '1',
+            color: '#666'
           }}
-          title="Refresh connection status"
+          title="Close"
         >
-          🔄
+          ×
         </button>
       </div>
       

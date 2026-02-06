@@ -171,6 +171,31 @@
   letter-spacing: 0.5px;
 }
 
+/* Error Section */
+.error-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border: 1px solid #dc2626;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.error-icon {
+  color: #dc2626;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.error-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #991b1b;
+  line-height: 1.5;
+}
+
 /* Footer */
 .modal-footer {
   padding: 0 32px 32px 32px;

@@ -9,11 +9,14 @@ const ConfirmDeleteModal = ({
   itemDetails = [],
   onConfirm,
   onCancel,
+  onClose,
   isDeleting = false,
   customTitle,
   customMessage,
-  customWarning
+  customWarning,
+  errorMessage = null
 }) => {
+  const handleClose = onClose || onCancel;
   if (!isOpen) return null;
 
   const defaultTitle = `Delete ${itemType.charAt(0).toUpperCase() + itemType.slice(1)} Confirmation`;
@@ -22,7 +25,7 @@ const ConfirmDeleteModal = ({
 
   const handleOverlayClick = (e) => {
     if (e.target === e.currentTarget) {
-      onCancel();
+      handleClose();
     }
   };
 
@@ -32,7 +35,7 @@ const ConfirmDeleteModal = ({
         {/* Close Button */}
         <button 
           className="modal-close-btn"
-          onClick={onCancel}
+          onClick={handleClose}
           disabled={isDeleting}
           aria-label="Close"
         >
@@ -74,44 +77,71 @@ const ConfirmDeleteModal = ({
           )}
 
           {/* Warning */}
-          <div className="warning-section">
-            <div className="warning-icon">
-              <AlertTriangle size={16} />
+          {!errorMessage && (
+            <div className="warning-section">
+              <div className="warning-icon">
+                <AlertTriangle size={16} />
+              </div>
+              <span className="warning-text">
+                {customWarning || defaultWarning}
+              </span>
             </div>
-            <span className="warning-text">
-              {customWarning || defaultWarning}
-            </span>
-          </div>
+          )}
+
+          {/* Error Message */}
+          {errorMessage && (
+            <div className="error-section">
+              <div className="error-icon">
+                <X size={16} />
+              </div>
+              <span className="error-text">
+                {errorMessage}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Footer */}
         <div className="modal-footer">
-          <button
-            type="button"
-            className="btn btn-cancel"
-            onClick={onCancel}
-            disabled={isDeleting}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            className="btn btn-delete"
-            onClick={onConfirm}
-            disabled={isDeleting}
-          >
-            {isDeleting ? (
-              <>
-                <div className="btn-spinner"></div>
-                Deleting...
-              </>
-            ) : (
-              <>
-                <Trash2 size={16} />
-                Delete {itemType.charAt(0).toUpperCase() + itemType.slice(1)}
-              </>
-            )}
-          </button>
+          {errorMessage ? (
+            <button
+              type="button"
+              className="btn btn-cancel"
+              onClick={handleClose}
+              style={{ width: '100%' }}
+            >
+              Close
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                className="btn btn-cancel"
+                onClick={handleClose}
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-delete"
+                onClick={onConfirm}
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <div className="btn-spinner"></div>
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={16} />
+                    Delete {itemType.charAt(0).toUpperCase() + itemType.slice(1)}
+                  </>
+                )}
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

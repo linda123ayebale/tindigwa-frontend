@@ -50,7 +50,7 @@ export const validateEmail = (email, isRequired = false) => {
 };
 
 /**
- * Validates a National ID
+ * Validates a Uganda National ID (NIN)
  * @param {string} nationalId - The national ID to validate
  * @param {boolean} isRequired - Whether the national ID is required
  * @returns {Object} - { isValid: boolean, error: string }
@@ -65,21 +65,35 @@ export const validateNationalId = (nationalId, isRequired = false) => {
     return { isValid: true, error: '' };
   }
 
-  // Convert to uppercase for validation
-  const idUpperCase = nationalId.toUpperCase().trim();
+  // Remove spaces and convert to uppercase for validation
+  const cleaned = nationalId.replace(/\s/g, '').toUpperCase();
 
-  // Check if it has exactly 14 characters
-  if (idUpperCase.length !== 14) {
+  // Rule 1: Must be exactly 14 characters
+  if (cleaned.length !== 14) {
     return { isValid: false, error: 'National ID must be exactly 14 characters' };
   }
 
-  // Check if it contains only alphanumeric characters (letters and numbers)
-  const alphanumericRegex = /^[A-Z0-9]+$/;
-  if (!alphanumericRegex.test(idUpperCase)) {
+  // Rule 2: Must start with a letter
+  if (!/^[A-Z]/.test(cleaned)) {
+    return { isValid: false, error: 'National ID must start with a letter' };
+  }
+
+  // Rule 3: Second character must be M or F (gender)
+  if (cleaned[1] !== 'M' && cleaned[1] !== 'F') {
+    return { isValid: false, error: 'Second character must be M or F' };
+  }
+
+  // Rule 4: Must contain only letters and numbers
+  if (!/^[A-Z0-9]+$/.test(cleaned)) {
     return { isValid: false, error: 'National ID must contain only letters and numbers' };
   }
 
-  return { isValid: true, error: '' };
+  // Rule 5: Must contain at least some digits
+  if (!/\d/.test(cleaned)) {
+    return { isValid: false, error: 'National ID must contain numbers' };
+  }
+
+  return { isValid: true, error: '', value: cleaned };
 };
 
 /**

@@ -200,6 +200,15 @@
   font-weight: 500;
 }
 
+/* Input Hint Text */
+.input-hint {
+  display: block;
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+  font-style: italic;
+}
+
 /* Photo Upload Section */
 .photo-upload-section {
   margin-bottom: 32px;

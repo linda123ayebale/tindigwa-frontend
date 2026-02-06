@@ -94,6 +94,7 @@ import { isTokenExpired } from './utils/tokenUtils';
 import { clearAuthData } from './services/api';
 import AuthService from './services/authService';
 import LoanTracking from './pages/Loans/LoanTracking.jsx';
+import ResetPassword from './pages/Auth/ResetPassword.jsx';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -166,10 +167,11 @@ function App() {
 
         {/* Auth */}
         <Route path="/setup" element={isSetupCompleted ? <Setup onSetupComplete={refetchSetupStatus} /> : <Navigate to="/login" replace />} />
-        <Route path="/login" element={isAuthenticated ? <OtpVerification setIsAuthenticated={setIsAuthenticated} />: <Login setIsAuthenticated={setIsAuthenticated} />} />
+        <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login setIsAuthenticated={setIsAuthenticated} />} />
 +        <Route path="/verify-otp" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <OtpVerification setIsAuthenticated={setIsAuthenticated} />} />
  
-        <Route path="/forgot-password" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <ForgotPassword />} />
+        <Route path="/forgot-password" element={isAuthenticated ? <Navigate to="/login" replace /> : <ForgotPassword />} />
+        <Route path="/reset-password" element={isAuthenticated ? <Navigate to="/login" replace /> : <ResetPassword />} />
 
         {/* Dashboard */}
         <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" replace />} />

@@ -10,7 +10,7 @@ import EmploymentStep from '../../components/ClientSteps/EmploymentStep';
 import DocumentsReviewStep from '../../components/ClientSteps/DocumentsReviewStep';
 import NotificationModal from '../../components/NotificationModal';
 import { useNotification } from '../../hooks/useNotification';
-import { validatePhoneNumber, validateEmail } from '../../utils/validation';
+import { validatePhoneNumber, validateEmail, validateNationalId } from '../../utils/validation';
 import './AddClient.css';
 import Sidebar from '../../components/Layout/Sidebar';
 
@@ -72,6 +72,18 @@ const AddClient = () => {
 
   const updateFormData = (updates) => {
     setFormData(prev => ({ ...prev, ...updates }));
+    
+    // Clear errors for fields that are being updated
+    const updatedFields = Object.keys(updates);
+    if (updatedFields.length > 0) {
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        updatedFields.forEach(field => {
+          delete newErrors[field];
+        });
+        return newErrors;
+      });
+    }
   };
 
   const validateStep = (step) => {
@@ -82,8 +94,13 @@ const AddClient = () => {
         if (!formData.firstName?.trim()) newErrors.firstName = 'First name is required';
         if (!formData.lastName?.trim()) newErrors.lastName = 'Last name is required';
         if (!formData.gender?.trim()) newErrors.gender = 'Gender is required';
-        if (!formData.nationalId?.trim()) newErrors.nationalId = 'National ID is required';
         if (!formData.maritalStatus?.trim()) newErrors.maritalStatus = 'Marital status is required';
+        
+        // National ID validation - MANDATORY with Uganda NIN format
+        const ninValidation = validateNationalId(formData.nationalId, true);
+        if (!ninValidation.isValid) {
+          newErrors.nationalId = ninValidation.error;
+        }
         
         // Phone number validation - MANDATORY
         const phoneValidation = validatePhoneNumber(formData.phoneNumber);
