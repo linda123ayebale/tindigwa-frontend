@@ -5,8 +5,8 @@ public class CategoryInUseException extends RuntimeException {
     private final long expenseCount;
     
     public CategoryInUseException(Long categoryId, long expenseCount) {
-        super(String.format("Cannot delete category with id %d: it has %d associated expenses. Consider deactivating instead.", 
-            categoryId, expenseCount));
+        super(String.format("Cannot delete this category. It has %d associated expense(s). Consider deactivating instead.", 
+            expenseCount));
         this.categoryId = categoryId;
         this.expenseCount = expenseCount;
     }
