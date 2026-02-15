@@ -14,7 +14,7 @@ const ConnectionStatus = () => {
       setStatus(prev => ({ ...prev, backend: 'checking', error: null }));
       
       // Try to hit a simple endpoint to check connectivity
-      await ApiService.get('/clients');
+      await ApiService.get('/auth/check-connection');
       
       setStatus({
         backend: 'connected',
@@ -41,15 +41,17 @@ const ConnectionStatus = () => {
   }, []);
 
   // Auto-hide after 5 seconds regardless of status
-  useEffect(() => {
-    if (status.backend === 'connected' || status.backend === 'disconnected') {
-      const timer = setTimeout(() => {
-        setIsVisible(false);
-      }, 5000);
+  // useEffect(() => {
+  //   if (status.backend === 'connected' || status.backend === 'disconnected') {
+  //     const timer = setTimeout(() => {
+  //       setIsVisible(false);
+  //     }, 5000);
       
-      return () => clearTimeout(timer);
-    }
-  }, [status.backend]);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [status.backend]);
+
+  if(status.backend === 'connected') return null; // Don't show anything while checking
 
   const getStatusColor = () => {
     switch (status.backend) {
@@ -62,17 +64,17 @@ const ConnectionStatus = () => {
 
   const getStatusText = () => {
     switch (status.backend) {
-      case 'connected': return '✅ Backend Connected';
-      case 'disconnected': return '❌ Backend Disconnected';
+      case 'connected': return '✅ Connected';
+      case 'disconnected': return '❌ Not Connected';
       case 'checking': return '🔄 Checking Connection...';
       default: return '❓ Unknown Status';
     }
   };
 
   // Don't render if closed
-  if (!isVisible) {
-    return null;
-  }
+  // if (!isVisible) {
+  //   return null;
+  // }
 
   return (
     <div style={{
@@ -110,7 +112,7 @@ const ConnectionStatus = () => {
             }}
             title="Refresh connection status"
           >
-            🔄
+            
           </button>
         </div>
         
@@ -134,7 +136,7 @@ const ConnectionStatus = () => {
       
       {status.lastCheck && (
         <div style={{ fontSize: '12px', color: '#666' }}>
-          Last checked: {status.lastCheck}
+          {status.lastCheck}
         </div>
       )}
       
@@ -145,13 +147,13 @@ const ConnectionStatus = () => {
           marginTop: '5px',
           wordBreak: 'break-word'
         }}>
-          Error: {status.error}
+          {status.error}
         </div>
       )}
       
-      <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
+      {/* <div style={{ fontSize: '12px', color: '#666', marginTop: '5px' }}>
         Backend: {process.env.REACT_APP_API_BASE_URL?.replace('/api', '') || 'http://localhost:8082'}
-      </div>
+      </div> */}
     </div>
   );
 };

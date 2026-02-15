@@ -3,6 +3,8 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { toast } from 'react-hot-toast';
 
+const API_BASE_WS_URL = process.env.REACT_APP_WS_URL;
+
 const useExpenseWebSocket = (onMessage) => {
   const clientRef = useRef(null);
   const isConnectedRef = useRef(false);
@@ -10,7 +12,7 @@ const useExpenseWebSocket = (onMessage) => {
   const connect = useCallback(() => {
     if (isConnectedRef.current) return;
 
-    const socket = new SockJS('http://localhost:8081/ws');
+    const socket = new SockJS(API_BASE_WS_URL ? API_BASE_WS_URL : 'http://localhost:8081/ws');
     const client = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
